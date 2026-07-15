@@ -32,7 +32,15 @@
     .제안중{background:#fff0f0;color:#b73838} .계약완료{background:#e9f8ef;color:#167347} .보류{background:#f0f2f5;color:#596273}
     .empty{padding:44px;text-align:center;color:var(--muted)} .side{padding:18px} .side h2{margin:0 0 14px;font-size:20px} .form-grid{display:grid;gap:10px}
     .two{display:grid;grid-template-columns:1fr 1fr;gap:10px} label{font-size:13px;font-weight:800;color:#59677f} .form-actions{display:flex;gap:8px;margin-top:6px} .form-actions .btn{flex:1}
-    .actions-cell{display:flex;gap:6px} .icon-btn{border:0;background:#eef4ff;color:#24477f;border-radius:9px;padding:7px 9px;font-weight:800} .icon-btn.del{background:#fff0f0;color:#b52d2d}
+    .actions-cell{
+  display:flex;
+  gap:6px;
+  position:relative;
+  z-index:9999;
+} .icon-btn{
+  position:relative;
+  z-index:9999;
+}.icon-btn{border:0;background:#eef4ff;color:#24477f;border-radius:9px;padding:7px 9px;font-weight:800} .icon-btn.del{background:#fff0f0;color:#b52d2d}
     @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}}
     @media(max-width:620px){.wrap{padding:18px 12px 50px}.top{padding:0 12px}.brand{font-size:18px}.title-row{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
   </style>
