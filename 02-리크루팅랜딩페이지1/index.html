@@ -25,6 +25,19 @@
 .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:0 auto 18px}.card{border:1px solid var(--line);border-radius:16px;padding:24px 12px;background:rgba(20,24,33,.9)}.number{color:var(--gold);font-size:clamp(33px,7vw,48px);font-weight:950;line-height:1}.label{font-size:clamp(15px,3.8vw,20px);font-weight:750;margin-top:10px}.full-width{margin:18px auto 42px;background:var(--gold);color:#070707;font-size:clamp(23px,5vw,34px);font-weight:950;padding:22px 14px;border-radius:16px}
 .apply{padding:42px 0 110px;border-top:1px solid rgba(255,255,255,.08)}.apply h2{font-size:clamp(26px,6vw,38px);margin:0 0 8px}.apply .desc{color:var(--muted);margin:0 0 24px}.form{max-width:620px;margin:auto;text-align:left;background:rgba(20,24,33,.94);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px}.field{margin-bottom:16px}.field label{display:block;font-weight:800;margin-bottom:7px}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(255,255,255,.16);background:#0c1017;color:#fff;border-radius:11px;padding:14px;font:inherit;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}.field textarea{min-height:90px;resize:vertical}.agree{display:flex;align-items:flex-start;gap:9px;color:#d4d9e2;font-size:13px;margin:6px 0 18px}.agree input{margin-top:4px}.submit{width:100%;min-height:58px;font-size:18px}.kakao-secondary{margin-top:12px!important;background:transparent!important;color:#fee500!important;border:1px solid rgba(254,229,0,.65)!important;box-shadow:none!important;font-size:15px!important;min-height:50px!important}.notice{font-size:12px;color:#929bab;text-align:center;margin-top:12px}.sticky{position:fixed;z-index:10;left:0;right:0;bottom:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(7,8,11,.92);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.12)}.sticky .btn{width:min(620px,100%);min-height:52px}.toast{position:fixed;z-index:30;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#fff;color:#111;border-radius:12px;padding:12px 17px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;white-space:nowrap;max-width:calc(100% - 30px)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(max-width:520px){.hero{min-height:auto;padding:66px 0 54px}.brand{margin-bottom:34px}.white1{margin-bottom:34px}.cards{gap:10px}.card{padding:20px 8px}.form{padding:18px 15px}.gold2{white-space:normal}}
+
+.completion-page{display:none;position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#07101c,#111827);padding:24px;align-items:center;justify-content:center;text-align:center;color:#fff}.completion-card{width:min(520px,100%);background:#fff;color:#111827;border-radius:24px;padding:38px 24px;box-shadow:0 24px 80px rgba(0,0,0,.35)}.completion-icon{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;background:#eaf8f0;color:#168552;font-size:38px;font-weight:900}.completion-card h2{font-size:30px;margin:0 0 12px}.completion-card p{margin:0;color:#4b5563;line-height:1.7}.completion-actions{display:flex;gap:10px;margin-top:24px}.completion-actions a{flex:1;text-decoration:none;border-radius:12px;padding:14px 10px;font-weight:800}.completion-actions .call{background:#111827;color:#fff}.completion-actions .kakao{background:#fee500;color:#191919}@media(max-width:480px){.completion-actions{flex-direction:column}}
+
+.completion-card{position:relative}
+.completion-close{
+  position:absolute;top:14px;right:14px;width:42px;height:42px;
+  border:0;border-radius:50%;background:#f1f5f9;color:#111827;
+  font-size:25px;line-height:1;cursor:pointer;display:grid;
+  place-items:center;font-weight:800
+}
+.completion-close:hover{background:#e2e8f0}
+.completion-close:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+
 </style>
 </head>
 <body>
@@ -33,7 +46,7 @@
   <div class="white1">혼자 뛰는 영업에는 한계가 있습니다.</div>
   <div class="gold1">시스템을 가진 설계사만 !!</div>
   <div class="gold2">보험업계에서 지속적으로 성장해 나갈 수 있습니다.</div>
-  <a class="btn" href="https://forms.gle/r35psyiTNFHVnQzn7" target="_blank" rel="noopener">무료 상담 신청하기</a>
+  <a class="btn" href="#apply">무료 상담 신청하기</a>
 </div></section>
 
 <main class="wrap">
@@ -49,15 +62,70 @@
 <section class="apply" id="apply"><div class="wrap">
   <h2>전화 상담 신청</h2>
   <p class="desc">이름과 연락처를 남겨주시면 확인 후 직접 전화드리겠습니다.</p>
-  <div class="form" style="text-align:center">
-    <p style="margin:0 0 20px;color:#d4d9e2;line-height:1.7">이름과 연락처를 먼저 남겨주세요.<br>확인 후 김민석 사업단장이 직접 연락드립니다.</p>
-    <a class="btn submit" href="https://forms.gle/r35psyiTNFHVnQzn7" target="_blank" rel="noopener">무료 상담 신청하기</a>
+  <form class="form" id="recruitForm">
+    <div class="field"><label for="name">이름</label><input id="name" name="name" required placeholder="성함을 입력해주세요"></div>
+    <div class="field"><label for="phone">연락처</label><input id="phone" name="phone" type="tel" inputmode="tel" required placeholder="010-0000-0000"></div>
+    <div class="field"><label for="career">보험 경력</label><select id="career" name="career" required><option value="">선택해주세요</option><option>신입</option><option>1년 미만</option><option>1~3년</option><option>3~5년</option><option>5년 이상</option><option>팀장·지사장 경력</option></select></div>
+    <div class="field"><label for="message">문의 내용</label><textarea id="message" name="message" placeholder="궁금한 점이나 현재 상황을 적어주세요"></textarea></div>
+    <label class="agree"><input type="checkbox" required><span>상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</span></label>
+    <button class="btn submit" type="submit">무료 상담 신청하기</button>
     <a class="btn submit kakao-secondary" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡 상담</a>
     <p class="notice">제출하신 정보는 상담 연락 목적으로만 사용됩니다.</p>
-  </div>
+  </form>
 </div></section>
 
-<div class="sticky"><a class="btn" href="https://forms.gle/r35psyiTNFHVnQzn7" target="_blank" rel="noopener">무료 상담 신청하기</a></div>
+<div class="sticky"><a class="btn" href="#apply">무료 상담 신청하기</a></div>
 
+
+<div class="completion-page" id="completionPage" aria-live="polite"><div class="completion-card"><button type="button" class="completion-close" id="completionClose" aria-label="완료 화면 닫기">×</button><div class="completion-icon">✓</div><h2>신청이 완료되었습니다.</h2><p>전문 상담사가 확인 후 연락드리겠습니다.</p><div class="completion-actions"><a class="call" href="tel:01087958502">📞 전화 상담</a><a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">💬 카카오톡 상담</a></div></div></div>
+
+<script>
+(function(){
+ const SUPABASE_URL='https://pzlxrlkvbrufhimyglyo.supabase.co';
+ const SUPABASE_KEY='sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd';
+ const form=document.getElementById('recruitForm');
+ const completion=document.getElementById('completionPage');
+ const completionClose=document.getElementById('completionClose');
+ let hiddenPageElements=[];
+
+ function closeCompletion(){
+   completion.style.display='none';
+   hiddenPageElements.forEach(({el,display})=>{
+     if(display) el.style.display=display;
+     else el.style.removeProperty('display');
+   });
+   hiddenPageElements=[];
+   document.body.style.removeProperty('overflow');
+   window.scrollTo({top:0,behavior:'smooth'});
+ }
+
+ completionClose?.addEventListener('click',closeCompletion);
+ completion?.addEventListener('click',e=>{
+   if(e.target===completion) closeCompletion();
+ });
+ document.addEventListener('keydown',e=>{
+   if(e.key==='Escape' && completion?.style.display==='flex') closeCompletion();
+ });
+
+ if(!form) return;
+ form.addEventListener('submit',async function(e){
+   e.preventDefault();
+   if(!form.reportValidity()) return;
+   const btn=form.querySelector('button[type="submit"]');
+   const old=btn.textContent; btn.disabled=true; btn.textContent='접수 중...';
+   const fd=new FormData(form);
+   const payload={name:(fd.get('name')||'').toString().trim(),phone:(fd.get('phone')||'').toString().trim(),age_group:(fd.get('career')||'').toString(),status:'신규',source:'리크루팅랜딩페이지1',interest:'보험설계사 채용 상담',memo:(fd.get('message')||'').toString().trim()||'리크루팅 상담 신청',message:(fd.get('message')||'').toString().trim()};
+   try{
+     const r=await fetch(SUPABASE_URL+'/rest/v1/customers',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});
+     if(!r.ok) throw new Error(await r.text());
+     form.reset();
+     hiddenPageElements=Array.from(document.body.querySelectorAll('body > *:not(#completionPage)')).map(el=>({el,display:el.style.display}));
+     hiddenPageElements.forEach(({el})=>el.style.display='none');
+     completion.style.display='flex'; document.body.style.overflow='hidden'; window.scrollTo(0,0);
+   }catch(err){console.error(err);alert('접수에 실패했습니다. 잠시 후 다시 시도하거나 카카오톡으로 문의해주세요.');}
+   finally{btn.disabled=false;btn.textContent=old;}
+ });
+})();
+</script>
 </body>
 </html>

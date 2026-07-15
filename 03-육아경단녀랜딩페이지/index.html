@@ -102,6 +102,19 @@ h1 em{font-style:normal;color:var(--orange)}
   .card{padding:21px 17px}
   .form{padding:19px 15px}
 }
+
+.completion-page{display:none;position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#07101c,#111827);padding:24px;align-items:center;justify-content:center;text-align:center;color:#fff}.completion-card{width:min(520px,100%);background:#fff;color:#111827;border-radius:24px;padding:38px 24px;box-shadow:0 24px 80px rgba(0,0,0,.35)}.completion-icon{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;background:#eaf8f0;color:#168552;font-size:38px;font-weight:900}.completion-card h2{font-size:30px;margin:0 0 12px}.completion-card p{margin:0;color:#4b5563;line-height:1.7}.completion-actions{display:flex;gap:10px;margin-top:24px}.completion-actions a{flex:1;text-decoration:none;border-radius:12px;padding:14px 10px;font-weight:800}.completion-actions .call{background:#111827;color:#fff}.completion-actions .kakao{background:#fee500;color:#191919}@media(max-width:480px){.completion-actions{flex-direction:column}}
+
+.completion-card{position:relative}
+.completion-close{
+  position:absolute;top:14px;right:14px;width:42px;height:42px;
+  border:0;border-radius:50%;background:#f1f5f9;color:#111827;
+  font-size:25px;line-height:1;cursor:pointer;display:grid;
+  place-items:center;font-weight:800
+}
+.completion-close:hover{background:#e2e8f0}
+.completion-close:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+
 </style>
 
 <style>
@@ -204,7 +217,7 @@ h1 em{font-style:normal;color:var(--orange)}
     <h1>육아도 소중하게,<br><em>내 커리어도 다시 시작!</em></h1>
     <p>아이 등원 후 가능한 유연한 근무와 체계적인 교육으로 보험 경험이 없어도 새롭게 시작할 수 있습니다.</p>
     <div class="hero-actions">
-      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfTTjrt-fDNK6of05Q9bUu1C1HhaEFnnPiVYEZDlEGcVgnO1w/viewform?usp=publish-editor" target="_blank" rel="noopener">상담 신청</a>
+      <a class="btn" href="#apply">상담 신청</a>
       <a class="btn kakao-btn" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡 상담</a>
     </div>
     <div class="small-note">부담 없는 상담부터 받아보세요.</div>
@@ -244,20 +257,76 @@ h1 em{font-style:normal;color:var(--orange)}
   <div class="wrap">
     <h2 class="section-title">경력단절 주부 채용 상담</h2>
     <p class="section-sub">아이를 키우면서도 나만의 커리어를 다시 시작할 수 있습니다.<br>지금 부담 없이 상담받아보세요.</p>
-    <div class="form" style="text-align:center">
-      <div class="apply-actions">
-        <a class="btn submit" href="https://docs.google.com/forms/d/e/1FAIpQLSfTTjrt-fDNK6of05Q9bUu1C1HhaEFnnPiVYEZDlEGcVgnO1w/viewform?usp=publish-editor" target="_blank" rel="noopener">상담 신청</a>
-        <a class="btn submit kakao-btn" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡 상담</a>
-      </div>
-      <p class="notice">상담 신청은 구글폼으로 접수되며, 카카오톡 상담도 바로 가능합니다.</p>
-    </div>
+    <form class="form" id="momForm">
+      <div class="field"><label for="name">이름</label><input id="name" name="name" required placeholder="성함을 입력해주세요"></div>
+      <div class="field"><label for="phone">연락처</label><input id="phone" name="phone" type="tel" inputmode="tel" required placeholder="010-0000-0000"></div>
+      <div class="field"><label for="region">거주 지역</label><input id="region" name="region" placeholder="예: 서울, 경기 수원"></div>
+      <div class="field"><label for="current_status">현재 상황</label><select id="current_status" name="current_status" required><option value="">선택해주세요</option><option>육아 중인 경력단절 주부</option><option>재취업 준비 중</option><option>보험설계사 신입 지원</option><option>보험설계사 경력자</option><option>기타</option></select></div>
+      <div class="field"><label for="time">상담 가능 시간</label><input id="time" name="time" placeholder="예: 평일 오후 2시 이후"></div>
+      <div class="field"><label for="memo">문의 내용</label><textarea id="memo" name="memo" placeholder="근무시간, 교육, 업무 방식 등 궁금한 점을 남겨주세요"></textarea></div>
+      <label class="agree"><input type="checkbox" required><span>상담 진행을 위한 개인정보 수집 및 이용에 동의합니다.</span></label>
+      <button class="btn submit" type="submit">상담 신청</button>
+      <a class="btn submit kakao-btn" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡 상담</a>
+      <p class="notice">제출하신 정보는 상담 연락 목적으로만 사용됩니다.</p>
+    </form>
   </div>
 </section>
 
 <div class="sticky">
-  <a class="btn sticky-form" href="https://docs.google.com/forms/d/e/1FAIpQLSfTTjrt-fDNK6of05Q9bUu1C1HhaEFnnPiVYEZDlEGcVgnO1w/viewform?usp=publish-editor" target="_blank" rel="noopener">상담 신청</a>
+  <a class="btn sticky-form" href="#apply">상담 신청</a>
   <a class="btn sticky-kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡 상담</a>
 </div>
 
+
+<div class="completion-page" id="completionPage" aria-live="polite"><div class="completion-card"><button type="button" class="completion-close" id="completionClose" aria-label="완료 화면 닫기">×</button><div class="completion-icon">✓</div><h2>신청이 완료되었습니다.</h2><p>전문 상담사가 확인 후 연락드리겠습니다.</p><div class="completion-actions"><a class="call" href="tel:01087958502">📞 전화 상담</a><a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">💬 카카오톡 상담</a></div></div></div>
+
+<script>
+(function(){
+ const SUPABASE_URL='https://pzlxrlkvbrufhimyglyo.supabase.co';
+ const SUPABASE_KEY='sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd';
+ const form=document.getElementById('momForm');
+ const completion=document.getElementById('completionPage');
+ const completionClose=document.getElementById('completionClose');
+ let hiddenPageElements=[];
+
+ function closeCompletion(){
+   completion.style.display='none';
+   hiddenPageElements.forEach(({el,display})=>{
+     if(display) el.style.display=display;
+     else el.style.removeProperty('display');
+   });
+   hiddenPageElements=[];
+   document.body.style.removeProperty('overflow');
+   window.scrollTo({top:0,behavior:'smooth'});
+ }
+
+ completionClose?.addEventListener('click',closeCompletion);
+ completion?.addEventListener('click',e=>{
+   if(e.target===completion) closeCompletion();
+ });
+ document.addEventListener('keydown',e=>{
+   if(e.key==='Escape' && completion?.style.display==='flex') closeCompletion();
+ });
+
+ if(!form) return;
+ form.addEventListener('submit',async function(e){
+   e.preventDefault();
+   if(!form.reportValidity()) return;
+   const btn=form.querySelector('button[type="submit"]');
+   const old=btn.textContent; btn.disabled=true; btn.textContent='접수 중...';
+   const fd=new FormData(form);
+   const payload={name:(fd.get('name')||'').toString().trim(),phone:(fd.get('phone')||'').toString().trim(),age_group:(fd.get('current_status')||'').toString(),status:'신규',source:'육아경단녀 랜딩페이지',available_time:(fd.get('time')||'').toString().trim(),interest:'경력단절 주부 채용 상담',memo:['거주지역: '+((fd.get('region')||'').toString().trim()||'미입력'),(fd.get('memo')||'').toString().trim()].filter(Boolean).join(' / '),message:(fd.get('memo')||'').toString().trim()};
+   try{
+     const r=await fetch(SUPABASE_URL+'/rest/v1/customers',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});
+     if(!r.ok) throw new Error(await r.text());
+     form.reset();
+     hiddenPageElements=Array.from(document.body.querySelectorAll('body > *:not(#completionPage)')).map(el=>({el,display:el.style.display}));
+     hiddenPageElements.forEach(({el})=>el.style.display='none');
+     completion.style.display='flex'; document.body.style.overflow='hidden'; window.scrollTo(0,0);
+   }catch(err){console.error(err);alert('접수에 실패했습니다. 잠시 후 다시 시도하거나 카카오톡으로 문의해주세요.');}
+   finally{btn.disabled=false;btn.textContent=old;}
+ });
+})();
+</script>
 </body>
 </html>
