@@ -47,6 +47,32 @@
     .today-active{outline:3px solid rgba(23,105,255,.18)}
     .money{font-variant-numeric:tabular-nums}
     .copy-note{font-size:12px;color:var(--muted)}
+    .stat-filter{cursor:pointer;transition:.18s ease;user-select:none}
+    .stat-filter:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(48,88,145,.16)}
+    .stat-filter.active{border:2px solid var(--blue);background:#eef5ff}
+
+    .consult-modal{position:fixed;inset:0;z-index:100;background:rgba(17,30,52,.48);display:none;align-items:center;justify-content:center;padding:18px}
+    .consult-modal.open{display:flex}
+    .consult-card{width:min(900px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;box-shadow:0 24px 70px rgba(20,33,58,.28)}
+    .consult-head{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:2}
+    .consult-head h2{margin:0;font-size:24px}
+    .consult-close{width:42px;height:42px;border:0;border-radius:50%;background:#eef4ff;font-size:28px;line-height:1}
+    .consult-body{padding:20px}
+    .customer-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+    .summary-box{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fbfdff}
+    .summary-box small{display:block;color:var(--muted);font-weight:800;margin-bottom:4px}
+    .history-list{display:grid;gap:10px;margin:14px 0 18px}
+    .history-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+    .history-item .time{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:7px}
+    .history-item .content{white-space:pre-wrap;line-height:1.65}
+    .history-empty{padding:28px;text-align:center;color:var(--muted);background:#f8fbff;border-radius:14px}
+    .consult-input{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:18px}
+    .consult-input textarea{min-height:130px}
+    .consult-actions{display:flex;justify-content:flex-end;gap:8px}
+    tr.customer-row{cursor:pointer}
+    tr.customer-row:hover td{background:#f2f7ff}
+    @media(max-width:700px){.customer-summary{grid-template-columns:1fr 1fr}.consult-modal{padding:0}.consult-card{width:100%;height:100%;max-height:none;border-radius:0}}
+
     @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}}
     @media(max-width:620px){.wrap{padding:18px 12px 50px}.top{padding:0 12px}.brand{font-size:18px}.title-row{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
   </style>
@@ -68,11 +94,11 @@
 <main class="wrap">
   <div class="title-row"><div><h1>고객 관리 대시보드</h1><div class="sub">랜딩페이지 신청자가 자동으로 표시됩니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
   <section class="stats">
-    <div class="stat"><small>전체 고객</small><strong id="sTotal">0</strong></div>
-    <div class="stat"><small>신규 문의</small><strong id="sNew">0</strong></div>
-    <div class="stat"><small>오늘 연락 예정</small><strong id="sToday">0</strong></div>
-    <div class="stat"><small>분석 진행</small><strong id="sAnalysis">0</strong></div>
-    <div class="stat"><small>계약 완료</small><strong id="sDone">0</strong></div>
+    <div class="stat stat-filter" data-filter="all"><small>전체 고객</small><strong id="sTotal">0</strong></div>
+    <div class="stat stat-filter" data-filter="new"><small>신규 문의</small><strong id="sNew">0</strong></div>
+    <div class="stat stat-filter" data-filter="today"><small>오늘 연락 예정</small><strong id="sToday">0</strong></div>
+    <div class="stat stat-filter" data-filter="analysis"><small>분석 진행</small><strong id="sAnalysis">0</strong></div>
+    <div class="stat stat-filter" data-filter="done"><small>계약 완료</small><strong id="sDone">0</strong></div>
     <div class="stat"><small>이번 달 월보험료</small><strong id="sPremium" class="money">0원</strong></div>
     <div class="stat"><small>이번 달 수수료</small><strong id="sCommission" class="money">0원</strong></div>
   </section>
@@ -89,7 +115,6 @@
         <div class="bulk-tools">
           <button type="button" class="btn light" id="todayBtn">오늘 연락 예정만 보기</button>
           <button type="button" class="btn primary" id="smsBtn">선택 고객 문자 보내기</button>
-          <button type="button" class="btn light" id="kakaoBtn">선택 고객 카카오 안내</button>
           <span class="copy-note">체크박스로 고객을 선택한 뒤 사용하세요.</span>
         </div>
       </div>
@@ -132,6 +157,35 @@
 </main>
 </div>
 
+<div id="consultModal" class="consult-modal" aria-hidden="true">
+  <div class="consult-card" role="dialog" aria-modal="true" aria-labelledby="consultTitle">
+    <div class="consult-head">
+      <h2 id="consultTitle">고객 상담 기록</h2>
+      <button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button>
+    </div>
+    <div class="consult-body">
+      <div class="customer-summary">
+        <div class="summary-box"><small>이름</small><strong id="consultName">-</strong></div>
+        <div class="summary-box"><small>연락처</small><strong id="consultPhone">-</strong></div>
+        <div class="summary-box"><small>상태</small><strong id="consultStatus">-</strong></div>
+        <div class="summary-box"><small>다음 연락일</small><strong id="consultFollowUp">-</strong></div>
+      </div>
+
+      <h3>상담 기록</h3>
+      <div id="consultHistory" class="history-list"></div>
+
+      <div class="consult-input">
+        <label for="consultMemo">새 상담 내용</label>
+        <textarea id="consultMemo" placeholder="통화 내용, 고객 요청사항, 다음 상담 계획 등을 입력해주세요."></textarea>
+        <div class="consult-actions">
+          <button type="button" class="btn light" id="consultCancel">닫기</button>
+          <button type="button" class="btn primary" id="consultSave">상담 기록 저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const { createClient } = supabase;
 const db = createClient('https://pzlxrlkvbrufhimyglyo.supabase.co', 'sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd');
@@ -140,6 +194,8 @@ let currentPage = 1;
 const pageSize = 10;
 const selectedIds = new Set();
 let todayOnly = false;
+let activeStatsFilter = "all";
+let activeConsultCustomerId = null;
 
 const $ = id => document.getElementById(id);
 const today = () => new Date().toISOString().slice(0,10);
@@ -190,7 +246,14 @@ function getFilteredCustomers(){
     (!q||(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q)) &&
     (!sf||c.status===sf) &&
     (!sourcef||(c.source||"")===sourcef) &&
-    (!todayOnly||c.follow_up_date===today())
+    (!todayOnly||c.follow_up_date===today()) &&
+    (
+      activeStatsFilter==="all" ||
+      (activeStatsFilter==="new" && (c.status||"신규")==="신규") ||
+      (activeStatsFilter==="today" && c.follow_up_date===today()) ||
+      (activeStatsFilter==="analysis" && ["분석대기","분석진행"].includes(c.status)) ||
+      (activeStatsFilter==="done" && c.status==="계약완료")
+    )
   );
 
   if(sort==="createdDesc") list.sort((a,b)=>(b.created_at||"").localeCompare(a.created_at||""));
@@ -210,7 +273,7 @@ function render(){
 
   $("customerBody").innerHTML=pageList.map(c=>{
     const checked=selectedIds.has(String(c.id));
-    return `<tr class="${checked?"selected-row":""}">
+    return `<tr class="customer-row ${checked?"selected-row":""}" data-customer-id="${esc(c.id)}">
       <td class="select-col"><input type="checkbox" class="row-check" data-id="${esc(c.id)}" ${checked?"checked":""}></td>
       <td>${esc((c.created_at||"").slice(0,10))}</td><td><b>${esc(c.name)}</b></td>
       <td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td><td>${esc(c.source||"-")}</td><td>${esc(c.age_group||"-")}</td>
@@ -282,6 +345,109 @@ function editCustomer(id){
   $("formTitle").textContent="고객 정보 수정";
   document.querySelector(".side").scrollIntoView({behavior:"smooth",block:"start"});
 }
+
+function formatDateTime(value){
+  if(!value)return "";
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return String(value);
+  return d.toLocaleString("ko-KR",{
+    year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit"
+  });
+}
+
+function getConsultHistory(customer){
+  const raw=customer?.consultation_history;
+  if(Array.isArray(raw))return raw;
+  if(typeof raw==="string"){
+    try{
+      const parsed=JSON.parse(raw);
+      return Array.isArray(parsed)?parsed:[];
+    }catch(e){return [];}
+  }
+  return [];
+}
+
+function renderConsultHistory(customer){
+  const history=getConsultHistory(customer).slice().reverse();
+  $("consultHistory").innerHTML=history.length
+    ? history.map(item=>`
+      <div class="history-item">
+        <div class="time">${esc(formatDateTime(item.created_at))}</div>
+        <div class="content">${esc(item.content||"")}</div>
+      </div>
+    `).join("")
+    : '<div class="history-empty">아직 저장된 상담 기록이 없습니다.</div>';
+}
+
+function openConsultation(id){
+  const customer=customers.find(c=>String(c.id)===String(id));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  activeConsultCustomerId=String(customer.id);
+  $("consultName").textContent=customer.name||"-";
+  $("consultPhone").textContent=customer.phone||"-";
+  $("consultStatus").textContent=customer.status||"신규";
+  $("consultFollowUp").textContent=customer.follow_up_date||"-";
+  $("consultMemo").value="";
+  renderConsultHistory(customer);
+
+  $("consultModal").classList.add("open");
+  $("consultModal").setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>$("consultMemo").focus(),100);
+}
+
+function closeConsultation(){
+  $("consultModal").classList.remove("open");
+  $("consultModal").setAttribute("aria-hidden","true");
+  document.body.style.overflow="";
+  activeConsultCustomerId=null;
+  $("consultMemo").value="";
+}
+
+async function saveConsultation(){
+  if(!activeConsultCustomerId)return;
+
+  const content=$("consultMemo").value.trim();
+  if(!content){alert("상담 내용을 입력해주세요.");return;}
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  const history=getConsultHistory(customer);
+  const nextHistory=[
+    ...history,
+    {
+      created_at:new Date().toISOString(),
+      content
+    }
+  ];
+
+  const saveBtn=$("consultSave");
+  const originalText=saveBtn.textContent;
+  saveBtn.disabled=true;
+  saveBtn.textContent="저장 중...";
+
+  const {error}=await db
+    .from("customers")
+    .update({consultation_history:nextHistory})
+    .eq("id",activeConsultCustomerId);
+
+  saveBtn.disabled=false;
+  saveBtn.textContent=originalText;
+
+  if(error){
+    alert("상담 기록 저장 실패: "+error.message);
+    return;
+  }
+
+  customer.consultation_history=nextHistory;
+  $("consultMemo").value="";
+  renderConsultHistory(customer);
+  alert("상담 기록이 저장되었습니다.");
+}
+
 
 async function deleteCustomer(id){
   const c=customers.find(x=>String(x.id)===String(id));
@@ -362,9 +528,16 @@ AI보험 미래전략사업부 김민석 사업단장입니다.
 
 $("todayBtn").addEventListener("click",()=>{
   todayOnly=!todayOnly;
+  activeStatsFilter=todayOnly?"today":"all";
   currentPage=1;
+
   $("todayBtn").classList.toggle("today-active",todayOnly);
   $("todayBtn").textContent=todayOnly?"전체 고객 보기":"오늘 연락 예정만 보기";
+
+  document.querySelectorAll(".stat-filter").forEach(card=>{
+    card.classList.toggle("active",card.dataset.filter===activeStatsFilter);
+  });
+
   render();
 });
 
@@ -380,18 +553,50 @@ $("smsBtn").addEventListener("click",()=>{
   location.href=`sms:${phones.join(",")}${separator}body=${body}`;
 });
 
-$("kakaoBtn").addEventListener("click",async()=>{
-  const selected=getSelectedCustomers();
-  if(!selected.length){alert("카카오 안내를 보낼 고객을 먼저 체크해주세요.");return;}
 
-  const message=buildMessage(selected);
-  try{
-    await navigator.clipboard.writeText(message);
-    alert("안내문을 복사했습니다. 카카오톡에 붙여넣어 보내주세요.");
-  }catch(e){
-    alert(message);
+document.querySelectorAll(".stat-filter").forEach(card=>{
+  card.addEventListener("click",()=>{
+    activeStatsFilter=card.dataset.filter||"all";
+    currentPage=1;
+
+    document.querySelectorAll(".stat-filter").forEach(item=>{
+      item.classList.toggle("active",item===card);
+    });
+
+    if(activeStatsFilter==="today"){
+      todayOnly=true;
+      $("todayBtn").classList.add("today-active");
+      $("todayBtn").textContent="전체 고객 보기";
+    }else{
+      todayOnly=false;
+      $("todayBtn").classList.remove("today-active");
+      $("todayBtn").textContent="오늘 연락 예정만 보기";
+    }
+
+    render();
+  });
+});
+
+
+$("customerBody").addEventListener("dblclick",event=>{
+  if(event.target.closest("button,a,input,select,textarea"))return;
+  const row=event.target.closest("tr[data-customer-id]");
+  if(!row)return;
+  openConsultation(row.dataset.customerId);
+});
+
+$("consultClose").addEventListener("click",closeConsultation);
+$("consultCancel").addEventListener("click",closeConsultation);
+$("consultSave").addEventListener("click",saveConsultation);
+
+$("consultModal").addEventListener("click",event=>{
+  if(event.target===$("consultModal"))closeConsultation();
+});
+
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&$("consultModal").classList.contains("open")){
+    closeConsultation();
   }
-  window.open("https://open.kakao.com/o/sPtglPDi","_blank","noopener");
 });
 
 $("pagination").addEventListener("click",event=>{
@@ -421,6 +626,7 @@ $("selectAll").addEventListener("change",event=>{
   renderPagination(Math.max(1,Math.ceil(getFilteredCustomers().length/pageSize)));
 });
 
+document.querySelector('.stat-filter[data-filter="all"]')?.classList.add("active");
 checkSession();
 </script>
 </body>
