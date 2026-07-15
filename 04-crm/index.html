@@ -65,6 +65,14 @@
     .history-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
     .history-item .time{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:7px}
     .history-item .content{white-space:pre-wrap;line-height:1.65}
+    .history-item-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .history-actions{display:flex;gap:6px}
+    .history-btn{border:0;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:800;cursor:pointer}
+    .history-btn.edit{background:#eef4ff;color:#24477f}
+    .history-btn.delete{background:#fff0f0;color:#b52d2d}
+    .consult-follow-box{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;margin:0 0 18px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fbfdff}
+    .consult-follow-box .field{margin:0}
+    @media(max-width:520px){.consult-follow-box{grid-template-columns:1fr}}
     .history-empty{padding:28px;text-align:center;color:var(--muted);background:#f8fbff;border-radius:14px}
     .consult-input{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:18px}
     .consult-input textarea{min-height:130px}
@@ -171,6 +179,14 @@
         <div class="summary-box"><small>다음 연락일</small><strong id="consultFollowUp">-</strong></div>
       </div>
 
+      <div class="consult-follow-box">
+        <div class="field">
+          <label for="consultFollowUpInput">다음 연락일 지정</label>
+          <input id="consultFollowUpInput" type="date">
+        </div>
+        <button type="button" class="btn primary" id="consultFollowUpSave">다음 연락일 저장</button>
+      </div>
+
       <h3>상담 기록</h3>
       <div id="consultHistory" class="history-list"></div>
 
@@ -196,6 +212,7 @@ const selectedIds = new Set();
 let todayOnly = false;
 let activeStatsFilter = "all";
 let activeConsultCustomerId = null;
+let editingHistoryIndex = null;
 
 const $ = id => document.getElementById(id);
 const today = () => new Date().toISOString().slice(0,10);
@@ -369,11 +386,19 @@ function getConsultHistory(customer){
 }
 
 function renderConsultHistory(customer){
-  const history=getConsultHistory(customer).slice().reverse();
-  $("consultHistory").innerHTML=history.length
-    ? history.map(item=>`
-      <div class="history-item">
-        <div class="time">${esc(formatDateTime(item.created_at))}</div>
+  const history=getConsultHistory(customer);
+  const reversed=history.map((item,index)=>({item,index})).reverse();
+
+  $("consultHistory").innerHTML=reversed.length
+    ? reversed.map(({item,index})=>`
+      <div class="history-item" data-history-index="${index}">
+        <div class="history-item-head">
+          <div class="time">${esc(formatDateTime(item.created_at))}</div>
+          <div class="history-actions">
+            <button type="button" class="history-btn edit" data-history-action="edit" data-history-index="${index}">수정</button>
+            <button type="button" class="history-btn delete" data-history-action="delete" data-history-index="${index}">삭제</button>
+          </div>
+        </div>
         <div class="content">${esc(item.content||"")}</div>
       </div>
     `).join("")
@@ -389,7 +414,10 @@ function openConsultation(id){
   $("consultPhone").textContent=customer.phone||"-";
   $("consultStatus").textContent=customer.status||"신규";
   $("consultFollowUp").textContent=customer.follow_up_date||"-";
+  $("consultFollowUpInput").value=customer.follow_up_date||"";
   $("consultMemo").value="";
+  editingHistoryIndex=null;
+  $("consultSave").textContent="상담 기록 저장";
   renderConsultHistory(customer);
 
   $("consultModal").classList.add("open");
@@ -403,7 +431,9 @@ function closeConsultation(){
   $("consultModal").setAttribute("aria-hidden","true");
   document.body.style.overflow="";
   activeConsultCustomerId=null;
+  editingHistoryIndex=null;
   $("consultMemo").value="";
+  $("consultSave").textContent="상담 기록 저장";
 }
 
 async function saveConsultation(){
@@ -416,13 +446,23 @@ async function saveConsultation(){
   if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
 
   const history=getConsultHistory(customer);
-  const nextHistory=[
-    ...history,
-    {
-      created_at:new Date().toISOString(),
-      content
-    }
-  ];
+  let nextHistory;
+
+  if(editingHistoryIndex!==null){
+    nextHistory=history.map((item,index)=>
+      index===editingHistoryIndex
+        ? {...item,content,updated_at:new Date().toISOString()}
+        : item
+    );
+  }else{
+    nextHistory=[
+      ...history,
+      {
+        created_at:new Date().toISOString(),
+        content
+      }
+    ];
+  }
 
   const saveBtn=$("consultSave");
   const originalText=saveBtn.textContent;
@@ -435,19 +475,101 @@ async function saveConsultation(){
     .eq("id",activeConsultCustomerId);
 
   saveBtn.disabled=false;
-  saveBtn.textContent=originalText;
 
   if(error){
+    saveBtn.textContent=originalText;
     alert("상담 기록 저장 실패: "+error.message);
     return;
   }
 
   customer.consultation_history=nextHistory;
   $("consultMemo").value="";
+  editingHistoryIndex=null;
+  saveBtn.textContent="상담 기록 저장";
   renderConsultHistory(customer);
-  alert("상담 기록이 저장되었습니다.");
+  alert(originalText==="수정 내용 저장"?"상담 기록이 수정되었습니다.":"상담 기록이 저장되었습니다.");
 }
 
+async function deleteConsultationHistory(index){
+  if(!activeConsultCustomerId)return;
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  const history=getConsultHistory(customer);
+  const target=history[index];
+  if(!target)return;
+
+  if(!confirm("이 상담 기록을 삭제할까요?"))return;
+
+  const nextHistory=history.filter((_,i)=>i!==index);
+  const {error}=await db
+    .from("customers")
+    .update({consultation_history:nextHistory})
+    .eq("id",activeConsultCustomerId);
+
+  if(error){
+    alert("상담 기록 삭제 실패: "+error.message);
+    return;
+  }
+
+  customer.consultation_history=nextHistory;
+  if(editingHistoryIndex===index){
+    editingHistoryIndex=null;
+    $("consultMemo").value="";
+    $("consultSave").textContent="상담 기록 저장";
+  }
+  renderConsultHistory(customer);
+  alert("상담 기록이 삭제되었습니다.");
+}
+
+function editConsultationHistory(index){
+  if(!activeConsultCustomerId)return;
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer)return;
+
+  const history=getConsultHistory(customer);
+  const target=history[index];
+  if(!target)return;
+
+  editingHistoryIndex=index;
+  $("consultMemo").value=target.content||"";
+  $("consultSave").textContent="수정 내용 저장";
+  $("consultMemo").focus();
+  $("consultMemo").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+async function saveConsultFollowUp(){
+  if(!activeConsultCustomerId)return;
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  const nextDate=$("consultFollowUpInput").value||null;
+  const button=$("consultFollowUpSave");
+  const originalText=button.textContent;
+  button.disabled=true;
+  button.textContent="저장 중...";
+
+  const {error}=await db
+    .from("customers")
+    .update({follow_up_date:nextDate})
+    .eq("id",activeConsultCustomerId);
+
+  button.disabled=false;
+  button.textContent=originalText;
+
+  if(error){
+    alert("다음 연락일 저장 실패: "+error.message);
+    return;
+  }
+
+  customer.follow_up_date=nextDate;
+  $("consultFollowUp").textContent=nextDate||"-";
+  render();
+  alert("다음 연락일이 저장되었습니다.");
+}
 
 async function deleteCustomer(id){
   const c=customers.find(x=>String(x.id)===String(id));
@@ -588,6 +710,18 @@ $("customerBody").addEventListener("dblclick",event=>{
 $("consultClose").addEventListener("click",closeConsultation);
 $("consultCancel").addEventListener("click",closeConsultation);
 $("consultSave").addEventListener("click",saveConsultation);
+$("consultFollowUpSave").addEventListener("click",saveConsultFollowUp);
+
+$("consultHistory").addEventListener("click",event=>{
+  const button=event.target.closest("button[data-history-action]");
+  if(!button)return;
+
+  const index=Number(button.dataset.historyIndex);
+  const action=button.dataset.historyAction;
+
+  if(action==="edit") editConsultationHistory(index);
+  if(action==="delete") deleteConsultationHistory(index);
+});
 
 $("consultModal").addEventListener("click",event=>{
   if(event.target===$("consultModal"))closeConsultation();
