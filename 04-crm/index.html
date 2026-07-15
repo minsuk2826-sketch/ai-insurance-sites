@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI보험 CRM 2.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--blue:#1769ff;--blue2:#0e52d8;--navy:#14213a;--muted:#6c7890;--line:#dfe8f5;--soft:#f5f9ff;--white:#fff;--green:#1aa36f;--orange:#f59e0b;--red:#e44848;--shadow:0 14px 40px rgba(48,88,145,.10)}
+    *{box-sizing:border-box} body{margin:0;font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;background:var(--soft);color:var(--navy)}
+    button,input,select,textarea{font:inherit} button{cursor:pointer}
+    .hidden{display:none!important} .wrap{max-width:1280px;margin:auto;padding:22px 18px 60px}
+    header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+    .top{max-width:1280px;margin:auto;height:64px;padding:0 18px;display:flex;align-items:center;justify-content:space-between}
+    .brand{font-weight:900;font-size:22px} .brand b{color:var(--blue)} .btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800}
+    .primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff} .light{background:#eef4ff;color:#24477f} .danger{background:#fff0f0;color:#b52d2d}
+    .login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(180deg,#f7fbff,#edf5ff)}
+    .login-card{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:var(--shadow)}
+    .login-card h1{margin:0 0 8px} .login-card p{margin:0 0 20px;color:var(--muted)} .field{display:grid;gap:6px;margin-bottom:12px}
+    input,select,textarea{width:100%;border:1px solid #d7e1ef;border-radius:12px;padding:11px 12px;outline:none;background:#fff}
+    input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(23,105,255,.09)} textarea{min-height:90px;resize:vertical}
+    .msg{margin-top:12px;padding:11px;border-radius:10px;font-size:14px;font-weight:700}
+    .title-row{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:20px} h1{font-size:30px;margin:0} .sub{color:var(--muted);margin-top:6px}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px} .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+    .stat small{color:var(--muted);font-weight:800} .stat strong{display:block;font-size:30px;margin-top:6px}
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:18px} .panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+    .panel-head{padding:18px;border-bottom:1px solid var(--line)} .panel-head h2{margin:0;font-size:20px}
+    .filters{display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:10px;margin-top:14px}
+    .table-wrap{overflow:auto} table{width:100%;border-collapse:collapse;min-width:1120px} th,td{padding:13px 14px;border-bottom:1px solid #edf2f8;text-align:left;font-size:14px}
+    th{background:#fbfdff;color:#56647d;font-size:13px} tr:hover td{background:#fafcff} .status{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900}
+    .신규{background:#eaf2ff;color:#1757b8} .연락완료{background:#eefaf6;color:#137a55} .분석대기{background:#fff7e6;color:#a76600} .분석진행{background:#f0edff;color:#6847c5}
+    .제안중{background:#fff0f0;color:#b73838} .계약완료{background:#e9f8ef;color:#167347} .보류{background:#f0f2f5;color:#596273}
+    .empty{padding:44px;text-align:center;color:var(--muted)} .side{padding:18px} .side h2{margin:0 0 14px;font-size:20px} .form-grid{display:grid;gap:10px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px} label{font-size:13px;font-weight:800;color:#59677f} .form-actions{display:flex;gap:8px;margin-top:6px} .form-actions .btn{flex:1}
+    .actions-cell{display:flex;gap:6px} .icon-btn{border:0;background:#eef4ff;color:#24477f;border-radius:9px;padding:7px 9px;font-weight:800} .icon-btn.del{background:#fff0f0;color:#b52d2d}
+    @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}}
+    @media(max-width:620px){.wrap{padding:18px 12px 50px}.top{padding:0 12px}.brand{font-size:18px}.title-row{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div id="loginScreen" class="login-screen">
+  <form id="loginForm" class="login-card">
+    <h1>AI보험 CRM 2.0</h1>
+    <p>관리자 계정으로 로그인하세요.</p>
+    <div class="field"><label>이메일</label><input id="loginEmail" type="email" required></div>
+    <div class="field"><label>비밀번호</label><input id="loginPassword" type="password" required></div>
+    <button class="btn primary" style="width:100%" type="submit">로그인</button>
+    <div id="loginMsg" class="msg hidden"></div>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+<header><div class="top"><div class="brand"><b>AI보험</b> CRM 2.0</div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
+<main class="wrap">
+  <div class="title-row"><div><h1>고객 관리 대시보드</h1><div class="sub">랜딩페이지 신청자가 자동으로 표시됩니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
+  <section class="stats">
+    <div class="stat"><small>전체 고객</small><strong id="sTotal">0</strong></div>
+    <div class="stat"><small>신규 문의</small><strong id="sNew">0</strong></div>
+    <div class="stat"><small>오늘 연락 예정</small><strong id="sToday">0</strong></div>
+    <div class="stat"><small>분석 진행</small><strong id="sAnalysis">0</strong></div>
+    <div class="stat"><small>계약 완료</small><strong id="sDone">0</strong></div>
+  </section>
+
+  <section class="layout">
+    <div class="panel">
+      <div class="panel-head"><h2>고객 목록</h2>
+        <div class="filters">
+          <input id="search" placeholder="이름 또는 전화번호 검색">
+          <select id="statusFilter"><option value="">전체 상태</option><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>보류</option></select>
+          <select id="sourceFilter"><option value="">전체 유입경로</option></select>
+          <select id="sortBy"><option value="createdDesc">최근 등록순</option><option value="followAsc">다음 연락일순</option><option value="nameAsc">이름순</option></select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr><th>등록일</th><th>이름</th><th>연락처</th><th>유입경로</th><th>나이대</th><th>상태</th><th>상담 가능 시간</th><th>다음 연락일</th><th>메모</th><th>관리</th></tr></thead><tbody id="customerBody"></tbody></table>
+        <div id="emptyState" class="empty">등록된 고객이 없습니다.</div>
+      </div>
+    </div>
+
+    <aside class="panel side">
+      <h2 id="formTitle">신규 고객 등록</h2>
+      <form id="customerForm" class="form-grid">
+        <input type="hidden" id="customerId">
+        <div class="two">
+          <div class="field"><label>이름</label><input id="name" required></div>
+          <div class="field"><label>휴대폰 번호</label><input id="phone" required></div>
+        </div>
+        <div class="field"><label>유입경로</label><select id="source"><option value="CRM">CRM 직접등록</option><option>AI보험점검 랜딩페이지</option><option>리크루팅랜딩페이지1</option><option>육아경단녀 랜딩페이지</option><option>랜딩페이지</option><option>카카오톡</option><option>전화</option><option>소개</option><option>기타</option></select></div>
+        <div class="two">
+          <div class="field"><label>나이대</label><select id="age"><option value="">선택</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></div>
+          <div class="field"><label>상태</label><select id="status"><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>보류</option></select></div>
+        </div>
+        <div class="field"><label>상담 가능 시간</label><input id="availableTime"></div>
+        <div class="field"><label>다음 연락일</label><input id="followUp" type="date"></div>
+        <div class="field"><label>관심 분야</label><input id="interest"></div>
+        <div class="field"><label>상담 메모</label><textarea id="memo"></textarea></div>
+        <div class="form-actions"><button class="btn light" type="button" id="cancelBtn">초기화</button><button class="btn primary" type="submit">저장하기</button></div>
+      </form>
+    </aside>
+  </section>
+</main>
+</div>
+
+<script>
+const { createClient } = supabase;
+const db = createClient('https://pzlxrlkvbrufhimyglyo.supabase.co', 'sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd');
+let customers = [];
+
+const $ = id => document.getElementById(id);
+const today = () => new Date().toISOString().slice(0,10);
+const esc = s => String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+
+async function checkSession(){
+  const {data} = await db.auth.getSession();
+  if(data.session) showApp(); else showLogin();
+}
+function showLogin(){ $("loginScreen").classList.remove("hidden"); $("app").classList.add("hidden"); }
+async function showApp(){ $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden"); await loadCustomers(); }
+
+$("loginForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const email=$("loginEmail").value.trim(), password=$("loginPassword").value;
+  const {error} = await db.auth.signInWithPassword({email,password});
+  const msg=$("loginMsg");
+  if(error){msg.textContent="로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.";msg.classList.remove("hidden");msg.style.background="#fff0f0";msg.style.color="#b52d2d";}
+  else{msg.classList.add("hidden");showApp();}
+});
+$("logoutBtn").addEventListener("click", async()=>{await db.auth.signOut();showLogin();});
+
+async function loadCustomers(){
+  const {data,error} = await db.from("customers").select("*").order("created_at",{ascending:false});
+  if(error){alert("고객 목록을 불러오지 못했습니다: "+error.message);return}
+  customers=data||[]; populateSourceFilter(); render();
+}
+function populateSourceFilter(){
+  const select=$("sourceFilter");
+  const current=select.value;
+  const preferred=["AI보험점검 랜딩페이지","리크루팅랜딩페이지1","육아경단녀 랜딩페이지","랜딩페이지","CRM","카카오톡","전화","소개","기타"];
+  const values=[...new Set(customers.map(c=>c.source).filter(Boolean))];
+  values.sort((a,b)=>{const ai=preferred.indexOf(a),bi=preferred.indexOf(b);if(ai!==-1||bi!==-1)return (ai===-1?999:ai)-(bi===-1?999:bi);return a.localeCompare(b);});
+  select.innerHTML='<option value="">전체 유입경로</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  if(values.includes(current)) select.value=current;
+}
+function render(){
+  const q=$("search").value.trim().toLowerCase(), sf=$("statusFilter").value, sourcef=$("sourceFilter").value, sort=$("sortBy").value;
+  let list=customers.filter(c=>(!q||(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q))&&(!sf||c.status===sf)&&(!sourcef||(c.source||"")===sourcef));
+  if(sort==="createdDesc") list.sort((a,b)=>(b.created_at||"").localeCompare(a.created_at||""));
+  if(sort==="followAsc") list.sort((a,b)=>(a.follow_up_date||"9999").localeCompare(b.follow_up_date||"9999"));
+  if(sort==="nameAsc") list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  $("customerBody").innerHTML=list.map(c=>`<tr>
+    <td>${esc((c.created_at||"").slice(0,10))}</td><td><b>${esc(c.name)}</b></td>
+    <td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td><td>${esc(c.source||"-")}</td><td>${esc(c.age_group||"-")}</td>
+    <td><span class="status ${esc(c.status||"신규")}">${esc(c.status||"신규")}</span></td>
+    <td>${esc(c.available_time||"-")}</td><td>${esc(c.follow_up_date||"-")}</td>
+    <td title="${esc(c.memo||c.message||"")}">${esc((c.memo||c.message||"").slice(0,24))}</td>
+    <td><div class="actions-cell"><button class="icon-btn" onclick="editCustomer('${c.id}')">수정</button><button class="icon-btn del" onclick="deleteCustomer('${c.id}')">삭제</button></div></td>
+  </tr>`).join("");
+  $("emptyState").style.display=list.length?"none":"block";
+  $("sTotal").textContent=customers.length;
+  $("sNew").textContent=customers.filter(c=>c.status==="신규").length;
+  $("sToday").textContent=customers.filter(c=>c.follow_up_date===today()).length;
+  $("sAnalysis").textContent=customers.filter(c=>["분석대기","분석진행"].includes(c.status)).length;
+  $("sDone").textContent=customers.filter(c=>c.status==="계약완료").length;
+}
+function clearForm(){$("customerForm").reset();$("customerId").value="";$("formTitle").textContent="신규 고객 등록";$("status").value="신규";$("source").value="CRM";}
+window.editCustomer=id=>{const c=customers.find(x=>x.id===id);if(!c)return;$("customerId").value=c.id;$("name").value=c.name||"";$("phone").value=c.phone||"";$("age").value=c.age_group||"";$("status").value=c.status||"신규";$("source").value=c.source||"CRM";$("availableTime").value=c.available_time||"";$("followUp").value=c.follow_up_date||"";$("interest").value=c.interest||"";$("memo").value=c.memo||"";$("formTitle").textContent="고객 정보 수정";window.scrollTo({top:0,behavior:"smooth"});};
+window.deleteCustomer=async id=>{if(!confirm("이 고객을 삭제할까요?"))return;const {error}=await db.from("customers").delete().eq("id",id);if(error)alert(error.message);else loadCustomers();};
+$("customerForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const id=$("customerId").value;
+  const payload={name:$("name").value.trim(),phone:$("phone").value.trim(),age_group:$("age").value,status:$("status").value,source:$("source").value||"CRM",available_time:$("availableTime").value.trim(),follow_up_date:$("followUp").value||null,interest:$("interest").value.trim(),memo:$("memo").value.trim()};
+  const res=id?await db.from("customers").update(payload).eq("id",id):await db.from("customers").insert(payload);
+  if(res.error)alert("저장 실패: "+res.error.message);else{clearForm();loadCustomers();}
+});
+["search","statusFilter","sourceFilter","sortBy"].forEach(id=>$(id).addEventListener("input",render));
+$("cancelBtn").addEventListener("click",clearForm);$("newBtn").addEventListener("click",()=>{clearForm();$("name").focus()});
+checkSession();
+</script>
+</body>
+</html>

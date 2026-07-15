@@ -1,0 +1,25 @@
+[AI보험] 랜딩페이지 Supabase 연결본
+
+연결 정보
+- Supabase URL: https://pzlxrlkvbrufhimyglyo.supabase.co
+- 저장 테이블: public.customers
+
+작동 방식
+1. 고객이 신청폼 작성
+2. 신청 버튼 클릭
+3. customers 테이블에 자동 저장
+4. status = 신규
+5. source = 랜딩페이지
+
+저장 필드
+- name
+- phone
+- age_group
+- available_time
+- interest
+- memo
+
+배포
+- 이 ZIP을 기존 Netlify 사이트에 다시 업로드하세요.
+- 배포 후 실제 신청 테스트를 1회 진행하세요.
+- Supabase Table Editor에서 customers 행이 추가되면 정상입니다.
