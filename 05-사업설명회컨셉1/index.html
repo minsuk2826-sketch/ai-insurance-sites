@@ -1,654 +1,149 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="AI보험 미래전략사업부 보험사업설명회 신청 페이지" />
-  <meta property="og:title" content="AI보험 미래전략사업부 사업설명회" />
-  <meta property="og:description" content="불확실한 시대, 새로운 가능성을 확인해보세요." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="/og-image.jpg" />
-  <title>AI보험 미래전략사업부 | 사업설명회</title>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="AI보험 미래전략사업부 보험사업설명회 참석 신청">
+  <meta property="og:title" content="보험사업설명회에 당신을 초대합니다">
+  <meta property="og:description" content="더 늦기 전에 새로운 기회를 준비하세요.">
+  <meta property="og:image" content="/seminar-main.png">
+  <title>보험사업설명회 참석 신청</title>
   <style>
-    :root {
-      --navy: #07162d;
-      --blue: #0f5cff;
-      --blue2: #2f7bff;
-      --yellow: #ffd84d;
-      --white: #ffffff;
-      --muted: #b8c5da;
-      --card: rgba(255,255,255,.08);
-      --line: rgba(255,255,255,.14);
+    *{box-sizing:border-box}
+    html,body{margin:0;background:#020b17;font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Noto Sans KR",Arial,sans-serif}
+    body{display:flex;justify-content:center}
+    .page{position:relative;width:min(100%,768px);line-height:0}
+    .main-img{display:block;width:100%;height:auto}
+    .hotspot{position:absolute;display:block;border:0;background:transparent;cursor:pointer;z-index:5}
+    /* 이미지 안 빨간 '사업설명회 참석 신청하기' 버튼 위치 */
+    .apply-hotspot{left:56.1%;top:61.25%;width:39.2%;height:4.45%}
+    /* 이미지 안 노란 카카오톡 버튼 위치 */
+    .kakao-hotspot{left:50.8%;top:85.15%;width:46.4%;height:5.55%}
+    .bottom-apply{
+      position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+      width:min(100%,768px);z-index:20;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+      background:rgba(2,11,23,.92);backdrop-filter:blur(10px)
     }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   Roboto, "Noto Sans KR", Arial, sans-serif;
-      color: var(--white);
-      background:
-        radial-gradient(circle at 20% 10%, rgba(47,123,255,.25), transparent 32%),
-        radial-gradient(circle at 85% 20%, rgba(15,92,255,.17), transparent 30%),
-        linear-gradient(180deg, #061126 0%, #091a34 55%, #07162d 100%);
-      line-height: 1.55;
+    .bottom-apply button{
+      width:100%;height:56px;border:0;border-radius:14px;background:#ffd719;
+      color:#091425;font-size:18px;font-weight:900;cursor:pointer
     }
-
-    a { color: inherit; text-decoration: none; }
-    button, input, select { font: inherit; }
-
-    .wrap {
-      width: min(100%, 760px);
-      margin: 0 auto;
-      overflow: hidden;
-      background: rgba(3, 13, 31, .36);
-      min-height: 100vh;
+    .modal{
+      display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);
+      padding:18px;overflow:auto;align-items:center;justify-content:center
     }
-
-    .hero {
-      position: relative;
-      min-height: 700px;
-      display: flex;
-      align-items: flex-end;
-      padding: 58px 24px 46px;
-      isolation: isolate;
-      background:
-        linear-gradient(180deg, rgba(3,13,31,.22) 0%, rgba(3,13,31,.5) 42%, #07162d 100%),
-        url("hero-bg.jpg") center/cover no-repeat;
+    .modal.open{display:flex}
+    .card{
+      width:min(100%,480px);background:#fff;border-radius:22px;padding:25px 20px;
+      color:#101828;line-height:1.45;box-shadow:0 24px 70px rgba(0,0,0,.4)
     }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      background:
-        linear-gradient(90deg, rgba(2,10,25,.58), rgba(2,10,25,.2)),
-        linear-gradient(180deg, transparent 48%, #07162d 100%);
+    .card h2{margin:0 0 6px;font-size:25px;letter-spacing:-1px;text-align:center}
+    .card .sub{margin:0 0 20px;color:#667085;font-size:14px;text-align:center}
+    .field{margin:0 0 13px}
+    .field label{display:block;margin-bottom:6px;font-size:14px;font-weight:800}
+    .field input,.field select{
+      display:block;width:100%;height:50px;border:1px solid #d0d5dd;border-radius:10px;
+      padding:0 13px;background:#fff;color:#101828;font-size:15px;outline:none
     }
-
-    .hero-content { width: 100%; max-width: 620px; }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 22px;
-      padding: 8px 12px;
-      border: 1px solid rgba(255,255,255,.24);
-      border-radius: 999px;
-      background: rgba(3,13,31,.42);
-      backdrop-filter: blur(8px);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: -.02em;
+    .field input:focus,.field select:focus{border-color:#175cd3;box-shadow:0 0 0 3px rgba(23,92,211,.12)}
+    .agree{display:flex;gap:8px;align-items:flex-start;margin:8px 0 16px;color:#667085;font-size:12px}
+    .agree input{width:18px;height:18px;flex:0 0 auto}
+    .submit{width:100%;height:54px;border:0;border-radius:11px;background:#c91018;color:#fff;font-size:17px;font-weight:900;cursor:pointer}
+    .close{width:100%;margin-top:9px;height:44px;border:0;border-radius:10px;background:#eef2f6;color:#344054;font-weight:800;cursor:pointer}
+    .success{
+      display:none;position:fixed;inset:0;z-index:200;background:#06162c;color:#fff;
+      padding:24px;align-items:center;justify-content:center;text-align:center;line-height:1.5
     }
-
-    .brand-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--yellow);
-      box-shadow: 0 0 16px rgba(255,216,77,.9);
-    }
-
-    .eyebrow {
-      margin: 0 0 12px;
-      color: var(--yellow);
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -.04em;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(38px, 8vw, 64px);
-      line-height: 1.1;
-      letter-spacing: -.06em;
-      word-break: keep-all;
-    }
-
-    .hero-sub {
-      margin: 18px 0 0;
-      color: #eaf0fa;
-      font-size: clamp(17px, 4vw, 22px);
-      font-weight: 600;
-      letter-spacing: -.035em;
-      word-break: keep-all;
-    }
-
-    .hero-desc {
-      margin: 14px 0 26px;
-      color: var(--muted);
-      font-size: 15px;
-      word-break: keep-all;
-    }
-
-    .hero-btns {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .btn {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 56px;
-      border: 0;
-      border-radius: 14px;
-      padding: 14px 18px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: transform .18s ease, opacity .18s ease;
-    }
-
-    .btn:active { transform: scale(.98); }
-    .btn-primary {
-      color: #061126;
-      background: linear-gradient(135deg, #ffe477, #ffd43b);
-      box-shadow: 0 12px 30px rgba(255, 212, 59, .2);
-    }
-
-    .btn-secondary {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      backdrop-filter: blur(8px);
-    }
-
-    section { padding: 62px 24px; }
-    .section-title {
-      margin: 0;
-      font-size: 30px;
-      line-height: 1.25;
-      letter-spacing: -.055em;
-      word-break: keep-all;
-    }
-
-    .section-desc {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 15px;
-      word-break: keep-all;
-    }
-
-    .problem-grid, .benefit-grid {
-      display: grid;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    .card {
-      padding: 22px 20px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--card);
-      backdrop-filter: blur(8px);
-    }
-
-    .card .num {
-      display: inline-flex;
-      width: 32px; height: 32px;
-      align-items: center; justify-content: center;
-      margin-bottom: 14px;
-      border-radius: 10px;
-      background: rgba(47,123,255,.18);
-      color: #7fb1ff;
-      font-weight: 900;
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 19px;
-      letter-spacing: -.04em;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      word-break: keep-all;
-    }
-
-    .highlight {
-      background:
-        linear-gradient(135deg, rgba(15,92,255,.26), rgba(255,216,77,.08)),
-        rgba(255,255,255,.05);
-    }
-
-    .check-list {
-      margin: 26px 0 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 13px;
-    }
-
-    .check-list li {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      padding: 15px 16px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      color: #ecf2fb;
-      font-weight: 650;
-      letter-spacing: -.025em;
-    }
-
-    .check {
-      flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center; justify-content: center;
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      color: #07162d;
-      background: var(--yellow);
-      font-size: 14px;
-      font-weight: 900;
-    }
-
-    .seminar-box {
-      margin-top: 28px;
-      padding: 24px 20px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #0f5cff, #0942bd);
-      box-shadow: 0 18px 45px rgba(15,92,255,.22);
-    }
-
-    .seminar-box dl {
-      margin: 0;
-      display: grid;
-      grid-template-columns: 76px 1fr;
-      gap: 12px 8px;
-    }
-
-    .seminar-box dt { color: #bfd3ff; font-size: 14px; }
-    .seminar-box dd { margin: 0; font-weight: 750; word-break: keep-all; }
-
-    .form-section {
-      padding-bottom: 116px;
-      background: linear-gradient(180deg, rgba(15,92,255,.05), rgba(255,255,255,.02));
-    }
-
-    .form-card {
-      margin-top: 28px;
-      padding: 24px 20px;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: #fff;
-      color: #111827;
-    }
-
-    .form-group { margin-bottom: 16px; }
-    label {
-      display: block;
-      margin-bottom: 7px;
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    input, select {
-      width: 100%;
-      height: 52px;
-      border: 1px solid #d8dee8;
-      border-radius: 12px;
-      padding: 0 14px;
-      outline: none;
-      background: #fff;
-      color: #111827;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(15,92,255,.11);
-    }
-
-    .privacy {
-      display: flex;
-      align-items: flex-start;
-      gap: 9px;
-      margin: 6px 0 18px;
-      font-size: 12px;
-      color: #5f6b7a;
-    }
-
-    .privacy input {
-      width: 18px; height: 18px;
-      margin-top: 1px;
-      flex: 0 0 auto;
-    }
-
-    .submit-btn {
-      width: 100%;
-      min-height: 56px;
-      border: 0;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--blue2), var(--blue));
-      color: #fff;
-      font-size: 17px;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .notice {
-      margin: 12px 0 0;
-      text-align: center;
-      color: #7a8492;
-      font-size: 12px;
-    }
-
-    .footer {
-      padding: 32px 24px 110px;
-      color: #8391a8;
-      font-size: 12px;
-      text-align: center;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }
-
-    .sticky {
-      position: fixed;
-      z-index: 50;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: min(100%, 760px);
-      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-      background: rgba(4,15,35,.9);
-      border-top: 1px solid rgba(255,255,255,.12);
-      backdrop-filter: blur(12px);
-    }
-
-    .sticky a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 56px;
-      border-radius: 14px;
-      background: var(--yellow);
-      color: #07162d;
-      font-size: 17px;
-      font-weight: 900;
-    }
-
-    .success {
-      display: none;
-      position: fixed;
-      z-index: 100;
-      inset: 0;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: linear-gradient(180deg, #07162d, #0b2144);
-      text-align: center;
-    }
-
-    .success.active { display: flex; }
-    .success-box { width: min(100%, 480px); }
-    .success-icon {
-      display: flex;
-      width: 82px; height: 82px;
-      align-items: center; justify-content: center;
-      margin: 0 auto 24px;
-      border-radius: 50%;
-      background: var(--yellow);
-      color: #07162d;
-      font-size: 40px;
-      font-weight: 900;
-    }
-
-    .success h2 {
-      margin: 0;
-      font-size: 32px;
-      letter-spacing: -.055em;
-    }
-
-    .success p {
-      margin: 14px 0 28px;
-      color: var(--muted);
-      word-break: keep-all;
-    }
-
-    @media (min-width: 640px) {
-      .hero { padding: 70px 44px 58px; }
-      section { padding: 74px 44px; }
-      .problem-grid, .benefit-grid { grid-template-columns: repeat(2, 1fr); }
-      .hero-btns { grid-template-columns: 1.35fr 1fr; }
+    .success.open{display:flex}
+    .success-box{width:min(100%,440px)}
+    .check{width:78px;height:78px;border-radius:50%;margin:0 auto 20px;background:#ffd719;color:#07152a;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:900}
+    .success h2{font-size:30px;margin:0 0 10px}
+    .success p{color:#c7d2e4;margin:0 0 24px}
+    .success button{width:100%;height:52px;border:0;border-radius:12px;background:#ffd719;color:#07152a;font-weight:900;font-size:16px}
+    @media(max-width:520px){
+      .bottom-apply{padding-left:10px;padding-right:10px}
+      .bottom-apply button{height:52px;font-size:16px}
     }
   </style>
 </head>
-
 <body>
-  <main class="wrap">
-    <section class="hero">
-      <div class="hero-content">
-        <div class="brand">
-          <span class="brand-dot"></span>
-          AI보험 미래전략사업부
-        </div>
-
-        <p class="eyebrow">불안한 지금, 새로운 선택이 필요합니다</p>
-        <h1>보험사업설명회에<br />초대합니다</h1>
-        <p class="hero-sub">경기침체와 고용불안 속에서<br />나만의 새로운 가능성을 확인해보세요.</p>
-        <p class="hero-desc">
-          보험업에 대한 막연한 권유가 아닌, 실제 운영 시스템과 성장 방향을
-          투명하게 안내해드립니다.
-        </p>
-
-        <div class="hero-btns">
-          <a class="btn btn-primary" href="#apply">설명회 신청하기</a>
-          <a class="btn btn-secondary" href="#info">내용 먼저 확인하기</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="info">
-      <h2 class="section-title">이런 고민을 하고 계신가요?</h2>
-      <p class="section-desc">현재의 어려움이 새로운 기회를 찾는 출발점이 될 수 있습니다.</p>
-
-      <div class="problem-grid">
-        <article class="card">
-          <span class="num">01</span>
-          <h3>줄어드는 소득</h3>
-          <p>물가는 오르는데 실제 생활에 쓸 수 있는 소득은 점점 줄어드는 상황</p>
-        </article>
-        <article class="card">
-          <span class="num">02</span>
-          <h3>불안정한 직장</h3>
-          <p>회사의 상황과 경기 흐름에 따라 언제든 흔들릴 수 있는 고용 환경</p>
-        </article>
-        <article class="card">
-          <span class="num">03</span>
-          <h3>막막한 투잡</h3>
-          <p>무엇을 시작해야 할지, 어떤 방식이 현실적인지 알기 어려운 상황</p>
-        </article>
-        <article class="card">
-          <span class="num">04</span>
-          <h3>준비되지 않은 미래</h3>
-          <p>노후와 가족의 미래를 생각하면 지금부터 새로운 준비가 필요한 시점</p>
-        </article>
-      </div>
-    </section>
-
-    <section>
-      <h2 class="section-title">설명회에서는<br />이 내용을 알려드립니다</h2>
-      <ul class="check-list">
-        <li><span class="check">✓</span><span>보험설계사의 실제 업무와 수익구조</span></li>
-        <li><span class="check">✓</span><span>신입도 시작할 수 있는 교육 및 정착 시스템</span></li>
-        <li><span class="check">✓</span><span>DB 지원과 고객 관리 시스템 활용 방법</span></li>
-        <li><span class="check">✓</span><span>1인 GA 및 3인 지사제 운영 방향</span></li>
-        <li><span class="check">✓</span><span>본업과 병행 가능한 현실적인 시작 방법</span></li>
-      </ul>
-    </section>
-
-    <section>
-      <h2 class="section-title">AI보험 미래전략사업부의<br />운영 시스템</h2>
-      <p class="section-desc">혼자 뛰는 영업이 아니라, 성장할 수 있는 구조를 함께 만듭니다.</p>
-
-      <div class="benefit-grid">
-        <article class="card highlight">
-          <h3>1인 GA 운영</h3>
-          <p>개인의 성장을 넘어 독립적인 사업 운영까지 단계적으로 준비합니다.</p>
-        </article>
-        <article class="card highlight">
-          <h3>3인 지사제 운영</h3>
-          <p>소규모 조직부터 지사 운영까지 확장 가능한 시스템을 제공합니다.</p>
-        </article>
-        <article class="card highlight">
-          <h3>DB 지원</h3>
-          <p>영업 초기 가장 어려운 고객 접점을 확보할 수 있도록 지원합니다.</p>
-        </article>
-        <article class="card highlight">
-          <h3>체계적인 교육</h3>
-          <p>신입과 경력자 모두 현장에서 활용할 수 있는 실전 교육을 진행합니다.</p>
-        </article>
-      </div>
-    </section>
-
-    <section>
-      <h2 class="section-title">사업설명회 안내</h2>
-      <div class="seminar-box">
-        <dl>
-          <dt>대상</dt><dd>20~50대 신입·경력자·경력단절자·주부·직장인</dd>
-          <dt>방식</dt><dd>개별 또는 소규모 사업설명회</dd>
-          <dt>장소</dt><dd>신청 후 담당자가 별도 안내</dd>
-          <dt>비용</dt><dd>무료</dd>
-          <dt>담당</dt><dd>AI보험 미래전략사업부 김민석 사업단장</dd>
-        </dl>
-      </div>
-    </section>
-
-    <section id="apply" class="form-section">
-      <h2 class="section-title">사업설명회 신청</h2>
-      <p class="section-desc">간단한 정보를 남겨주시면 확인 후 연락드리겠습니다.</p>
-
-      <form id="leadForm" class="form-card">
-        <div class="form-group">
-          <label for="name">이름</label>
-          <input id="name" name="name" type="text" placeholder="이름을 입력해주세요" required />
-        </div>
-
-        <div class="form-group">
-          <label for="phone">연락처</label>
-          <input id="phone" name="phone" type="tel" inputmode="numeric"
-                 placeholder="010-0000-0000" maxlength="13" required />
-        </div>
-
-        <div class="form-group">
-          <label for="age">연령대</label>
-          <select id="age" name="age" required>
-            <option value="">연령대를 선택해주세요</option>
-            <option>20대</option>
-            <option>30대</option>
-            <option>40대</option>
-            <option>50대</option>
-            <option>기타</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="career">현재 상태</label>
-          <select id="career" name="career" required>
-            <option value="">현재 상태를 선택해주세요</option>
-            <option>직장인</option>
-            <option>자영업자</option>
-            <option>주부·경력단절</option>
-            <option>보험 경력자</option>
-            <option>구직 중</option>
-            <option>기타</option>
-          </select>
-        </div>
-
-        <label class="privacy">
-          <input type="checkbox" required />
-          <span>사업설명회 안내를 위한 개인정보 수집 및 이용에 동의합니다.</span>
-        </label>
-
-        <button class="submit-btn" type="submit">무료 사업설명회 신청하기</button>
-        <p class="notice">신청 내용은 상담 및 설명회 안내 목적으로만 사용됩니다.</p>
-      </form>
-    </section>
-
-    <footer class="footer">
-      AI보험 미래전략사업부 · 김민석 사업단장<br />
-      본 페이지는 보험계약 모집이 아닌 사업설명회 참가 신청을 위한 페이지입니다.
-    </footer>
+  <main class="page">
+    <img class="main-img" src="seminar-main.png" alt="보험사업설명회 안내 및 참석 신청">
+    <button class="hotspot apply-hotspot" aria-label="사업설명회 신청하기" onclick="openForm()"></button>
+    <a class="hotspot kakao-hotspot" aria-label="카카오톡 상담 신청" href="javascript:openForm()"></a>
   </main>
 
-  <div class="sticky">
-    <a href="#apply">사업설명회 무료 신청</a>
+  <div class="bottom-apply"><button onclick="openForm()">사업설명회 참석 신청하기</button></div>
+
+  <div id="modal" class="modal" onclick="backdropClose(event)">
+    <form id="leadForm" class="card">
+      <h2>사업설명회 참석 신청</h2>
+      <p class="sub">신청 내용을 확인한 후 개별 연락드리겠습니다.</p>
+      <div class="field"><label for="name">이름 *</label><input id="name" name="name" required placeholder="이름을 입력해주세요"></div>
+      <div class="field"><label for="phone">휴대폰 번호 *</label><input id="phone" name="phone" required inputmode="numeric" maxlength="13" placeholder="010-0000-0000"></div>
+      <div class="field"><label for="age">연령대 *</label><select id="age" name="age" required><option value="">선택해주세요</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>기타</option></select></div>
+      <div class="field"><label for="career">보험경력 *</label><select id="career" name="career" required><option value="">선택해주세요</option><option>신입</option><option>경력</option></select></div>
+      <div class="field"><label for="region">지역 *</label><select id="region" name="region" required><option value="">선택해주세요</option><option>서울</option><option>경기</option><option>인천</option><option>부산</option><option>대구</option><option>대전</option><option>광주</option><option>울산</option><option>세종</option><option>강원</option><option>충북</option><option>충남</option><option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option></select></div>
+      <label class="agree"><input type="checkbox" required><span>사업설명회 안내 및 상담을 위한 개인정보 수집·이용에 동의합니다.</span></label>
+      <button class="submit" type="submit">사업설명회 참석 신청하기</button>
+      <button class="close" type="button" onclick="closeForm()">닫기</button>
+    </form>
   </div>
 
-  <section id="successPage" class="success">
+  <section id="success" class="success">
     <div class="success-box">
-      <div class="success-icon">✓</div>
+      <div class="check">✓</div>
       <h2>신청이 완료되었습니다</h2>
-      <p>
-        사업설명회 신청이 정상적으로 접수되었습니다.<br />
-        담당자가 확인 후 연락드리겠습니다.
-      </p>
-      <button class="btn btn-primary" onclick="location.reload()">처음으로 돌아가기</button>
+      <p>사업설명회 참석 신청이 정상적으로 접수되었습니다.<br>담당자가 확인 후 연락드리겠습니다.</p>
+      <button onclick="location.reload()">확인</button>
     </div>
   </section>
 
-  <script>
-    const form = document.getElementById("leadForm");
-    const phone = document.getElementById("phone");
-    const successPage = document.getElementById("successPage");
+<script>
+  const modal=document.getElementById('modal');
+  const form=document.getElementById('leadForm');
+  const success=document.getElementById('success');
+  const phone=document.getElementById('phone');
 
-    phone.addEventListener("input", (e) => {
-      let value = e.target.value.replace(/[^0-9]/g, "").slice(0, 11);
-      if (value.length < 4) {
-        e.target.value = value;
-      } else if (value.length < 8) {
-        e.target.value = value.replace(/(\d{3})(\d+)/, "$1-$2");
-      } else {
-        e.target.value = value.replace(/(\d{3})(\d{4})(\d+)/, "$1-$2-$3");
-      }
-    });
+  function openForm(){modal.classList.add('open');document.body.style.overflow='hidden';}
+  function closeForm(){modal.classList.remove('open');document.body.style.overflow='';}
+  function backdropClose(e){if(e.target===modal)closeForm();}
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  phone.addEventListener('input',e=>{
+    let v=e.target.value.replace(/\D/g,'').slice(0,11);
+    if(v.length<4)e.target.value=v;
+    else if(v.length<8)e.target.value=v.replace(/(\d{3})(\d+)/,'$1-$2');
+    else e.target.value=v.replace(/(\d{3})(\d{4})(\d+)/,'$1-$2-$3');
+  });
 
-      const submitButton = form.querySelector(".submit-btn");
-      submitButton.disabled = true;
-      submitButton.textContent = "신청 중...";
-
-      const payload = {
-        name: form.name.value.trim(),
-        phone: form.phone.value.trim(),
-        age: form.age.value,
-        career: form.career.value,
-        source: "사업설명회 컨셉1",
-        created_at: new Date().toISOString()
-      };
-
-      try {
-        /*
-          Supabase 또는 CRM 연결 시 아래 fetch 부분을 활성화하고
-          YOUR_API_ENDPOINT를 실제 접수 API 주소로 변경하세요.
-
-          const response = await fetch("YOUR_API_ENDPOINT", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-
-          if (!response.ok) throw new Error("접수 실패");
-        */
-
-        console.log("접수 데이터:", payload);
-        successPage.classList.add("active");
-        document.body.style.overflow = "hidden";
-        form.reset();
-      } catch (error) {
-        alert("접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "무료 사업설명회 신청하기";
-      }
-    });
-  </script>
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const btn=form.querySelector('.submit');
+    btn.disabled=true;btn.textContent='신청 중...';
+    const payload={
+      name:form.name.value.trim(),phone:form.phone.value.trim(),
+      age:form.age.value,career:form.career.value,region:form.region.value,
+      source:'사업설명회 컨셉1',created_at:new Date().toISOString()
+    };
+    try{
+      /*
+      실제 CRM/Supabase 저장 주소가 준비되면 아래 주석을 해제하세요.
+      const res=await fetch('YOUR_API_ENDPOINT',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      if(!res.ok)throw new Error('접수 실패');
+      */
+      console.log(payload);
+      modal.classList.remove('open');
+      success.classList.add('open');
+      form.reset();
+    }catch(err){
+      alert('접수 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }finally{
+      btn.disabled=false;btn.textContent='사업설명회 참석 신청하기';
+    }
+  });
+</script>
 </body>
 </html>
