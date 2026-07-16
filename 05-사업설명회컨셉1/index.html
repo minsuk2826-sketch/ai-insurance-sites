@@ -16,9 +16,9 @@
     .main-img{display:block;width:100%;height:auto}
     .hotspot{position:absolute;display:block;border:0;background:transparent;cursor:pointer;z-index:5}
     /* 이미지 안 빨간 '사업설명회 참석 신청하기' 버튼 위치 */
-    .apply-hotspot{left:56.1%;top:61.25%;width:39.2%;height:4.45%}
+    .apply-hotspot{left:56.0%;top:76.55%;width:39.2%;height:4.45%}
     /* 이미지 안 노란 카카오톡 버튼 위치 */
-    .kakao-hotspot{left:50.8%;top:85.15%;width:46.4%;height:5.55%}
+    .kakao-hotspot{left:50.0%;top:85.15%;width:47.5%;height:5.75%}
     .bottom-apply{
       position:fixed;left:50%;bottom:0;transform:translateX(-50%);
       width:min(100%,768px);z-index:20;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
@@ -30,26 +30,33 @@
     }
     .modal{
       display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);
-      padding:18px;overflow:auto;align-items:center;justify-content:center
+      padding:10px;overflow:auto;align-items:center;justify-content:center
     }
     .modal.open{display:flex}
     .card{
-      width:min(100%,480px);background:#fff;border-radius:22px;padding:25px 20px;
-      color:#101828;line-height:1.45;box-shadow:0 24px 70px rgba(0,0,0,.4)
+      width:min(100%,460px);
+      max-height:calc(100vh - 20px);
+      overflow-y:auto;
+      background:#fff;
+      border-radius:18px;
+      padding:18px 16px;
+      color:#101828;
+      line-height:1.35;
+      box-shadow:0 24px 70px rgba(0,0,0,.4)
     }
-    .card h2{margin:0 0 6px;font-size:25px;letter-spacing:-1px;text-align:center}
-    .card .sub{margin:0 0 20px;color:#667085;font-size:14px;text-align:center}
-    .field{margin:0 0 13px}
-    .field label{display:block;margin-bottom:6px;font-size:14px;font-weight:800}
+    .card h2{margin:0 0 4px;font-size:22px;letter-spacing:-1px;text-align:center}
+    .card .sub{margin:0 0 13px;color:#667085;font-size:12px;text-align:center}
+    .field{margin:0 0 9px}
+    .field label{display:block;margin-bottom:4px;font-size:12px;font-weight:800}
     .field input,.field select{
-      display:block;width:100%;height:50px;border:1px solid #d0d5dd;border-radius:10px;
-      padding:0 13px;background:#fff;color:#101828;font-size:15px;outline:none
+      display:block;width:100%;height:42px;border:1px solid #d0d5dd;border-radius:9px;
+      padding:0 11px;background:#fff;color:#101828;font-size:14px;outline:none
     }
     .field input:focus,.field select:focus{border-color:#175cd3;box-shadow:0 0 0 3px rgba(23,92,211,.12)}
-    .agree{display:flex;gap:8px;align-items:flex-start;margin:8px 0 16px;color:#667085;font-size:12px}
-    .agree input{width:18px;height:18px;flex:0 0 auto}
-    .submit{width:100%;height:54px;border:0;border-radius:11px;background:#c91018;color:#fff;font-size:17px;font-weight:900;cursor:pointer}
-    .close{width:100%;margin-top:9px;height:44px;border:0;border-radius:10px;background:#eef2f6;color:#344054;font-weight:800;cursor:pointer}
+    .agree{display:flex;gap:7px;align-items:flex-start;margin:5px 0 10px;color:#667085;font-size:11px}
+    .agree input{width:16px;height:16px;flex:0 0 auto}
+    .submit{width:100%;height:46px;border:0;border-radius:10px;background:#c91018;color:#fff;font-size:15px;font-weight:900;cursor:pointer}
+    .close{width:100%;margin-top:6px;height:38px;border:0;border-radius:9px;background:#eef2f6;color:#344054;font-size:13px;font-weight:800;cursor:pointer}
     .success{
       display:none;position:fixed;inset:0;z-index:200;background:#06162c;color:#fff;
       padding:24px;align-items:center;justify-content:center;text-align:center;line-height:1.5
@@ -63,14 +70,46 @@
     @media(max-width:520px){
       .bottom-apply{padding-left:10px;padding-right:10px}
       .bottom-apply button{height:52px;font-size:16px}
+      .modal{padding:6px;align-items:flex-start}
+      .card{
+        margin:auto 0;
+        width:100%;
+        max-height:calc(100dvh - 12px);
+        border-radius:14px;
+        padding:13px 12px;
+      }
+      .card h2{font-size:20px}
+      .card .sub{font-size:11px;margin-bottom:9px}
+      .field{margin-bottom:6px}
+      .field label{font-size:11px;margin-bottom:3px}
+      .field input,.field select{height:38px;font-size:13px}
+      .agree{font-size:10px;margin:4px 0 7px}
+      .submit{height:42px;font-size:14px}
+      .close{height:34px}
+    }
+
+    @media(max-height:700px){
+      .modal{align-items:flex-start;padding:5px}
+      .card{
+        max-height:calc(100dvh - 10px);
+        padding:11px 12px;
+      }
+      .card h2{font-size:19px}
+      .card .sub{display:none}
+      .field{margin-bottom:5px}
+      .field input,.field select{height:36px}
+      .agree{margin:3px 0 6px}
+      .submit{height:40px}
+      .close{height:32px}
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <main class="page">
     <img class="main-img" src="seminar-main.png" alt="보험사업설명회 안내 및 참석 신청">
     <button class="hotspot apply-hotspot" aria-label="사업설명회 신청하기" onclick="openForm()"></button>
-    <a class="hotspot kakao-hotspot" aria-label="카카오톡 상담 신청" href="javascript:openForm()"></a>
+    <a class="hotspot kakao-hotspot" aria-label="카카오톡 사업설명회 참석 문의" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener"></a>
   </main>
 
   <div class="bottom-apply"><button onclick="openForm()">사업설명회 참석 신청하기</button></div>
@@ -100,14 +139,28 @@
   </section>
 
 <script>
+  const SUPABASE_URL='https://pzlxrlkvbrufhimyglyo.supabase.co';
+  const SUPABASE_KEY='sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd';
+  const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
   const modal=document.getElementById('modal');
   const form=document.getElementById('leadForm');
   const success=document.getElementById('success');
   const phone=document.getElementById('phone');
 
-  function openForm(){modal.classList.add('open');document.body.style.overflow='hidden';}
-  function closeForm(){modal.classList.remove('open');document.body.style.overflow='';}
-  function backdropClose(e){if(e.target===modal)closeForm();}
+  function openForm(){
+    modal.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+
+  function closeForm(){
+    modal.classList.remove('open');
+    document.body.style.overflow='';
+  }
+
+  function backdropClose(e){
+    if(e.target===modal)closeForm();
+  }
 
   phone.addEventListener('input',e=>{
     let v=e.target.value.replace(/\D/g,'').slice(0,11);
@@ -118,30 +171,35 @@
 
   form.addEventListener('submit',async e=>{
     e.preventDefault();
+
     const btn=form.querySelector('.submit');
-    btn.disabled=true;btn.textContent='신청 중...';
+    const originalText=btn.textContent;
+    btn.disabled=true;
+    btn.textContent='신청 중...';
+
     const payload={
-      name:form.name.value.trim(),phone:form.phone.value.trim(),
-      age:form.age.value,career:form.career.value,region:form.region.value,
-      source:'사업설명회 컨셉1',created_at:new Date().toISOString()
+      name:form.name.value.trim(),
+      phone:form.phone.value.trim(),
+      age_group:form.age.value,
+      status:'신규',
+      source:'사업설명회 컨셉1',
+      interest:'보험사업설명회 참석',
+      memo:`보험경력: ${form.career.value} / 지역: ${form.region.value}`
     };
+
     try{
-      /*
-      실제 CRM/Supabase 저장 주소가 준비되면 아래 주석을 해제하세요.
-      const res=await fetch('YOUR_API_ENDPOINT',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      });
-      if(!res.ok)throw new Error('접수 실패');
-      */
-      console.log(payload);
+      const {error}=await db.from('customers').insert(payload);
+      if(error)throw error;
+
       modal.classList.remove('open');
       success.classList.add('open');
       form.reset();
-    }catch(err){
-      alert('접수 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }catch(error){
+      console.error(error);
+      alert('신청 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
     }finally{
-      btn.disabled=false;btn.textContent='사업설명회 참석 신청하기';
+      btn.disabled=false;
+      btn.textContent=originalText;
     }
   });
 </script>
