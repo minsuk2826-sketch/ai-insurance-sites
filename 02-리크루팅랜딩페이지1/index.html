@@ -3,128 +3,446 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="AI보험 미래전략사업부 보험설계사 리크루팅 상담 페이지">
-<title>AI보험 미래전략사업부</title>
+<meta name="description" content="높은 수수료, 수수료 원장 공개, 부속약정서, 재택근무 및 도입수수료 상담">
+<title>AI보험 미래전략사업부 | 설계사 상담</title>
 
-<meta property="og:title" content="AI보험 미래전략사업부">
-<meta property="og:description" content="신입·경력·주부·경력단절 모두 환영 | 정착지원금 제공">
-<meta property="og:image" content="https://dynamic-boba-c6e045.netlify.app/og-image.png">
-<meta property="og:image:secure_url" content="https://dynamic-boba-c6e045.netlify.app/og-image.png">
+<meta property="og:title" content="1200% 룰·분급제? 높은 수수료 받으실 분">
+<meta property="og:description" content="관리자 수당과 중간유통을 줄인 투명한 수수료 구조">
+<meta property="og:image" content="https://ai-insurance-recruit.vercel.app/og-image.png">
+<meta property="og:image:secure_url" content="https://ai-insurance-recruit.vercel.app/og-image.png">
 <meta property="og:image:type" content="image/png">
-<meta property="og:url" content="https://dynamic-boba-c6e045.netlify.app/">
+<meta property="og:url" content="https://ai-insurance-recruit.vercel.app/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AI보험 미래전략사업부">
-<meta name="twitter:description" content="신입·경력·주부·경력단절 모두 환영 | 정착지원금 제공">
-<meta name="twitter:image" content="https://dynamic-boba-c6e045.netlify.app/og-image.png">
+<meta name="twitter:title" content="1200% 룰·분급제? 높은 수수료 받으실 분">
+<meta name="twitter:description" content="수수료 원장 공개 · 부속약정서 OK · 재택근무 OK">
+<meta name="twitter:image" content="https://ai-insurance-recruit.vercel.app/og-image.png">
 
 <style>
-:root{--gold:#d4af37;--bg:#090b10;--card:#141821;--text:#fff;--muted:#bbc2ce;--line:rgba(212,175,55,.45)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 50% 0,#172039 0,#090b10 42%,#07080b 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",Arial,sans-serif;text-align:center;line-height:1.5}.wrap{width:min(860px,calc(100% - 28px));margin:auto}
-.hero{min-height:92vh;display:flex;align-items:center;justify-content:center;padding:48px 0 36px}.brand{color:var(--gold);font-size:clamp(26px,6vw,42px);font-weight:900;margin-bottom:42px}.white1{font-size:clamp(25px,5.5vw,40px);font-weight:800;margin-bottom:42px;letter-spacing:-.04em}.gold1{color:var(--gold);font-size:clamp(34px,8vw,58px);font-weight:950;line-height:1.12;margin-bottom:13px;letter-spacing:-.05em}.gold2{color:var(--gold);font-size:clamp(17px,4vw,28px);font-weight:800;margin-bottom:38px;letter-spacing:-.035em}.btn{border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 28px;border-radius:14px;background:var(--gold);color:#111;font-size:18px;font-weight:900;text-decoration:none;box-shadow:0 12px 35px rgba(212,175,55,.24)}
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:0 auto 18px}.card{border:1px solid var(--line);border-radius:16px;padding:24px 12px;background:rgba(20,24,33,.9)}.number{color:var(--gold);font-size:clamp(33px,7vw,48px);font-weight:950;line-height:1}.label{font-size:clamp(15px,3.8vw,20px);font-weight:750;margin-top:10px}.full-width{margin:18px auto 42px;background:var(--gold);color:#070707;font-size:clamp(23px,5vw,34px);font-weight:950;padding:22px 14px;border-radius:16px}
-.apply{padding:42px 0 110px;border-top:1px solid rgba(255,255,255,.08)}.apply h2{font-size:clamp(26px,6vw,38px);margin:0 0 8px}.apply .desc{color:var(--muted);margin:0 0 24px}.form{max-width:620px;margin:auto;text-align:left;background:rgba(20,24,33,.94);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px}.field{margin-bottom:16px}.field label{display:block;font-weight:800;margin-bottom:7px}.field input,.field select,.field textarea{width:100%;border:1px solid rgba(255,255,255,.16);background:#0c1017;color:#fff;border-radius:11px;padding:14px;font:inherit;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}.field textarea{min-height:90px;resize:vertical}.agree{display:flex;align-items:flex-start;gap:9px;color:#d4d9e2;font-size:13px;margin:6px 0 18px}.agree input{margin-top:4px}.submit{width:100%;min-height:58px;font-size:18px}.kakao-secondary{margin-top:12px!important;background:transparent!important;color:#fee500!important;border:1px solid rgba(254,229,0,.65)!important;box-shadow:none!important;font-size:15px!important;min-height:50px!important}.notice{font-size:12px;color:#929bab;text-align:center;margin-top:12px}.sticky{position:fixed;z-index:10;left:0;right:0;bottom:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(7,8,11,.92);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.12)}.sticky .btn{width:min(620px,100%);min-height:52px}.toast{position:fixed;z-index:30;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#fff;color:#111;border-radius:12px;padding:12px 17px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;white-space:nowrap;max-width:calc(100% - 30px)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:520px){.hero{min-height:auto;padding:66px 0 54px}.brand{margin-bottom:34px}.white1{margin-bottom:34px}.cards{gap:10px}.card{padding:20px 8px}.form{padding:18px 15px}.gold2{white-space:normal}}
-
-.completion-page{display:none;position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#07101c,#111827);padding:24px;align-items:center;justify-content:center;text-align:center;color:#fff}.completion-card{width:min(520px,100%);background:#fff;color:#111827;border-radius:24px;padding:38px 24px;box-shadow:0 24px 80px rgba(0,0,0,.35)}.completion-icon{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;background:#eaf8f0;color:#168552;font-size:38px;font-weight:900}.completion-card h2{font-size:30px;margin:0 0 12px}.completion-card p{margin:0;color:#4b5563;line-height:1.7}.completion-actions{display:flex;gap:10px;margin-top:24px}.completion-actions a{flex:1;text-decoration:none;border-radius:12px;padding:14px 10px;font-weight:800}.completion-actions .call{background:#111827;color:#fff}.completion-actions .kakao{background:#fee500;color:#191919}@media(max-width:480px){.completion-actions{flex-direction:column}}
-
-.completion-card{position:relative}
-.completion-close{
-  position:absolute;top:14px;right:14px;width:42px;height:42px;
-  border:0;border-radius:50%;background:#f1f5f9;color:#111827;
-  font-size:25px;line-height:1;cursor:pointer;display:grid;
-  place-items:center;font-weight:800
+:root{
+  --navy:#061426;
+  --navy2:#0c2747;
+  --gold:#e2b446;
+  --gold2:#ffd978;
+  --white:#fff;
+  --muted:#b8c7d9;
+  --line:rgba(226,180,70,.38);
 }
-.completion-close:hover{background:#e2e8f0}
-.completion-close:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
-
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:#020912;
+  color:var(--white);
+  font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR","Segoe UI",Arial,sans-serif;
+}
+img{display:block;width:100%;height:auto}
+.page{
+  width:min(830px,100%);
+  margin:0 auto;
+  overflow:hidden;
+  background:linear-gradient(180deg,#07182b,#020912);
+}
+.hero{background:#03101f}
+.hero img{width:100%}
+.apply{
+  padding:38px 16px 115px;
+  background:
+    radial-gradient(circle at 50% 0,rgba(226,180,70,.17),transparent 34%),
+    linear-gradient(180deg,#07182b,#020912);
+}
+.heading{text-align:center;margin:0 auto 22px}
+.heading .eyebrow{
+  color:var(--gold2);
+  font-weight:900;
+  font-size:16px;
+  letter-spacing:.02em;
+}
+.heading h1{
+  margin:8px 0 7px;
+  font-size:clamp(28px,7vw,38px);
+  line-height:1.22;
+}
+.heading p{
+  margin:0;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.65;
+}
+.form{
+  max-width:650px;
+  margin:auto;
+  padding:22px 18px;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:linear-gradient(155deg,rgba(14,45,80,.97),rgba(4,17,31,.99));
+  box-shadow:0 18px 55px rgba(0,0,0,.38);
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.field.full{grid-column:1/-1}
+.field label{
+  display:block;
+  margin:0 0 7px;
+  font-size:14px;
+  font-weight:900;
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:12px;
+  background:#fff;
+  color:#172033;
+  padding:14px 13px;
+  font:inherit;
+  font-size:16px;
+  outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(226,180,70,.17);
+}
+.field textarea{min-height:105px;resize:vertical}
+.agree{
+  display:flex;
+  gap:9px;
+  align-items:flex-start;
+  margin:16px 0;
+  color:#d8e2ee;
+  font-size:13px;
+  line-height:1.55;
+}
+.agree input{width:19px;height:19px;margin-top:1px;flex:none}
+.submit{
+  width:100%;
+  min-height:58px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  color:#152033;
+  font-size:19px;
+  font-weight:950;
+  cursor:pointer;
+  box-shadow:0 11px 28px rgba(226,180,70,.22);
+}
+.submit:disabled{opacity:.65;cursor:wait}
+.status{
+  display:none;
+  margin-top:12px;
+  padding:12px;
+  border-radius:11px;
+  text-align:center;
+  font-weight:800;
+}
+.status.err{display:block;background:#fff0f0;color:#a62828}
+.or{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:20px 0;
+  color:#8395aa;
+  font-size:13px;
+}
+.or:before,.or:after{content:"";height:1px;flex:1;background:rgba(255,255,255,.14)}
+.kakao{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:56px;
+  border-radius:14px;
+  background:#fee500;
+  color:#191919;
+  text-decoration:none;
+  font-size:18px;
+  font-weight:950;
+}
+.phone{
+  display:flex;
+  justify-content:center;
+  margin-top:16px;
+  color:#e5edf7;
+  text-decoration:none;
+  font-size:17px;
+  font-weight:900;
+}
+.notice{
+  margin:15px 0 0;
+  color:#8ea1b7;
+  text-align:center;
+  font-size:12px;
+  line-height:1.65;
+}
+.sticky{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  z-index:40;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  padding:9px 10px calc(9px + env(safe-area-inset-bottom));
+  background:rgba(2,9,18,.94);
+  backdrop-filter:blur(11px);
+  border-top:1px solid rgba(255,255,255,.1);
+}
+.sticky a{
+  min-height:51px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:950;
+}
+.sticky .applyBtn{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#152033}
+.sticky .kakaoBtn{background:#fee500;color:#191919}
+.completion{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  padding:24px;
+  align-items:center;
+  justify-content:center;
+  background:rgba(1,7,14,.97);
+}
+.completion.show{display:flex}
+.completion-card{
+  position:relative;
+  width:min(450px,100%);
+  padding:36px 22px 24px;
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:linear-gradient(155deg,#102f53,#061426);
+  text-align:center;
+  box-shadow:0 25px 80px rgba(0,0,0,.5);
+}
+.completion-icon{
+  width:74px;height:74px;
+  display:grid;place-items:center;
+  margin:0 auto 18px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  color:#152033;
+  font-size:38px;
+  font-weight:950;
+}
+.completion h2{margin:0 0 9px;font-size:29px}
+.completion p{margin:0;color:#c6d4e3;line-height:1.7}
+.completion-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:21px;
+}
+.completion-actions a,.completion-actions button{
+  border:0;
+  border-radius:12px;
+  padding:14px 8px;
+  font:inherit;
+  font-weight:900;
+  text-decoration:none;
+  cursor:pointer;
+}
+.completion-actions .call{background:#fff;color:#152033}
+.completion-actions .kakao2{background:#fee500;color:#191919}
+.close{
+  position:absolute;
+  top:12px;right:12px;
+  width:40px;height:40px;
+  border:0;border-radius:50%;
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  font-size:24px;
+  cursor:pointer;
+}
+@media(max-width:560px){
+  .grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  .apply{padding-left:13px;padding-right:13px}
+  .form{padding:20px 15px}
+  .completion-actions{grid-template-columns:1fr}
+}
 </style>
 </head>
+
 <body>
-<section class="hero"><div class="wrap">
-  <div class="brand">AI보험 미래전략사업부</div>
-  <div class="white1">혼자 뛰는 영업에는 한계가 있습니다.</div>
-  <div class="gold1">시스템을 가진 설계사만 !!</div>
-  <div class="gold2">보험업계에서 지속적으로 성장해 나갈 수 있습니다.</div>
-  <a class="btn" href="#apply">무료 상담 신청하기</a>
-</div></section>
+<div class="page">
+  <section class="hero">
+    <img src="og-image.png" alt="높은 수수료와 도입수수료 안내">
+  </section>
 
-<main class="wrap">
-<section class="cards">
-  <div class="card"><div class="number">20건</div><div class="label">월 DB 제공</div></div>
-  <div class="card"><div class="number">90일</div><div class="label">정착프로그램</div></div>
-  <div class="card"><div class="number">1인</div><div class="label">GA 운영 가능</div></div>
-  <div class="card"><div class="number">3인</div><div class="label">지사 운영 가능</div></div>
-</section>
-<div class="full-width">🎁 신입 정착지원금 제공</div>
-</main>
+  <section class="apply" id="apply">
+    <div class="heading">
+      <div class="eyebrow">지금 바로 시작하세요!</div>
+      <h1>무료 상담 신청</h1>
+      <p>이름과 연락처를 남겨주시면 확인 후 빠르게 연락드리겠습니다.</p>
+    </div>
 
-<section class="apply" id="apply"><div class="wrap">
-  <h2>전화 상담 신청</h2>
-  <p class="desc">이름과 연락처를 남겨주시면 확인 후 직접 전화드리겠습니다.</p>
-  <form class="form" id="recruitForm">
-    <div class="field"><label for="name">이름</label><input id="name" name="name" required placeholder="성함을 입력해주세요"></div>
-    <div class="field"><label for="phone">연락처</label><input id="phone" name="phone" type="tel" inputmode="tel" required placeholder="010-0000-0000"></div>
-    <div class="field"><label for="career">보험 경력</label><select id="career" name="career" required><option value="">선택해주세요</option><option>신입</option><option>1년 미만</option><option>1~3년</option><option>3~5년</option><option>5년 이상</option><option>팀장·지사장 경력</option></select></div>
-    <div class="field"><label for="message">문의 내용</label><textarea id="message" name="message" placeholder="궁금한 점이나 현재 상황을 적어주세요"></textarea></div>
-    <label class="agree"><input type="checkbox" required><span>상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</span></label>
-    <button class="btn submit" type="submit">무료 상담 신청하기</button>
-    <a class="btn submit kakao-secondary" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡 상담</a>
-    <p class="notice">제출하신 정보는 상담 연락 목적으로만 사용됩니다.</p>
-  </form>
-</div></section>
+    <form class="form" id="recruitForm">
+      <div class="grid">
+        <div class="field">
+          <label for="name">이름</label>
+          <input id="name" name="name" autocomplete="name" required placeholder="성함을 입력해주세요">
+        </div>
 
-<div class="sticky"><a class="btn" href="#apply">무료 상담 신청하기</a></div>
+        <div class="field">
+          <label for="phone">연락처</label>
+          <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="010-0000-0000">
+        </div>
 
+        <div class="field">
+          <label for="career">보험 경력</label>
+          <select id="career" name="career" required>
+            <option value="">선택해주세요</option>
+            <option>신입</option>
+            <option>1년 미만</option>
+            <option>1~3년</option>
+            <option>3~5년</option>
+            <option>5년 이상</option>
+            <option>팀장·지사장 경력</option>
+          </select>
+        </div>
 
-<div class="completion-page" id="completionPage" aria-live="polite"><div class="completion-card"><button type="button" class="completion-close" id="completionClose" aria-label="완료 화면 닫기">×</button><div class="completion-icon">✓</div><h2>신청이 완료되었습니다.</h2><p>전문 상담사가 확인 후 연락드리겠습니다.</p><div class="completion-actions"><a class="call" href="tel:01087958502">📞 전화 상담</a><a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">💬 카카오톡 상담</a></div></div></div>
+        <div class="field">
+          <label for="time">상담 가능 시간</label>
+          <select id="time" name="time" required>
+            <option value="">선택해주세요</option>
+            <option>오전 9시~12시</option>
+            <option>오후 12시~3시</option>
+            <option>오후 3시~6시</option>
+            <option>저녁 6시 이후</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="message">문의 내용</label>
+          <textarea id="message" name="message" placeholder="궁금한 내용이나 현재 상황을 자유롭게 적어주세요"></textarea>
+        </div>
+      </div>
+
+      <label class="agree">
+        <input type="checkbox" required>
+        <span>상담 연락을 위한 개인정보 수집 및 이용에 동의합니다. 제출 정보는 상담 목적으로만 사용됩니다.</span>
+      </label>
+
+      <button class="submit" type="submit">무료 상담 신청하기</button>
+      <div id="formStatus" class="status"></div>
+
+      <div class="or">또는</div>
+
+      <a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">
+        카카오톡으로 바로 상담하기
+      </a>
+
+      <a class="phone" href="tel:01087958502">상담문의 010-8795-8502</a>
+      <p class="notice">상담 신청 내용은 CRM에 자동 저장됩니다.</p>
+    </form>
+  </section>
+</div>
+
+<div class="sticky">
+  <a class="applyBtn" href="#apply">상담 신청</a>
+  <a class="kakaoBtn" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오 상담</a>
+</div>
+
+<div class="completion" id="completionPage" aria-live="polite">
+  <div class="completion-card">
+    <button class="close" id="completionClose" type="button" aria-label="닫기">×</button>
+    <div class="completion-icon">✓</div>
+    <h2>접수가 완료되었습니다</h2>
+    <p>상담 신청이 정상적으로 접수되었습니다.<br>확인 후 빠르게 연락드리겠습니다.</p>
+    <div class="completion-actions">
+      <a class="call" href="tel:01087958502">전화 상담</a>
+      <a class="kakao2" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오 상담</a>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
- const SUPABASE_URL='https://pzlxrlkvbrufhimyglyo.supabase.co';
- const SUPABASE_KEY='sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd';
- const form=document.getElementById('recruitForm');
- const completion=document.getElementById('completionPage');
- const completionClose=document.getElementById('completionClose');
- let hiddenPageElements=[];
+  const SUPABASE_URL='https://pzlxrlkvbrufhimyglyo.supabase.co';
+  const SUPABASE_KEY='sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd';
 
- function closeCompletion(){
-   completion.style.display='none';
-   hiddenPageElements.forEach(({el,display})=>{
-     if(display) el.style.display=display;
-     else el.style.removeProperty('display');
-   });
-   hiddenPageElements=[];
-   document.body.style.removeProperty('overflow');
-   window.scrollTo({top:0,behavior:'smooth'});
- }
+  const form=document.getElementById('recruitForm');
+  const completion=document.getElementById('completionPage');
+  const completionClose=document.getElementById('completionClose');
+  const statusBox=document.getElementById('formStatus');
+  const phone=document.getElementById('phone');
 
- completionClose?.addEventListener('click',closeCompletion);
- completion?.addEventListener('click',e=>{
-   if(e.target===completion) closeCompletion();
- });
- document.addEventListener('keydown',e=>{
-   if(e.key==='Escape' && completion?.style.display==='flex') closeCompletion();
- });
+  phone.addEventListener('input',function(){
+    let n=this.value.replace(/\D/g,'').slice(0,11);
+    if(n.length>7) this.value=n.replace(/(\d{3})(\d{4})(\d{1,4})/,'$1-$2-$3');
+    else if(n.length>3) this.value=n.replace(/(\d{3})(\d{1,4})/,'$1-$2');
+    else this.value=n;
+  });
 
- if(!form) return;
- form.addEventListener('submit',async function(e){
-   e.preventDefault();
-   if(!form.reportValidity()) return;
-   const btn=form.querySelector('button[type="submit"]');
-   const old=btn.textContent; btn.disabled=true; btn.textContent='접수 중...';
-   const fd=new FormData(form);
-   const payload={name:(fd.get('name')||'').toString().trim(),phone:(fd.get('phone')||'').toString().trim(),age_group:(fd.get('career')||'').toString(),status:'신규',source:'리크루팅랜딩페이지1',interest:'보험설계사 채용 상담',memo:(fd.get('message')||'').toString().trim()||'리크루팅 상담 신청',message:(fd.get('message')||'').toString().trim()};
-   try{
-     const r=await fetch(SUPABASE_URL+'/rest/v1/customers',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});
-     if(!r.ok) throw new Error(await r.text());
-     form.reset();
-     hiddenPageElements=Array.from(document.body.querySelectorAll('body > *:not(#completionPage)')).map(el=>({el,display:el.style.display}));
-     hiddenPageElements.forEach(({el})=>el.style.display='none');
-     completion.style.display='flex'; document.body.style.overflow='hidden'; window.scrollTo(0,0);
-   }catch(err){console.error(err);alert('접수에 실패했습니다. 잠시 후 다시 시도하거나 카카오톡으로 문의해주세요.');}
-   finally{btn.disabled=false;btn.textContent=old;}
- });
+  function closeCompletion(){
+    completion.classList.remove('show');
+    document.body.style.removeProperty('overflow');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  completionClose.addEventListener('click',closeCompletion);
+  completion.addEventListener('click',e=>{
+    if(e.target===completion) closeCompletion();
+  });
+
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();
+    if(!form.reportValidity()) return;
+
+    const btn=form.querySelector('button[type="submit"]');
+    const old=btn.textContent;
+    btn.disabled=true;
+    btn.textContent='접수 중...';
+    statusBox.className='status';
+
+    const fd=new FormData(form);
+    const message=(fd.get('message')||'').toString().trim();
+
+    const payload={
+      name:(fd.get('name')||'').toString().trim(),
+      phone:(fd.get('phone')||'').toString().trim(),
+      age_group:(fd.get('career')||'').toString(),
+      status:'신규',
+      source:'도입수수료 랜딩페이지',
+      available_time:(fd.get('time')||'').toString(),
+      interest:'높은 수수료 및 도입수수료 상담',
+      memo:message || '도입수수료 랜딩페이지 상담 신청',
+      message:message
+    };
+
+    try{
+      const r=await fetch(SUPABASE_URL+'/rest/v1/customers',{
+        method:'POST',
+        headers:{
+          apikey:SUPABASE_KEY,
+          Authorization:'Bearer '+SUPABASE_KEY,
+          'Content-Type':'application/json',
+          Prefer:'return=minimal'
+        },
+        body:JSON.stringify(payload)
+      });
+
+      if(!r.ok) throw new Error(await r.text());
+
+      form.reset();
+      completion.classList.add('show');
+      document.body.style.overflow='hidden';
+      window.scrollTo(0,0);
+    }catch(err){
+      console.error(err);
+      statusBox.textContent='접수에 실패했습니다. 카카오톡 또는 전화로 문의해주세요.';
+      statusBox.className='status err';
+    }finally{
+      btn.disabled=false;
+      btn.textContent=old;
+    }
+  });
 })();
 </script>
 </body>
