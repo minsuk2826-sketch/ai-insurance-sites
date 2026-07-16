@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[AI보험] AI 보험 분석 무료 신청</title>
+  <meta name="description" content="내 보험의 보장 상태를 확인하는 AI 보험 분석 무료 신청">
+  <meta name="theme-color" content="#f7fbff">
+
+  <style>
+    :root{
+      --blue:#1769ff;
+      --blue2:#0e52d8;
+      --cyan:#21b8ef;
+      --navy:#14213a;
+      --text:#182338;
+      --muted:#6c7890;
+      --line:#dfe8f5;
+      --soft:#f5f9ff;
+      --yellow:#ffd84d;
+      --white:#fff;
+      --shadow:0 18px 50px rgba(48,88,145,.12);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;
+      color:var(--text);
+      background:#fff;
+      line-height:1.55;
+    }
+    a{text-decoration:none;color:inherit}
+    button,input,select{font:inherit}
+    .wrap{width:min(1120px,calc(100% - 28px));margin:0 auto}
+
+    .topbar{
+      position:sticky;top:0;z-index:30;
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(49,86,142,.08);
+    }
+    .topbar .inner{
+      height:62px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+    .brand{font-weight:900;letter-spacing:-.04em}
+    .brand strong{color:var(--blue)}
+    .top-link{
+      padding:9px 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-size:14px;
+      font-weight:800;
+    }
+
+    .hero{
+      background:
+        radial-gradient(circle at 82% 28%,rgba(23,105,255,.13),transparent 28%),
+        radial-gradient(circle at 15% 18%,rgba(34,184,240,.11),transparent 22%),
+        linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+      overflow:hidden;
+    }
+    .hero-inner{
+      min-height:585px;
+      display:grid;
+      grid-template-columns:1.02fr .98fr;
+      gap:44px;
+      align-items:center;
+      padding:34px 0 52px;
+    }
+    .hero-copy{text-align:center}
+    .hero-brand{
+      color:var(--blue);
+      font-weight:900;
+      font-size:28px;
+      letter-spacing:-.04em;
+      margin-bottom:2px;
+    }
+    .hero-subbrand{
+      color:#2d3e5d;
+      font-weight:800;
+      margin-bottom:20px;
+    }
+    .hero h1{
+      margin:0;
+      font-size:clamp(50px,6.4vw,82px);
+      line-height:1.03;
+      letter-spacing:-.065em;
+    }
+    .hero h1 em{font-style:normal;color:var(--blue)}
+    .hero .sub{
+      margin:19px 0 7px;
+      font-size:22px;
+      font-weight:900;
+    }
+    .hero .desc{
+      margin:0 0 26px;
+      color:var(--muted);
+      font-size:17px;
+    }
+    .hero-actions{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      min-height:56px;
+      padding:0 24px;
+      border-radius:15px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      font-weight:900;
+      box-shadow:0 10px 28px rgba(23,105,255,.12);
+    }
+    .btn.blue{color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2))}
+    .btn.kakao{background:var(--yellow);color:#1f2937}
+    .hero-bullets{
+      margin-top:22px;
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:17px;
+      color:#52617a;
+      font-size:14px;
+      font-weight:800;
+    }
+
+    .phone-wrap{display:flex;justify-content:center}
+    .phone{
+      width:min(390px,100%);
+      border-radius:38px;
+      padding:18px;
+      background:#fff;
+      border:1px solid #dce7f6;
+      box-shadow:0 26px 70px rgba(57,90,142,.18);
+      transform:rotate(2deg);
+    }
+    .notch{width:112px;height:20px;border-radius:999px;background:#162036;margin:0 auto 18px}
+    .phone-title{text-align:center;font-size:20px;font-weight:900;margin-bottom:16px}
+    .score-box{
+      border-radius:26px;
+      padding:22px;
+      background:linear-gradient(180deg,#f8fbff,#eef5ff);
+      border:1px solid #dce8f7;
+    }
+    .score-main{display:grid;grid-template-columns:155px 1fr;gap:18px;align-items:center}
+    .ring{
+      width:155px;aspect-ratio:1;border-radius:50%;
+      background:conic-gradient(var(--blue) 0 72%,#e6edf7 72% 100%);
+      padding:14px;display:grid;place-items:center;
+    }
+    .ring-inner{
+      width:100%;height:100%;border-radius:50%;
+      background:#fff;display:grid;place-items:center;text-align:center;
+      box-shadow:inset 0 0 0 1px #e8eef7;
+    }
+    .ring strong{font-size:48px;line-height:1}
+    .ring small{color:var(--blue);font-weight:900}
+    .bars{display:grid;gap:11px}
+    .bar-row{display:grid;grid-template-columns:82px 1fr 34px;gap:8px;align-items:center;font-size:13px}
+    .bar{height:8px;background:#e8eef7;border-radius:999px;overflow:hidden}
+    .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));border-radius:999px}
+    .ai-note{
+      margin-top:16px;background:#fff;border:1px solid #e2eaf5;border-radius:16px;
+      padding:14px;font-size:13px;color:#5b6880;
+    }
+
+    section{padding:80px 0}
+    .section-title{text-align:center;margin-bottom:36px}
+    .section-title h2{
+      margin:0 0 10px;
+      font-size:clamp(31px,4vw,47px);
+      letter-spacing:-.055em;
+      line-height:1.15;
+    }
+    .section-title p{margin:0;color:var(--muted);font-size:18px}
+
+    .questions{background:var(--soft)}
+    .card-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+    .soft-card{
+      background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px 16px;
+      text-align:center;box-shadow:0 8px 24px rgba(52,91,144,.06);
+    }
+    .soft-card .ico{font-size:33px;margin-bottom:12px}
+    .soft-card b{display:block;font-size:16px}
+
+    .analysis-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+    .panel{
+      background:#fff;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:var(--shadow);
+    }
+    .panel h3{margin:0 0 22px;font-size:25px}
+    .mini-score{display:grid;grid-template-columns:190px 1fr;gap:26px;align-items:center}
+    .mini-score .ring{width:190px}
+    .question-panel{
+      background:linear-gradient(145deg,#f8fbff,#edf4ff);
+      display:flex;flex-direction:column;justify-content:center;
+    }
+    .question-mark{
+      width:56px;height:56px;border-radius:50%;background:var(--blue);color:#fff;
+      display:grid;place-items:center;font-size:31px;font-weight:900;margin-bottom:16px;
+    }
+    .question-panel h3{font-size:34px;line-height:1.35;letter-spacing:-.05em}
+    .question-panel strong{color:var(--blue)}
+
+    .features-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+    .feature{
+      border:1px solid var(--line);border-radius:20px;padding:24px 16px;text-align:center;background:#fff;
+    }
+    .feature .ico{font-size:31px;margin-bottom:12px}
+    .feature b{display:block;margin-bottom:7px}
+    .feature span{font-size:14px;color:var(--muted)}
+
+    .cases{background:var(--soft)}
+    .case-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .case{
+      background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:var(--shadow)
+    }
+    .tag{
+      display:inline-block;padding:6px 10px;border-radius:999px;background:#e9f2ff;
+      color:#1658bd;font-size:13px;font-weight:900;
+    }
+    .case h3{margin:14px 0 20px}
+    .change{
+      display:flex;justify-content:center;align-items:center;gap:20px;
+      font-size:38px;font-weight:900;color:#17386f;
+    }
+    .change .arrow{color:var(--blue)}
+    .case-note{margin-top:18px;color:#687790;font-size:14px;text-align:center}
+
+    .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    .step{text-align:center;position:relative}
+    .step-circle{
+      width:78px;height:78px;border-radius:50%;margin:0 auto 14px;
+      display:grid;place-items:center;border:1px solid var(--line);background:#fff;
+      box-shadow:0 10px 24px rgba(51,90,143,.08);font-size:30px;
+    }
+    .step small{display:block;color:var(--blue);font-weight:900}
+    .step b{display:block}
+    .step:not(:last-child)::after{
+      content:"→";position:absolute;right:-10px;top:26px;color:#90a8cb;font-size:22px;
+    }
+
+    .trust{
+      background:#fff;
+      padding-top:12px;
+    }
+    .trust-box{
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:linear-gradient(135deg,#f8fbff,#ffffff);
+      padding:26px;
+      text-align:center;
+      box-shadow:0 12px 35px rgba(48,88,145,.08);
+    }
+    .trust-box strong{color:var(--blue)}
+
+    .apply{background:linear-gradient(180deg,#eff6ff,#fff)}
+    .apply-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:24px;align-items:stretch}
+    .apply-copy{
+      border:1px solid var(--line);border-radius:24px;padding:34px;
+      background:linear-gradient(135deg,#eaf3ff,#fbfdff);
+    }
+    .apply-copy h2{font-size:40px;line-height:1.2;letter-spacing:-.05em;margin:0 0 18px}
+    .apply-copy em{font-style:normal;color:var(--blue)}
+    .apply-copy ul{list-style:none;padding:0;margin:0;color:#4d5c76}
+    .apply-copy li{margin:12px 0}
+
+    .form-card{
+      background:#fff;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:var(--shadow);
+    }
+    .form-card h3{text-align:center;font-size:25px;margin:0 0 20px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    input,select{
+      width:100%;height:52px;border:1px solid #d7e1ef;border-radius:12px;
+      padding:0 14px;outline:none;background:#fff;
+    }
+    input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(23,105,255,.1)}
+    .full{grid-column:1/-1}
+    .agree{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:#687790}
+    .agree input{width:18px;height:18px;margin-top:2px}
+    .submit{
+      height:56px;border:0;border-radius:12px;
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+      color:#fff;font-weight:900;cursor:pointer;
+    }
+    .contact-row{display:flex;gap:10px;margin-top:12px}
+    .contact-row a{flex:1;text-align:center;padding:13px;border-radius:12px;font-weight:900}
+    .contact-row .call{background:#edf4ff;color:#22477f}
+    .contact-row .kakao{background:var(--yellow);color:#1f2937}
+
+    footer{
+      padding:28px 0;border-top:1px solid var(--line);
+      color:#74829a;font-size:13px;text-align:center;
+    }
+
+    @media(max-width:920px){
+      .hero-inner,.analysis-grid,.apply-grid{grid-template-columns:1fr}
+      .hero-inner{min-height:auto;padding:38px 0 58px}
+      .card-grid,.features-grid{grid-template-columns:repeat(2,1fr)}
+      .steps{grid-template-columns:repeat(2,1fr)}
+      .step:not(:last-child)::after{display:none}
+      .case-grid{grid-template-columns:1fr}
+      .phone{max-width:430px}
+    }
+    @media(max-width:620px){
+      .wrap{width:min(100% - 22px,1120px)}
+      .topbar .inner{height:58px}
+      .top-link{font-size:12px;padding:8px 10px}
+      .hero-inner{padding-top:24px}
+      .hero-brand{font-size:23px}
+      .hero-subbrand{margin-bottom:14px}
+      .hero h1{font-size:48px}
+      .hero .sub{font-size:18px}
+      .score-main,.mini-score{grid-template-columns:1fr}
+      .ring{margin:auto}
+      .card-grid,.features-grid,.steps{grid-template-columns:1fr}
+      section{padding:62px 0}
+      .form-grid{grid-template-columns:1fr}
+      .full{grid-column:auto}
+      .contact-row{flex-direction:column}
+      .change{font-size:29px}
+      .apply-copy h2{font-size:33px}
+    }
+  
+  /* Mobile header fix */
+  .topbar .inner{
+    justify-content:center !important;
+  }
+  .brand{
+    width:100%;
+    text-align:center;
+    white-space:nowrap;
+  }
+  @media(max-width:620px){
+    .topbar .inner{
+      height:54px !important;
+      padding-left:6px;
+      padding-right:6px;
+    }
+    .brand{
+      font-size:14px !important;
+      letter-spacing:-0.05em;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+  }
+
+
+  /* Final mobile hero spacing */
+  .hero h1{ margin-top:0 !important; }
+  @media(max-width:620px){
+    .hero-inner{ padding-top:18px !important; }
+    .hero-copy{ padding-top:0 !important; }
+  }
+
+
+  .completion-page{
+    min-height:100vh;display:none;align-items:center;justify-content:center;
+    padding:34px 18px;background:linear-gradient(180deg,#f1f7ff 0%,#ffffff 100%);
+  }
+  .completion-card{
+    width:min(560px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;
+    padding:42px 28px;text-align:center;box-shadow:var(--shadow);
+  }
+  .completion-icon{
+    width:82px;height:82px;border-radius:50%;display:grid;place-items:center;margin:0 auto 22px;
+    background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-size:40px;font-weight:900;
+  }
+  .completion-card h2{margin:0 0 14px;font-size:34px;letter-spacing:-.05em;line-height:1.2}
+  .completion-card .lead{margin:0;color:#55657d;font-size:18px;line-height:1.7}
+  .receipt-box{margin:24px 0;padding:16px;border-radius:16px;background:#f3f7fd;color:#42536d}
+  .receipt-box strong{display:block;margin-top:4px;color:var(--blue);font-size:20px;letter-spacing:.02em}
+  .completion-guide{margin:22px 0;text-align:left;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 4px}
+  .completion-guide b{display:block;margin-bottom:10px}
+  .completion-guide p{margin:7px 0;color:#64738a}
+  .completion-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .completion-actions a{padding:15px 12px;border-radius:13px;font-weight:900}
+  .completion-actions .call{background:#edf4ff;color:#22477f}
+  .completion-actions .kakao{background:var(--yellow);color:#1f2937}
+  @media(max-width:520px){
+    .completion-card{padding:34px 20px}.completion-card h2{font-size:29px}.completion-actions{grid-template-columns:1fr}
+  }
+
+</style>
+
+  <meta property="og:title" content="[AI보험] AI 보험 분석 무료 신청">
+  <meta property="og:description" content="내 보험의 보장 상태를 확인하는 AI 보험 분석 무료 신청">
+  <meta property="og:image" content="https://teal-bonbon-d38e5d.netlify.app/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://teal-bonbon-d38e5d.netlify.app/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="[AI보험] AI 보험 분석 무료 신청">
+  <meta name="twitter:description" content="내 보험의 보장 상태를 확인하는 AI 보험 분석 무료 신청">
+  <meta name="twitter:image" content="https://teal-bonbon-d38e5d.netlify.app/og-image.jpg">
+
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="wrap inner">
+      <div class="brand"><strong>[AI보험]</strong> 내가 가입한 보험의 점수는?</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+
+          <h1>내 보험 점수는<br><em>몇 점</em>일까요?</h1>
+          <p class="sub">내 보험의 보장 상태를 확인하는 AI 보험 분석</p>
+          <p class="desc">보험은 가입보다 점검이 중요합니다.</p>
+
+          <div class="hero-actions">
+            <a class="btn blue" href="#apply">AI 보험 분석 무료 신청 →</a>
+            <a class="btn kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡으로 문의하기</a>
+          </div>
+
+          <div class="hero-bullets">
+            <span>✓ 100% 무료 진단</span>
+            <span>✓ 개인 맞춤 분석</span>
+            <span>✓ 간편 신청 완료</span>
+            <span>✓ 개인정보 안전 보호</span>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="phone-title">AI 보험 점수</div>
+            <div class="score-box">
+              <div class="score-main">
+                <div class="ring">
+                  <div class="ring-inner">
+                    <div><strong>72</strong>점<br><small>등급 B</small></div>
+                  </div>
+                </div>
+                <div class="bars">
+                  <div class="bar-row"><span>암 보장</span><div class="bar"><i style="width:90%"></i></div><b>90</b></div>
+                  <div class="bar-row"><span>뇌혈관</span><div class="bar"><i style="width:45%"></i></div><b>45</b></div>
+                  <div class="bar-row"><span>심장질환</span><div class="bar"><i style="width:52%"></i></div><b>52</b></div>
+                  <div class="bar-row"><span>입원비</span><div class="bar"><i style="width:85%"></i></div><b>85</b></div>
+                  <div class="bar-row"><span>보험료 효율</span><div class="bar"><i style="width:78%"></i></div><b>78</b></div>
+                </div>
+              </div>
+              <div class="ai-note"><b>AI 한 줄 평가</b><br>뇌혈관·심장질환 보장은 보완이 필요하며, 암 보장과 보험료 효율은 양호합니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="questions">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>혹시 이런 생각, 해보신 적 있으신가요?</h2>
+          <p>지금 내 보험이 충분한지 간단하게 확인해보세요.</p>
+        </div>
+        <div class="card-grid">
+          <div class="soft-card"><div class="ico">🐷</div><b>보험료는 매달 내는데<br>내 보험이 좋은 보험일까?</b></div>
+          <div class="soft-card"><div class="ico">🛡️</div><b>암 진단비는<br>충분할까?</b></div>
+          <div class="soft-card"><div class="ico">🧠</div><b>뇌·심장 보장은<br>괜찮을까?</b></div>
+          <div class="soft-card"><div class="ico">🧮</div><b>보험료를 너무 많이<br>내고 있는 건 아닐까?</b></div>
+          <div class="soft-card"><div class="ico">🔎</div><b>놓치고 있는 보장은<br>없을까?</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap analysis-grid">
+        <div class="panel">
+          <h3>AI 보험 점수 예시</h3>
+          <div class="mini-score">
+            <div class="ring">
+              <div class="ring-inner">
+                <div><strong>72</strong>점<br><small>등급 B</small></div>
+              </div>
+            </div>
+            <div class="bars">
+              <div class="bar-row"><span>암 보장</span><div class="bar"><i style="width:90%"></i></div><b>90</b></div>
+              <div class="bar-row"><span>뇌혈관</span><div class="bar"><i style="width:45%"></i></div><b>45</b></div>
+              <div class="bar-row"><span>심장질환</span><div class="bar"><i style="width:52%"></i></div><b>52</b></div>
+              <div class="bar-row"><span>입원비</span><div class="bar"><i style="width:85%"></i></div><b>85</b></div>
+              <div class="bar-row"><span>보험료 효율</span><div class="bar"><i style="width:78%"></i></div><b>78</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel question-panel">
+          <div class="question-mark">?</div>
+          <h3>여기서 질문 하나.<br>만약 지금 <strong>암 진단</strong>을 받는다면<br>내 보험은 과연 충분할까요?</h3>
+          <p>AI 보험 점수와 전문가 검토를 통해 현재 보장 상태를 알기 쉽게 안내해드립니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>AI 보험 점수가 알려드립니다</h2>
+          <p>어려운 보험 내용을 점수와 우선순위로 정리합니다.</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature"><div class="ico">🛡️</div><b>부족한 보장</b><span>꼭 필요한 보장의 부족 여부 확인</span></div>
+          <div class="feature"><div class="ico">💰</div><b>과도한 보험료</b><span>불필요하거나 비효율적인 부분 분석</span></div>
+          <div class="feature"><div class="ico">🔁</div><b>중복 특약</b><span>비슷한 보장의 중복 여부 점검</span></div>
+          <div class="feature"><div class="ico">📋</div><b>보완 우선순위</b><span>먼저 점검할 항목을 순서대로 안내</span></div>
+          <div class="feature"><div class="ico">📈</div><b>보험료 효율성</b><span>보험료 대비 보장 수준 종합 평가</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cases">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>점검 전·후 변화 예시</h2>
+          <p>아래 수치는 이해를 돕기 위한 예시이며 실제 결과는 개인별로 다릅니다.</p>
+        </div>
+        <div class="case-grid">
+          <div class="case">
+            <span class="tag">CASE 01 · 보장 점수 개선</span>
+            <h3>부족한 핵심 보장을 점검한 경우</h3>
+            <div class="change"><span>58점</span><span class="arrow">→</span><span>83점</span></div>
+            <div class="case-note">암·뇌혈관·심장질환 보장 균형을 점검한 예시입니다.</div>
+          </div>
+          <div class="case">
+            <span class="tag">CASE 02 · 보험료 효율 점검</span>
+            <h3>중복·불필요 특약을 확인한 경우</h3>
+            <div class="change"><span>42만원</span><span class="arrow">→</span><span>29만원</span></div>
+            <div class="case-note">보장을 유지하면서 불필요한 지출을 점검한 예시입니다.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-title">
+          <h2>신청부터 결과 확인까지</h2>
+          <p>간단한 절차로 내 보험의 현재 상태를 점검합니다.</p>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="step-circle">📝</div><small>01</small><b>점수 진단 신청</b></div>
+          <div class="step"><div class="step-circle">📄</div><small>02</small><b>보험증권 확인</b></div>
+          <div class="step"><div class="step-circle">🤖</div><small>03</small><b>AI 기준 분석</b></div>
+          <div class="step"><div class="step-circle">👤</div><small>04</small><b>전문가 검토</b></div>
+          <div class="step"><div class="step-circle">📊</div><small>05</small><b>점수 리포트 안내</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust">
+      <div class="wrap">
+        <div class="trust-box">
+          <strong>보험은 가입보다 점검이 중요합니다.</strong><br>
+          현재 보장 상태를 확인하고, 부족하거나 중복된 부분이 있는지 먼저 살펴보세요.
+        </div>
+      </div>
+    </section>
+
+    <section class="apply" id="apply">
+      <div class="wrap apply-grid">
+        <div class="apply-copy">
+          <h2>지금 <em>무료로</em><br>AI 보험 분석을 신청해보세요.</h2>
+          <ul>
+            <li>✓ 간편하게 신청 완료</li>
+            <li>✓ 100점 만점 보장 진단</li>
+            <li>✓ 개인정보 안전 보호</li>
+            <li>✓ 전문가 1:1 결과 안내</li>
+          </ul>
+        </div>
+
+        <form id="insuranceScoreForm" class="form-card" name="insurance-score" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="insurance-score">
+          <p style="display:none"><label>자동입력 방지 <input name="bot-field"></label></p>
+
+          <h3>AI 보험 분석 무료 신청</h3>
+          <div class="form-grid">
+            <input name="name" type="text" placeholder="이름을 입력해주세요" required>
+            <input name="phone" type="tel" placeholder="휴대폰 번호를 입력해주세요" required>
+
+            <select name="age" required>
+              <option value="">나이대를 선택해주세요</option>
+              <option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option>
+            </select>
+
+            <select name="time" required>
+              <option value="">상담 가능 시간을 선택해주세요</option>
+              <option>오전 9시~12시</option><option>오후 12시~3시</option><option>오후 3시~6시</option><option>저녁 6시 이후</option>
+            </select>
+
+            <select class="full" name="insurance_status" required>
+              <option value="">현재 보험 가입 여부를 선택해주세요</option>
+              <option>보험 가입 중</option><option>일부 가입</option><option>신규 가입 희망</option><option>잘 모르겠음</option>
+            </select>
+
+            <label class="agree full">
+              <input type="checkbox" name="privacy_agree" required>
+              <span>AI 보험 분석 및 상담을 위한 개인정보 수집·이용에 동의합니다. 수집 항목: 이름, 연락처, 나이대, 상담 가능 시간. 보유 기간: 상담 종료 또는 동의 철회 시까지.</span>
+            </label>
+
+            <button class="submit full" type="submit">AI 보험 분석 무료 신청</button>
+          </div>
+          <div id="formStatus" style="display:none;margin-top:12px;padding:12px;border-radius:12px;font-size:14px;font-weight:800;text-align:center"></div>
+
+          <div class="contact-row">
+            <a class="call" href="tel:01087958502">📞 전화 상담</a>
+            <a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">💬 카카오톡 오픈채팅</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      [AI보험] 내가 가입한 보험의 점수는? · 전화 010-8795-8502 · 카카오톡 오픈채팅: AI보험 미래전략사업부<br>
+      본 서비스는 보험 보장 상태 점검을 위한 상담 서비스이며, 분석 결과는 개인의 계약 내용에 따라 달라질 수 있습니다.
+    </div>
+  </footer>
+
+
+<div id="completionPage" class="completion-page" aria-live="polite">
+  <div class="completion-card" style="position:relative;">
+  <button onclick="location.reload()" style="position:absolute;top:15px;right:15px;border:none;background:none;font-size:32px;cursor:pointer;">×</button>
+    <div class="completion-icon">✓</div>
+    <h2>접수가 완료되었습니다</h2>
+    <p class="lead">AI 보험 분석 신청이 완료되었습니다.<br>전문 상담사가 확인 후 연락드리겠습니다.</p>
+    <div class="receipt-box">접수번호<strong id="receiptNumber">AI-00000000-0000</strong></div>
+    <div class="completion-guide">
+      <b>상담 전 준비해 주세요</b>
+      <p>✓ 현재 가입 중인 보험증권 또는 보장 내역</p>
+      <p>✓ 매월 납입 중인 보험료</p>
+      <p>✓ 궁금하거나 점검받고 싶은 내용</p>
+    </div>
+    <div class="completion-actions">
+      <a class="call" href="tel:01087958502">📞 전화 상담</a>
+      <a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">💬 카카오톡 상담</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SUPABASE_URL = "https://pzlxrlkvbrufhimyglyo.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd";
+  const form = document.getElementById("insuranceScoreForm");
+  const statusBox = document.getElementById("formStatus");
+  const completionPage = document.getElementById("completionPage");
+
+  function makeReceiptNumber() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const random = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
+    return `AI-${y}${m}${d}-${random}`;
+  }
+
+  function showStatus(message, ok) {
+    statusBox.style.display = "block";
+    statusBox.style.background = ok ? "#eaf8f0" : "#fff0f0";
+    statusBox.style.color = ok ? "#176b48" : "#b52d2d";
+    statusBox.textContent = message;
+  }
+
+  if (!form) return;
+
+  form.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "신청 내용을 저장하는 중...";
+
+    const fd = new FormData(form);
+    const payload = {
+      name: (fd.get("name") || "").toString().trim(),
+      phone: (fd.get("phone") || "").toString().trim(),
+      age_group: (fd.get("age") || "").toString(),
+      status: "신규",
+      source: "랜딩페이지",
+      available_time: (fd.get("time") || "").toString(),
+      interest: (fd.get("insurance_status") || "").toString(),
+      memo: "AI 보험 분석 무료 신청"
+    };
+
+    try {
+      const response = await fetch(SUPABASE_URL + "/rest/v1/customers", {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const detail = await response.text();
+        throw new Error(detail || "저장 실패");
+      }
+
+      form.reset();
+      document.getElementById("receiptNumber").textContent = makeReceiptNumber();
+      document.querySelector("header").style.display = "none";
+      document.querySelector("main").style.display = "none";
+      document.querySelector("footer").style.display = "none";
+      completionPage.style.display = "flex";
+      window.scrollTo({top: 0, behavior: "smooth"});
+    } catch (error) {
+      console.error(error);
+      showStatus("신청 저장에 실패했습니다. 카카오톡 오픈채팅 또는 전화 상담을 이용해주세요.", false);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
