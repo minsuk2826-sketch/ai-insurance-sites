@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>[AI보험] AI 보험 분석 무료 신청</title>
-  <meta name="description" content="내 보험의 보장 상태를 확인하는 AI 보험 분석 무료 신청">
+  <title>보험사업설명회 초대</title>
+  <meta name="description" content="지금 당신은 제2의 소득원을 준비하고 계신가요?">
   <meta name="theme-color" content="#f7fbff">
 
   <style>
@@ -418,7 +418,7 @@
       <div class="wrap hero-inner">
         <div class="hero-copy">
 
-          <h1>내 보험 점수는<br><em>몇 점</em>일까요?</h1>
+          <h1>경기침체<br>물가상승<br><em>불안한 미래...</em></h1>
           <p class="sub">내 보험의 보장 상태를 확인하는 AI 보험 분석</p>
           <p class="desc">보험은 가입보다 점검이 중요합니다.</p>
 
@@ -691,7 +691,7 @@
       phone: (fd.get("phone") || "").toString().trim(),
       age_group: (fd.get("age") || "").toString(),
       status: "신규",
-      source: "랜딩페이지",
+      source: "사업설명회컨셉1",
       available_time: (fd.get("time") || "").toString(),
       interest: (fd.get("insurance_status") || "").toString(),
       memo: "AI 보험 분석 무료 신청"
