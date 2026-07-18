@@ -3,118 +3,58 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#061426">
-<title>배달 1건 2,200원, 보험은 높은 수수료</title>
-<meta name="description" content="배달보다 높은 수익 기회. 보험설계사 투잡 무료 상담 신청.">
+<meta name="theme-color" content="#07111f">
+<title>투잡 중에는 보험이 최고다!</title>
+<meta name="description" content="보험 한 건만 계약해도 높은 수수료. 보험설계사 투잡 상담 신청.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="같은 1건, 결과는 천지차이">
-<meta property="og:description" content="배달 1건 2,200원, 보험계약 한 건은 높은 수수료의 시작">
+<meta property="og:title" content="투잡 중에는 보험이 최고다!">
+<meta property="og:description" content="배달 1건 2,200원보다 성과가 쌓이는 보험 투잡을 시작하세요.">
 <meta property="og:image" content="/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <main class="page">
-<section class="hero">
-  <div class="brand">AI보험 미래전략사업부</div>
-  <p class="eyebrow">배달로 하루 종일 달려도</p>
-  <h1>배달 1건 하면<br><span>2,200원</span> 버는데…</h1>
-  <p class="lead">사고 위험, 수리비, 유류비까지 감당하면서<br>언제까지 몸으로만 수익을 만들 건가요?</p>
+  <img class="landing-visual" src="./landing-main.jpg" alt="투잡 중에는 보험이 최고다. 보험 한 건만 계약해도 높은 수수료와 장기유지수수료">
 
-  <div class="story">
-    <article class="scene danger">
-      <div class="scene-title">배달 1건</div>
-      <div class="price">2,200원</div>
-      <div class="road">
-        <div class="rain"></div>
-        <div class="rider"><i></i><b></b><span></span></div>
-        <div class="bike"></div>
-        <div class="spark">!</div>
+  <section id="apply" class="apply">
+    <div id="formArea">
+      <h1>지금 바로 <em>상담 신청</em>하세요!</h1>
+      <div class="apply-layout">
+        <form id="leadForm" novalidate>
+          <label><span>이름</span><input name="name" required placeholder="이름"></label>
+          <label><span>연락처</span><input id="phone" name="phone" required inputmode="numeric" maxlength="13" placeholder="010-0000-0000"></label>
+          <label><span>연령</span><select name="age_group" required><option value="">연령대를 선택하세요</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></label>
+          <label><span>희망 형태</span><select name="interest" required><option value="">선택하세요</option><option>투잡으로 시작</option><option>전업으로 시작</option><option>상담 후 결정</option></select></label>
+          <button id="submitBtn" type="submit">상담 신청하기</button>
+          <p id="status" class="status" aria-live="polite"></p>
+        </form>
+
+        <aside class="quick">
+          <a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">
+            <b>TALK</b><span>카카오톡<br>간편 문의</span>
+          </a>
+          <div class="benefits">
+            <span>✓ 초보 가능</span><span>✓ 유연한 시간</span><span>✓ 높은 수익</span><span>✓ 정착 지원</span>
+          </div>
+        </aside>
       </div>
-      <div class="losses"><span>사고 위험</span><span>수리비 폭탄</span><span>유지비 부담</span></div>
-    </article>
-
-    <div class="turn">반전</div>
-
-    <article class="scene opportunity">
-      <div class="scene-title">보험계약 1건</div>
-      <div class="price">높은 수수료</div>
-      <div class="office">
-        <div class="won w1">₩</div><div class="won w2">₩</div>
-        <div class="agent"><i></i><b></b><span></span></div>
-      </div>
-      <div class="gains"><span>투잡 가능</span><span>초보 교육</span><span>장기 성장</span></div>
-    </article>
-  </div>
-
-  <div class="headline-box">
-    <small>시간을 파는 투잡이 아니라</small>
-    <strong>성과가 쌓이는 투잡을 시작하세요.</strong>
-  </div>
-  <a class="main-cta" href="#apply">무료 상담 신청하기</a>
-</section>
-
-<section class="why">
-  <p class="section-tag">WHY INSURANCE</p>
-  <h2>투잡 중에는 <em>보험이 최고다</em></h2>
-  <p class="desc">보험을 몰라도 괜찮습니다. 기초부터 실전까지 체계적으로 알려드립니다.</p>
-  <div class="features">
-    <article><span>01</span><h3>유연한 시간관리</h3><p>본업과 병행하며 본인 일정에 맞춰 시작</p></article>
-    <article><span>02</span><h3>초보자 교육</h3><p>자격 준비부터 상담 실전까지 단계별 지원</p></article>
-    <article><span>03</span><h3>높은 성장 가능성</h3><p>단순 건당 수익이 아닌 장기적인 영업 자산</p></article>
-  </div>
-</section>
-
-<section class="target">
-  <div class="target-card">
-    <p>이런 분께 추천합니다</p>
-    <ul>
-      <li>배달·대리운전 등 몸으로 하는 투잡이 힘든 분</li>
-      <li>퇴근 후 할 수 있는 새로운 수익원을 찾는 분</li>
-      <li>보험 경험은 없지만 제대로 배우고 싶은 분</li>
-      <li>20대~50대 신입·경력단절·경력자</li>
-    </ul>
-  </div>
-</section>
-
-<section id="apply" class="apply">
-  <div class="form-heading">
-    <p class="section-tag">FREE CONSULTATION</p>
-    <h2>무료 상담 신청</h2>
-    <p>정보를 남겨주시면 확인 후 빠르게 연락드립니다.</p>
-  </div>
-  <form id="leadForm">
-    <div class="grid">
-      <label>이름<input name="name" required placeholder="이름을 입력해주세요"></label>
-      <label>연락처<input id="phone" name="phone" required inputmode="numeric" placeholder="010-0000-0000"></label>
-      <label>연령대<select name="age_group" required><option value="">선택해주세요</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></label>
-      <label>희망 형태<select name="interest" required><option value="">선택해주세요</option><option>투잡으로 시작</option><option>전업으로 시작</option><option>상담 후 결정</option></select></label>
-      <label>상담 가능 시간<select name="available_time" required><option value="">선택해주세요</option><option>오전 9시~12시</option><option>오후 12시~3시</option><option>오후 3시~6시</option><option>저녁 6시 이후</option></select></label>
-      <label class="full">문의 내용<textarea name="message" placeholder="궁금한 내용을 남겨주세요"></textarea></label>
+      <label class="agree"><input type="checkbox" id="agree" required> 상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</label>
     </div>
-    <label class="agree"><input type="checkbox" required><span>상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</span></label>
-    <button id="submitBtn" type="submit">무료 상담 신청하기</button>
-    <p id="status" class="status"></p>
-    <a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡으로 바로 상담하기</a>
-  </form>
-</section>
+
+    <div id="success" class="success" aria-live="polite">
+      <div class="check">✓</div>
+      <h2>상담 신청이 완료되었습니다.</h2>
+      <p>전문 상담사가 확인 후 순차적으로 연락드리겠습니다.</p>
+      <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡으로 바로 문의</a>
+    </div>
+  </section>
 </main>
 
 <nav class="sticky">
   <a href="#apply">상담 신청</a>
   <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오 상담</a>
 </nav>
-
-<div id="completion" class="completion">
-  <div class="complete-card">
-    <button id="closeComplete" type="button" aria-label="닫기">×</button>
-    <div class="check">✓</div>
-    <h2>접수가 완료되었습니다</h2>
-    <p>상담 신청이 정상적으로 접수되었습니다.<br>확인 후 빠르게 연락드리겠습니다.</p>
-    <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오 상담</a>
-  </div>
-</div>
-
 <script src="./script.js"></script>
 </body>
 </html>
