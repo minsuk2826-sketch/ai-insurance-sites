@@ -1,58 +1,66 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07111f">
-<title>투잡 중에는 보험이 최고다!</title>
-<meta name="description" content="보험 한 건만 계약해도 높은 수수료. 보험설계사 투잡 상담 신청.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="투잡 중에는 보험이 최고다!">
-<meta property="og:description" content="배달 1건 2,200원보다 성과가 쌓이는 보험 투잡을 시작하세요.">
-<meta property="og:image" content="/og-image.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="./style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#061a3b">
+  <title>투잡 중에는 보험영업 투잡이 최고입니다</title>
+  <meta name="description" content="보험영업 투잡 상담 신청">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="투잡 중에는 보험영업 투잡이 최고입니다">
+  <meta property="og:description" content="보험 전문가와 상담해보세요.">
+  <meta property="og:image" content="landing.png">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#04162f;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif}
+    body{display:flex;justify-content:center}.page{position:relative;width:min(100%,720px);background:#04162f;box-shadow:0 0 40px rgba(0,0,0,.35)}
+    .hero{display:block;width:100%;height:auto;-webkit-user-drag:none;user-select:none}
+    .hotspot{position:absolute;z-index:5;bottom:6.2%;height:10.8%;border:0;background:transparent;cursor:pointer;border-radius:18px;text-indent:-9999px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+    .kakao{left:3.8%;width:45.3%}.apply{right:3.8%;width:45.3%}.hotspot:focus-visible{outline:4px solid #fff;outline-offset:-4px}
+    .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.7);backdrop-filter:blur(5px)}.modal.open{display:flex}
+    .card{width:min(440px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:24px;box-shadow:0 25px 70px rgba(0,0,0,.35);position:relative}
+    .close{position:absolute;right:14px;top:12px;border:0;background:#eef2f7;width:36px;height:36px;border-radius:50%;font-size:23px;cursor:pointer}
+    h2{margin:0 42px 7px 0;font-size:25px;color:#102349}p{margin:0 0 18px;color:#667085;line-height:1.55}.field{margin:0 0 12px}.field label{display:block;margin:0 0 6px;font-size:14px;font-weight:800;color:#344054}
+    input,select{width:100%;padding:13px 14px;border:1px solid #d5dce7;border-radius:11px;font:inherit;outline:none}input:focus,select:focus{border-color:#1557d8;box-shadow:0 0 0 3px rgba(21,87,216,.1)}
+    .agree{display:flex;gap:9px;align-items:flex-start;margin:14px 0;color:#596579;font-size:13px;line-height:1.45}.agree input{width:18px;height:18px;margin:1px 0 0;flex:none}
+    .submit{width:100%;border:0;border-radius:12px;padding:15px;background:linear-gradient(135deg,#164fd0,#073692);color:#fff;font-size:17px;font-weight:900;cursor:pointer}.submit:disabled{opacity:.65;cursor:wait}
+    .success{display:none;text-align:center}.success.show{display:block}.form.hidden{display:none}.check{width:66px;height:66px;margin:5px auto 16px;border-radius:50%;display:grid;place-items:center;background:#eaf8ef;color:#16934b;font-size:37px;font-weight:900}.success button{border:0;border-radius:12px;padding:13px 28px;background:#0b47bd;color:#fff;font-weight:900;cursor:pointer}
+    @media(max-width:480px){.card{padding:22px 18px;border-radius:18px}.hotspot{border-radius:10px}}
+  </style>
 </head>
 <body>
-<main class="page">
-  <div class="visual-wrap">
-    <img class="landing-visual" src="./landing-main.jpg" alt="투잡 중에는 보험이 최고다. 보험 한 건만 계약해도 높은 수수료와 장기유지수수료">
-  </div>
-</main>
+  <main class="page" aria-label="배달보험 설계사 모집 랜딩페이지">
+    <img class="hero" src="landing.png" alt="배달 한 건 2,200원, 보험은 한 건만 해도 높은 수수료. 투잡 중에는 보험영업 투잡이 최고입니다.">
+    <a class="hotspot kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener" aria-label="카카오톡 상담하기">카카오톡 상담하기</a>
+    <button class="hotspot apply" type="button" id="openForm" aria-label="간편 상담 신청">간편 상담 신청</button>
+  </main>
 
-<nav class="sticky" aria-label="상담 메뉴">
-  <button id="openConsult" type="button">상담 신청</button>
-  <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오 상담</a>
-</nav>
-
-<div id="consultModal" class="modal" aria-hidden="true">
-  <div class="modal-backdrop" data-close-modal></div>
-  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="modal-close" type="button" aria-label="닫기" data-close-modal>×</button>
-    <h1 id="modalTitle">상담 신청</h1>
-    <p class="modal-desc">정보를 남겨주시면 확인 후 연락드리겠습니다.</p>
-
-    <div id="formArea">
-      <form id="leadForm" novalidate>
-        <label><span>이름</span><input name="name" required placeholder="이름"></label>
-        <label><span>연락처</span><input id="phone" name="phone" required inputmode="numeric" maxlength="13" placeholder="010-0000-0000"></label>
-        <label><span>연령</span><select name="age_group" required><option value="">연령대를 선택하세요</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></label>
-        <label><span>희망 형태</span><select name="interest" required><option value="">선택하세요</option><option>투잡으로 시작</option><option>전업으로 시작</option><option>상담 후 결정</option></select></label>
-        <label class="agree"><input type="checkbox" id="agree" required><span>상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</span></label>
-        <button id="submitBtn" type="submit">상담 신청하기</button>
-        <p id="status" class="status" aria-live="polite"></p>
+  <section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="card">
+      <button class="close" id="closeForm" type="button" aria-label="닫기">×</button>
+      <form class="form" id="leadForm">
+        <h2 id="modalTitle">간편 상담 신청</h2>
+        <p>정보를 남겨주시면 보험 전문가가 확인 후 연락드립니다.</p>
+        <div class="field"><label for="name">이름</label><input id="name" name="name" autocomplete="name" placeholder="이름을 입력하세요" required></div>
+        <div class="field"><label for="phone">연락처</label><input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="010-0000-0000" required></div>
+        <div class="field"><label for="age">연령대</label><select id="age" name="age" required><option value="">연령대를 선택하세요</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></div>
+        <div class="field"><label for="interest">희망 형태</label><select id="interest" name="interest" required><option value="">희망 형태를 선택하세요</option><option>투잡으로 시작</option><option>전업으로 시작</option><option>상담 후 결정</option></select></div>
+        <label class="agree"><input type="checkbox" required><span>상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</span></label>
+        <button class="submit" type="submit">상담 신청하기</button>
       </form>
-    </div>
-
-    <div id="success" class="success" aria-live="polite">
-      <div class="check">✓</div>
-      <h2>상담 신청이 완료되었습니다.</h2>
-      <p>전문 상담사가 확인 후 순차적으로 연락드리겠습니다.</p>
-      <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡으로 바로 문의</a>
+      <div class="success" id="success"><div class="check">✓</div><h2>상담 신청이 완료되었습니다.</h2><p>전문 상담사가 확인 후 순차적으로 연락드리겠습니다.</p><button type="button" id="done">확인</button></div>
     </div>
   </section>
-</div>
 
-<script src="./script.js"></script>
+<script>
+const SUPABASE_URL='https://pzlxrlkvbrufhimyglyo.supabase.co';
+const SUPABASE_KEY='sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd';
+const modal=document.getElementById('modal'),form=document.getElementById('leadForm'),success=document.getElementById('success'),phone=document.getElementById('phone');
+function openModal(){modal.classList.add('open');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById('name').focus(),100)}
+function closeModal(){modal.classList.remove('open');document.body.style.overflow=''}
+document.getElementById('openForm').addEventListener('click',openModal);document.getElementById('closeForm').addEventListener('click',closeModal);document.getElementById('done').addEventListener('click',()=>{closeModal();form.classList.remove('hidden');success.classList.remove('show')});
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+phone.addEventListener('input',e=>{let v=e.target.value.replace(/\D/g,'').slice(0,11);if(v.length<4)e.target.value=v;else if(v.length<8)e.target.value=v.replace(/(\d{3})(\d+)/,'$1-$2');else e.target.value=v.replace(/(\d{3})(\d{4})(\d+)/,'$1-$2-$3')});
+form.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('.submit'),old=btn.textContent;btn.disabled=true;btn.textContent='신청 중...';const payload={name:form.name.value.trim(),phone:form.phone.value.trim(),age_group:form.age.value,status:'신규',source:'배달보험랜딩',interest:form.interest.value,memo:'배달보험 랜딩페이지 상담 신청'};try{const r=await fetch(SUPABASE_URL+'/rest/v1/customers',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});if(!r.ok)throw new Error(await r.text());form.reset();form.classList.add('hidden');success.classList.add('show')}catch(err){console.error(err);alert('신청 저장에 실패했습니다. 잠시 후 다시 시도해주세요.')}finally{btn.disabled=false;btn.textContent=old}});
+</script>
 </body>
 </html>
