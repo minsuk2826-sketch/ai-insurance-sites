@@ -1,19 +1,22 @@
+최종 연결 내용
+
+- 카카오 오픈채팅:
+  https://open.kakao.com/o/sPtglPDi
+
+- 상담 신청:
+  기존 Supabase CRM의 customers 테이블로 저장
+
+- CRM 유입 경로 표시:
+  전체보험사 비교견적
+
 적용 방법
+압축파일 안의 아래 파일을 GitHub의 06-전체보험비교 폴더에 모두 덮어쓰세요.
 
-GitHub 저장소의 `06-전체보험비교` 폴더 안에서 아래 파일을 전부 덮어쓰세요.
+index.html
+style.css
+script.js
+landing-main.jpg
 
-- index.html
-- style.css
-- script.js
-- landing-main.jpg
-
-수정 내용
-1. 이미지 안에 있던 눌리지 않는 가짜 상담 폼을 완전히 잘라냈습니다.
-2. 이미지 바로 아래에 실제 입력 가능한 상담 폼을 배치했습니다.
-3. 이름, 연락처, 상담 시간, 문의 내용, 동의 체크가 모두 작동합니다.
-4. 접수 후 완료 팝업이 표시됩니다.
-5. 모바일 하단 고정 상담 버튼도 작동합니다.
-
-중요
-실제 CRM 접수와 카카오 상담 주소는 script.js 맨 위 CONFIG에 기존 주소를 넣어야 합니다.
-기존 프로젝트에 이미 사용하던 SUBMIT_ENDPOINT와 KAKAO_URL이 있으면 그대로 복사해 넣으세요.
+Commit 후 Vercel 배포가 완료되면,
+https://ai-insurance-compare.vercel.app/?v=101
+로 접속해서 테스트하세요.

@@ -1,9 +1,10 @@
 const CONFIG = {
-  // 기존에 사용 중인 실제 카카오 상담 주소로 교체하세요.
-  KAKAO_URL: "https://open.kakao.com/",
-  // 기존 CRM/Supabase 접수 주소가 있으면 그대로 붙여넣으세요.
-  SUBMIT_ENDPOINT: ""
+  KAKAO_URL: "https://open.kakao.com/o/sPtglPDi",
+  SUPABASE_URL: "https://pzlxrlkvbrufhimyglyo.supabase.co",
+  SUPABASE_KEY: "sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd"
 };
+
+const db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 
 const kakaoBtn = document.getElementById("kakaoBtn");
 const stickyKakao = document.getElementById("stickyKakao");
@@ -13,6 +14,18 @@ stickyKakao.href = CONFIG.KAKAO_URL;
 const form = document.getElementById("leadForm");
 const submitBtn = document.getElementById("submitBtn");
 const modal = document.getElementById("completeModal");
+
+form.phone.addEventListener("input", (event) => {
+  let value = event.target.value.replace(/\D/g, "").slice(0, 11);
+
+  if (value.length < 4) {
+    event.target.value = value;
+  } else if (value.length < 8) {
+    event.target.value = value.replace(/(\d{3})(\d+)/, "$1-$2");
+  } else {
+    event.target.value = value.replace(/(\d{3})(\d{4})(\d+)/, "$1-$2-$3");
+  }
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -24,35 +37,34 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
-  const payload = Object.fromEntries(new FormData(form).entries());
-  payload.phone = phone;
-  payload.source = "전체보험사 비교견적 랜딩페이지";
-  payload.created_at = new Date().toISOString();
-
+  const originalText = submitBtn.textContent;
   submitBtn.disabled = true;
   submitBtn.textContent = "접수 중...";
 
+  const payload = {
+    name: form.name.value.trim(),
+    phone: form.phone.value.trim(),
+    age_group: "미입력",
+    status: "신규",
+    source: "전체보험사 비교견적",
+    available_time: form.preferred_time.value,
+    interest: "전체 보험사 비교견적 상담",
+    memo: form.message.value.trim()
+  };
+
   try {
-    if (CONFIG.SUBMIT_ENDPOINT) {
-      const response = await fetch(CONFIG.SUBMIT_ENDPOINT, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) throw new Error("submit failed");
-    } else {
-      // 주소를 아직 연결하지 않은 상태에서도 화면 동작을 확인할 수 있습니다.
-      console.log("상담 접수 데이터:", payload);
-    }
+    const { error } = await db.from("customers").insert(payload);
+    if (error) throw error;
 
     form.reset();
     modal.classList.add("show");
     modal.setAttribute("aria-hidden", "false");
   } catch (error) {
-    alert("접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    console.error(error);
+    alert("접수 저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = "무료 상담 신청하기";
+    submitBtn.textContent = originalText;
   }
 });
 
