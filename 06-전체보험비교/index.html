@@ -1,240 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>전체 보험사 비교견적 | 보험성장연구소</title>
-  <meta name="description" content="한 회사 상품만 제안하는 한계를 넘어, 여러 보험사의 상품을 비교해 고객에게 더 적합한 선택지를 제공합니다." />
-  <meta property="og:title" content="전체 보험사 비교견적 상담" />
-  <meta property="og:description" content="비교가 가능하면 상담 경쟁력도 달라집니다." />
-  <meta name="theme-color" content="#FEE500" />
-  <link rel="stylesheet" href="./style.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>전체 보험사 비교견적 상담</title>
+  <meta name="description" content="전체 보험사 비교견적으로 고객에게 더 적합한 보험 상품을 제안합니다.">
+  <meta name="theme-color" content="#FEE500">
+  <meta property="og:title" content="전체 보험사 비교견적 상담">
+  <meta property="og:description" content="한 회사만이 아닌 전체 보험사를 비교해보세요.">
+  <meta property="og:image" content="/landing-main.png">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="talk-badge">TALK</span>
-      <div>
-        <strong>보험성장연구소</strong>
-        <small>대표 김민석</small>
-      </div>
-    </div>
-    <a class="top-cta" href="#consult">상담 신청</a>
-  </header>
+  <main class="page">
+    <img class="main-image" src="./landing-main.png" alt="전체 보험사 비교견적 안내">
 
-  <main>
-    <section class="hero section">
-      <div class="hero-copy reveal">
-        <span class="eyebrow">현장에서 자주 마주치는 장면</span>
-        <h1>고객이 원하는 건<br><em>한 회사의 답</em>이 아닙니다.</h1>
-        <p>
-          메×츠 파트너스처럼 한 회사 상품만 판매할 수 있다면
-          고객의 질문에 충분히 답하기 어렵습니다.
-        </p>
+    <section class="real-form" id="consult">
+      <div class="form-heading">
+        <p>비교가 다르면 결과도 달라집니다.</p>
+        <h1>지금 바로 <em>상담문의</em> 주세요!</h1>
+        <span>전체 보험사 비교견적으로 고객 만족과 상담 경쟁력을 높여보세요.</span>
       </div>
 
-      <div class="comic-grid">
-        <article class="comic-card consult-card reveal delay-1">
-          <div class="scene-label">상담 중</div>
-          <div class="speech customer">
-            <b>“메×츠 말고 다른 회사는<br>비교해볼 수 없어요?”</b>
-          </div>
+      <form id="leadForm">
+        <label>이름
+          <input name="name" type="text" placeholder="이름을 입력해주세요" required>
+        </label>
 
-          <div class="characters">
-            <div class="woman">
-              <div class="hair"></div>
-              <div class="face"></div>
-              <div class="body"></div>
-            </div>
+        <label>연락처
+          <input name="phone" type="tel" inputmode="numeric" placeholder="- 없이 숫자만 입력해주세요" required>
+        </label>
 
-            <div class="desk">
-              <div class="laptop">
-                <span>partners</span>
-                <small>single company</small>
-              </div>
-            </div>
+        <label>상담 희망 시간
+          <select name="preferred_time" required>
+            <option value="">선택해주세요</option>
+            <option>오전 9시~12시</option>
+            <option>오후 12시~3시</option>
+            <option>오후 3시~6시</option>
+            <option>저녁 6시 이후</option>
+          </select>
+        </label>
 
-            <div class="bear">
-              <div class="ear e1"></div>
-              <div class="ear e2"></div>
-              <div class="head">
-                <div class="eye left"></div>
-                <div class="eye right"></div>
-                <div class="muzzle"></div>
-              </div>
-              <div class="suit"></div>
-            </div>
-          </div>
+        <label>문의 내용 <small>(선택)</small>
+          <textarea name="message" placeholder="문의 내용을 입력해주세요"></textarea>
+        </label>
 
-          <div class="speech bear-talk">
-            <b>“네… 죄송하지만 당사는<br>메×츠 상품만 취급하고 있어서<br>비교가 어렵습니다.”</b>
-          </div>
-        </article>
+        <label class="agree">
+          <input type="checkbox" required>
+          <span>개인정보 수집 및 상담 연락에 동의합니다.</span>
+        </label>
 
-        <article class="comic-card fail-card reveal delay-2">
-          <div class="scene-label danger">상담 실패</div>
-          <div class="fail-title">결국 고객은<br><em>계약을 포기하고 돌아섭니다.</em></div>
-
-          <div class="exit-scene">
-            <div class="sad-bear">
-              <div class="mini-head"></div>
-              <div class="mini-body"></div>
-            </div>
-            <div class="door"></div>
-            <div class="leaving-woman">
-              <div class="lw-head"></div>
-              <div class="lw-body"></div>
-            </div>
-          </div>
-
-          <ul class="problem-list">
-            <li>상품 선택 폭이 좁아 고객 니즈 충족이 어려움</li>
-            <li>비교 제안이 제한적이라 상담 신뢰도 하락</li>
-            <li>계약 성사율과 영업 효율까지 감소</li>
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <section class="solution section">
-      <div class="solution-title reveal">
-        <span>이제는 다릅니다!</span>
-        <h2>우리는 <em>전체 보험사 비교견적</em>이 가능합니다.</h2>
-        <p>고객의 기준으로 비교하고, 고객에게 더 적합한 선택지를 제안합니다.</p>
-      </div>
-
-      <div class="solution-grid">
-        <article class="advisor-card reveal">
-          <div class="happy-bear">
-            <div class="hb-ear e1"></div>
-            <div class="hb-ear e2"></div>
-            <div class="hb-head">
-              <div class="hb-eye left"></div>
-              <div class="hb-eye right"></div>
-              <div class="hb-mouth">⌣</div>
-            </div>
-            <div class="hb-suit"></div>
-            <div class="tablet">
-              <b>비교견적 결과</b>
-              <i></i><i></i><i></i><i></i>
-            </div>
-          </div>
-          <div class="advisor-speech">
-            “원하시는 보장 기준으로 여러 보험사를 한눈에 비교해드리고,
-            가장 유리한 상품을 제안해드릴게요.”
-          </div>
-        </article>
-
-        <div class="benefits">
-          <article class="benefit reveal delay-1">
-            <div class="icon">🔎</div>
-            <h3>전체 보험사 비교견적</h3>
-            <p>여러 보험사의 상품을 한 번에 비교</p>
-          </article>
-          <article class="benefit reveal delay-2">
-            <div class="icon">🎯</div>
-            <h3>고객 니즈 맞춤 제안</h3>
-            <p>보장, 보험료, 납입 조건까지 정확히 비교</p>
-          </article>
-          <article class="benefit reveal delay-3">
-            <div class="icon">👍</div>
-            <h3>계약 성사율 향상</h3>
-            <p>선택의 폭이 넓어져 상담 만족도와 신뢰도 상승</p>
-          </article>
-        </div>
-      </div>
-
-      <div class="insurers reveal">
-        <span>삼성화재</span><span>DB손해보험</span><span>현대해상</span>
-        <span>KB손해보험</span><span>메리츠화재</span><span>한화손해보험</span>
-        <span>외 다수</span>
-      </div>
-    </section>
-
-    <section class="why section">
-      <div class="why-grid">
-        <article class="why-card reveal">
-          <div>🛡️</div>
-          <strong>더 넓은 선택</strong>
-          <span>고객 만족도 극대화</span>
-        </article>
-        <article class="why-card reveal delay-1">
-          <div>🤝</div>
-          <strong>높아지는 신뢰</strong>
-          <span>객관적인 비교 제안</span>
-        </article>
-        <article class="why-card reveal delay-2">
-          <div>📈</div>
-          <strong>높은 계약 경쟁력</strong>
-          <span>상담 성사율 향상</span>
-        </article>
-        <article class="why-card reveal delay-3">
-          <div>✨</div>
-          <strong>안정적인 영업</strong>
-          <span>체계적인 비교 시스템</span>
-        </article>
-      </div>
-    </section>
-
-    <section class="consult section" id="consult">
-      <div class="consult-inner">
-        <div class="consult-copy reveal">
-          <span class="eyebrow">비교가 다르면 결과도 달라집니다.</span>
-          <h2>지금 바로 <em>상담문의</em> 주세요.</h2>
-          <p>전체 보험사 비교견적을 통해 고객 만족과 상담 경쟁력을 함께 높여보세요.</p>
-          <a class="kakao-button" id="kakaoButton" href="#" target="_blank" rel="noopener">
-            <span class="talk-badge small">TALK</span>
-            카카오톡으로 빠르게 상담하기
-          </a>
-        </div>
-
-        <form id="leadForm" class="lead-form reveal delay-1">
-          <label>
-            <span>이름</span>
-            <input type="text" name="name" placeholder="이름을 입력해주세요" required />
-          </label>
-          <label>
-            <span>연락처</span>
-            <input type="tel" name="phone" inputmode="numeric" placeholder="- 없이 숫자만 입력해주세요" required />
-          </label>
-          <label>
-            <span>상담 희망 시간</span>
-            <select name="preferred_time" required>
-              <option value="">선택해주세요</option>
-              <option>오전 9시~12시</option>
-              <option>오후 12시~3시</option>
-              <option>오후 3시~6시</option>
-              <option>저녁 6시 이후</option>
-            </select>
-          </label>
-          <label>
-            <span>문의 내용 <small>(선택)</small></span>
-            <textarea name="message" placeholder="문의 내용을 입력해주세요"></textarea>
-          </label>
-          <label class="agree">
-            <input type="checkbox" required />
-            <span>개인정보 수집 및 상담 연락에 동의합니다.</span>
-          </label>
-          <button type="submit">무료 상담 신청하기</button>
-          <p class="form-note">남겨주신 정보는 상담 목적 외에는 사용되지 않습니다.</p>
-        </form>
-      </div>
+        <button type="submit">무료 상담 신청하기</button>
+        <a id="kakaoBtn" class="kakao" href="#" target="_blank" rel="noopener">카카오톡으로 빠르게 상담하기</a>
+        <p class="note">남겨주신 정보는 상담 목적 외에는 사용되지 않습니다.</p>
+      </form>
     </section>
   </main>
 
-  <nav class="sticky-cta">
+  <nav class="sticky">
     <a href="#consult">상담 신청</a>
     <a id="stickyKakao" href="#" target="_blank" rel="noopener">카카오 상담</a>
   </nav>
 
-  <section id="completeScreen" class="complete-screen" aria-hidden="true">
+  <div id="complete" class="complete">
     <div class="complete-card">
-      <div class="complete-icon">✓</div>
+      <div class="check">✓</div>
       <h2>접수가 완료되었습니다.</h2>
       <p>전문 상담사가 확인 후 빠르게 연락드리겠습니다.</p>
       <button id="closeComplete" type="button">확인</button>
     </div>
-  </section>
+  </div>
 
   <script src="./script.js"></script>
 </body>
