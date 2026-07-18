@@ -1,12 +1,29 @@
 (()=>{
 const SUPABASE_URL='https://pzlxrlkvbrufhimyglyo.supabase.co';
 const SUPABASE_KEY='sb_publishable_WE6jk24ys0guHE1INCZv-w_cmd-HqOd';
+const modal=document.getElementById('consultModal');
+const openBtn=document.getElementById('openConsult');
 const form=document.getElementById('leadForm');
 const phone=document.getElementById('phone');
 const statusBox=document.getElementById('status');
 const btn=document.getElementById('submitBtn');
 const formArea=document.getElementById('formArea');
 const success=document.getElementById('success');
+
+function openModal(){
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+  document.body.classList.add('modal-open');
+  setTimeout(()=>document.querySelector('#leadForm input[name="name"]').focus(),100);
+}
+function closeModal(){
+  modal.classList.remove('show');
+  modal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('modal-open');
+}
+openBtn.addEventListener('click',openModal);
+document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closeModal));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('show'))closeModal();});
 
 phone.addEventListener('input',function(){
  let n=this.value.replace(/\D/g,'').slice(0,11);
@@ -36,7 +53,7 @@ form.addEventListener('submit',async e=>{
  try{
    const r=await fetch(SUPABASE_URL+'/rest/v1/customers',{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});
    if(!r.ok)throw new Error(await r.text());
-   form.reset();formArea.style.display='none';success.classList.add('show');document.getElementById('apply').scrollIntoView({behavior:'smooth',block:'start'});
+   form.reset();formArea.style.display='none';success.classList.add('show');
  }catch(err){console.error(err);statusBox.textContent='접수에 실패했습니다. 카카오톡으로 문의해주세요.';}
  finally{btn.disabled=false;btn.textContent=old;}
 });

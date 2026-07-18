@@ -15,31 +15,33 @@
 </head>
 <body>
 <main class="page">
-  <img class="landing-visual" src="./landing-main.jpg" alt="투잡 중에는 보험이 최고다. 보험 한 건만 계약해도 높은 수수료와 장기유지수수료">
+  <div class="visual-wrap">
+    <img class="landing-visual" src="./landing-main.jpg" alt="투잡 중에는 보험이 최고다. 보험 한 건만 계약해도 높은 수수료와 장기유지수수료">
+  </div>
+</main>
 
-  <section id="apply" class="apply">
+<nav class="sticky" aria-label="상담 메뉴">
+  <button id="openConsult" type="button">상담 신청</button>
+  <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오 상담</a>
+</nav>
+
+<div id="consultModal" class="modal" aria-hidden="true">
+  <div class="modal-backdrop" data-close-modal></div>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" type="button" aria-label="닫기" data-close-modal>×</button>
+    <h1 id="modalTitle">상담 신청</h1>
+    <p class="modal-desc">정보를 남겨주시면 확인 후 연락드리겠습니다.</p>
+
     <div id="formArea">
-      <h1>지금 바로 <em>상담 신청</em>하세요!</h1>
-      <div class="apply-layout">
-        <form id="leadForm" novalidate>
-          <label><span>이름</span><input name="name" required placeholder="이름"></label>
-          <label><span>연락처</span><input id="phone" name="phone" required inputmode="numeric" maxlength="13" placeholder="010-0000-0000"></label>
-          <label><span>연령</span><select name="age_group" required><option value="">연령대를 선택하세요</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></label>
-          <label><span>희망 형태</span><select name="interest" required><option value="">선택하세요</option><option>투잡으로 시작</option><option>전업으로 시작</option><option>상담 후 결정</option></select></label>
-          <button id="submitBtn" type="submit">상담 신청하기</button>
-          <p id="status" class="status" aria-live="polite"></p>
-        </form>
-
-        <aside class="quick">
-          <a class="kakao" href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">
-            <b>TALK</b><span>카카오톡<br>간편 문의</span>
-          </a>
-          <div class="benefits">
-            <span>✓ 초보 가능</span><span>✓ 유연한 시간</span><span>✓ 높은 수익</span><span>✓ 정착 지원</span>
-          </div>
-        </aside>
-      </div>
-      <label class="agree"><input type="checkbox" id="agree" required> 상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</label>
+      <form id="leadForm" novalidate>
+        <label><span>이름</span><input name="name" required placeholder="이름"></label>
+        <label><span>연락처</span><input id="phone" name="phone" required inputmode="numeric" maxlength="13" placeholder="010-0000-0000"></label>
+        <label><span>연령</span><select name="age_group" required><option value="">연령대를 선택하세요</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></label>
+        <label><span>희망 형태</span><select name="interest" required><option value="">선택하세요</option><option>투잡으로 시작</option><option>전업으로 시작</option><option>상담 후 결정</option></select></label>
+        <label class="agree"><input type="checkbox" id="agree" required><span>상담 연락을 위한 개인정보 수집 및 이용에 동의합니다.</span></label>
+        <button id="submitBtn" type="submit">상담 신청하기</button>
+        <p id="status" class="status" aria-live="polite"></p>
+      </form>
     </div>
 
     <div id="success" class="success" aria-live="polite">
@@ -49,12 +51,8 @@
       <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오톡으로 바로 문의</a>
     </div>
   </section>
-</main>
+</div>
 
-<nav class="sticky">
-  <a href="#apply">상담 신청</a>
-  <a href="https://open.kakao.com/o/sPtglPDi" target="_blank" rel="noopener">카카오 상담</a>
-</nav>
 <script src="./script.js"></script>
 </body>
 </html>
