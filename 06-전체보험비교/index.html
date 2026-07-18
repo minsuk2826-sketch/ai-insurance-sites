@@ -5,33 +5,46 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>전체 보험사 비교견적 상담</title>
   <meta name="description" content="전체 보험사 비교견적으로 고객에게 더 적합한 보험 상품을 제안합니다.">
-  <meta name="theme-color" content="#FEE500">
+  <meta name="theme-color" content="#ffd21c">
   <meta property="og:title" content="전체 보험사 비교견적 상담">
   <meta property="og:description" content="한 회사만이 아닌 전체 보험사를 비교해보세요.">
-  <meta property="og:image" content="/landing-main.png">
+  <meta property="og:image" content="/landing-main.jpg">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <main class="page">
-    <img class="main-image" src="./landing-main.png" alt="전체 보험사 비교견적 안내">
+    <img class="main-image" src="./landing-main.jpg?v=3" alt="전체 보험사 비교견적 안내">
 
-    <section class="real-form" id="consult">
-      <div class="form-heading">
-        <p>비교가 다르면 결과도 달라집니다.</p>
+    <section class="consult-section" id="consult">
+      <div class="consult-copy">
+        <p class="eyebrow">전체 보험사 비교견적 상담</p>
         <h1>지금 바로 <em>상담문의</em> 주세요!</h1>
-        <span>전체 보험사 비교견적으로 고객 만족과 상담 경쟁력을 높여보세요.</span>
+        <p class="description">
+          전체 보험사 비교견적으로 고객 만족과 상담 경쟁력을 동시에 높여보세요.
+        </p>
+
+        <a class="kakao-large" id="kakaoBtn" href="#" target="_blank" rel="noopener">
+          <span class="talk">TALK</span>
+          <span><strong>카카오톡으로 빠르게 상담하기</strong><small>친구추가 없이 간편하게 상담!</small></span>
+        </a>
       </div>
 
-      <form id="leadForm">
-        <label>이름
-          <input name="name" type="text" placeholder="이름을 입력해주세요" required>
+      <form id="leadForm" class="lead-form">
+        <h2>무료 상담 신청</h2>
+
+        <label>
+          <span>이름</span>
+          <input name="name" type="text" autocomplete="name" placeholder="이름을 입력해주세요" required>
         </label>
 
-        <label>연락처
-          <input name="phone" type="tel" inputmode="numeric" placeholder="- 없이 숫자만 입력해주세요" required>
+        <label>
+          <span>연락처</span>
+          <input name="phone" type="tel" inputmode="numeric" autocomplete="tel"
+                 placeholder="- 없이 숫자만 입력해주세요" required>
         </label>
 
-        <label>상담 희망 시간
+        <label>
+          <span>상담 희망 시간</span>
           <select name="preferred_time" required>
             <option value="">선택해주세요</option>
             <option>오전 9시~12시</option>
@@ -41,7 +54,8 @@
           </select>
         </label>
 
-        <label>문의 내용 <small>(선택)</small>
+        <label>
+          <span>문의 내용 <small>(선택)</small></span>
           <textarea name="message" placeholder="문의 내용을 입력해주세요"></textarea>
         </label>
 
@@ -50,27 +64,26 @@
           <span>개인정보 수집 및 상담 연락에 동의합니다.</span>
         </label>
 
-        <button type="submit">무료 상담 신청하기</button>
-        <a id="kakaoBtn" class="kakao" href="#" target="_blank" rel="noopener">카카오톡으로 빠르게 상담하기</a>
-        <p class="note">남겨주신 정보는 상담 목적 외에는 사용되지 않습니다.</p>
+        <button id="submitBtn" type="submit">무료 상담 신청하기</button>
+        <p class="notice">남겨주신 정보는 상담 목적 외에는 사용되지 않습니다.</p>
       </form>
     </section>
   </main>
 
-  <nav class="sticky">
+  <nav class="sticky-actions">
     <a href="#consult">상담 신청</a>
     <a id="stickyKakao" href="#" target="_blank" rel="noopener">카카오 상담</a>
   </nav>
 
-  <div id="complete" class="complete">
-    <div class="complete-card">
+  <div id="completeModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
       <div class="check">✓</div>
       <h2>접수가 완료되었습니다.</h2>
       <p>전문 상담사가 확인 후 빠르게 연락드리겠습니다.</p>
-      <button id="closeComplete" type="button">확인</button>
+      <button id="closeModal" type="button">확인</button>
     </div>
   </div>
 
-  <script src="./script.js"></script>
+  <script src="./script.js?v=3"></script>
 </body>
 </html>

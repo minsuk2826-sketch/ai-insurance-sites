@@ -1,15 +1,19 @@
-기존 GitHub 폴더 `06-전체보험비교` 안의 파일을 이 파일들로 교체하세요.
+적용 방법
 
-업로드할 파일:
+GitHub 저장소의 `06-전체보험비교` 폴더 안에서 아래 파일을 전부 덮어쓰세요.
+
 - index.html
 - style.css
 - script.js
-- landing-main.png
+- landing-main.jpg
 
-중요:
-- 기존 index.html, style.css, script.js는 덮어쓰기
-- landing-main.png는 새로 추가
-- README.txt는 올리지 않아도 됩니다.
+수정 내용
+1. 이미지 안에 있던 눌리지 않는 가짜 상담 폼을 완전히 잘라냈습니다.
+2. 이미지 바로 아래에 실제 입력 가능한 상담 폼을 배치했습니다.
+3. 이름, 연락처, 상담 시간, 문의 내용, 동의 체크가 모두 작동합니다.
+4. 접수 후 완료 팝업이 표시됩니다.
+5. 모바일 하단 고정 상담 버튼도 작동합니다.
 
-실제 카카오/CRM 연결:
-script.js 상단의 KAKAO_URL과 SUBMIT_ENDPOINT를 기존 주소로 변경하세요.
+중요
+실제 CRM 접수와 카카오 상담 주소는 script.js 맨 위 CONFIG에 기존 주소를 넣어야 합니다.
+기존 프로젝트에 이미 사용하던 SUBMIT_ENDPOINT와 KAKAO_URL이 있으면 그대로 복사해 넣으세요.

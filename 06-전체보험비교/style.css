@@ -1,32 +1,44 @@
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-:root{--yellow:#fee500;--orange:#f15a24;--brown:#2a1d13}
-body{margin:0;background:#fff8df;color:var(--brown);font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Noto Sans KR","Segoe UI",sans-serif;padding-bottom:76px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{--yellow:#ffd21c;--orange:#f04b22;--navy:#071c31;--text:#21170e}
+body{margin:0;background:#fff7dc;color:var(--text);font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Noto Sans KR","Segoe UI",sans-serif;padding-bottom:78px}
 .page{max-width:1024px;margin:0 auto;background:#fff}
 .main-image{display:block;width:100%;height:auto}
-.real-form{padding:44px 24px 52px;background:linear-gradient(180deg,#fff8df,#fff)}
-.form-heading{text-align:center;margin-bottom:26px}
-.form-heading p{margin:0 0 8px;font-weight:800;color:#685a47}
-.form-heading h1{font-size:clamp(30px,6vw,48px);margin:0 0 12px}
-.form-heading h1 em{font-style:normal;color:var(--orange)}
-.form-heading span{color:#746653;line-height:1.6}
-form{max-width:650px;margin:0 auto;background:#fff;border:1px solid #efdfaa;border-radius:24px;padding:26px;box-shadow:0 18px 48px rgba(80,55,0,.12)}
-label{display:block;font-weight:900;margin:14px 0}
-label small{font-weight:500;color:#8d806f}
-input,select,textarea{display:block;width:100%;margin-top:8px;border:1px solid #ddd3c1;border-radius:12px;padding:14px;font-size:16px;background:#fff}
-textarea{height:110px;resize:vertical}
-.agree{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:#776957}
-.agree input{width:18px;height:18px;margin:0}
-button,.kakao{display:block;width:100%;border:0;border-radius:14px;padding:16px;text-align:center;font-size:17px;font-weight:900}
-button{background:var(--yellow);cursor:pointer}
-.kakao{margin-top:11px;background:#2b2118;color:#fff;text-decoration:none}
-.note{text-align:center;font-size:12px;color:#8e816f;margin:12px 0 0}
-.sticky{position:fixed;z-index:30;left:50%;bottom:10px;transform:translateX(-50%);width:min(94%,760px);display:flex;gap:10px}
-.sticky a{flex:1;text-align:center;text-decoration:none;border-radius:15px;padding:15px 10px;font-weight:900;box-shadow:0 10px 28px rgba(0,0,0,.18)}
-.sticky a:first-child{background:var(--yellow);color:#21170f}.sticky a:last-child{background:#2b2118;color:#fff}
-.complete{display:none;position:fixed;z-index:100;inset:0;background:rgba(0,0,0,.55);padding:20px;align-items:center;justify-content:center}
-.complete.show{display:flex}
-.complete-card{background:#fff;width:min(100%,430px);border-radius:24px;padding:32px;text-align:center}
-.check{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);font-size:34px;font-weight:900;margin:0 auto 15px}
-.complete-card h2{font-size:25px;margin:0 0 10px}.complete-card p{color:#6f6253;line-height:1.6}
-.complete-card button{background:#2b2118;color:#fff;margin-top:10px}
-@media(max-width:600px){.real-form{padding:30px 14px 40px}form{padding:20px;border-radius:20px}}
+.consult-section{display:grid;grid-template-columns:1fr 1.15fr;gap:28px;padding:42px 34px 52px;background:linear-gradient(180deg,#fffaf0 0%,#fff 100%);border-top:1px solid #f1e3b7}
+.consult-copy{display:flex;flex-direction:column;justify-content:center}
+.eyebrow{margin:0 0 8px;color:#88755e;font-weight:800}
+.consult-copy h1{font-size:clamp(31px,4.4vw,46px);line-height:1.15;margin:0 0 14px;letter-spacing:-.04em}
+.consult-copy h1 em{font-style:normal;color:var(--orange)}
+.description{margin:0 0 24px;color:#665744;font-weight:650;line-height:1.65}
+.kakao-large{display:flex;align-items:center;gap:14px;text-decoration:none;background:var(--yellow);color:#16100a;padding:18px;border-radius:16px;box-shadow:0 12px 28px rgba(127,88,0,.14)}
+.kakao-large .talk{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:#291d15;color:#ffe500;font-weight:950}
+.kakao-large strong,.kakao-large small{display:block}.kakao-large strong{font-size:18px}.kakao-large small{margin-top:5px}
+.lead-form{background:#fff;border:1px solid #eadfca;border-radius:24px;padding:25px;box-shadow:0 18px 44px rgba(66,44,0,.11)}
+.lead-form h2{text-align:center;margin:0 0 19px;font-size:25px}
+.lead-form label{display:grid;grid-template-columns:115px 1fr;align-items:center;gap:12px;margin:11px 0;font-weight:800}
+.lead-form small{font-weight:500;color:#887d6e}
+input,select,textarea{width:100%;border:1px solid #ddd4c5;border-radius:10px;padding:13px 14px;font-size:16px;background:#fff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#e0a900;box-shadow:0 0 0 3px rgba(255,210,28,.2)}
+textarea{height:92px;resize:vertical}
+.agree{display:flex!important;align-items:center;gap:9px!important;font-size:13px;font-weight:600!important;color:#746858;margin-top:16px!important}
+.agree input{width:18px;height:18px;flex:none}
+#submitBtn{width:100%;border:0;border-radius:11px;padding:15px;background:var(--yellow);font-size:18px;font-weight:950;cursor:pointer}
+#submitBtn:disabled{opacity:.6}
+.notice{text-align:center;color:#8b7d6b;font-size:12px;margin:11px 0 0}
+.sticky-actions{position:fixed;z-index:30;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:9px;width:min(94%,720px)}
+.sticky-actions a{flex:1;padding:15px;text-align:center;text-decoration:none;border-radius:14px;font-weight:950;box-shadow:0 9px 24px rgba(0,0,0,.2)}
+.sticky-actions a:first-child{background:var(--yellow);color:#20160d}
+.sticky-actions a:last-child{background:var(--navy);color:#fff}
+.modal{display:none;position:fixed;z-index:100;inset:0;background:rgba(0,0,0,.58);padding:20px;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-card{width:min(100%,430px);background:#fff;border-radius:24px;padding:32px;text-align:center}
+.check{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;margin:0 auto 15px;background:var(--yellow);font-size:36px;font-weight:950}
+.modal-card h2{margin:0 0 10px}.modal-card p{color:#685b4c;line-height:1.6}
+.modal-card button{width:100%;border:0;border-radius:11px;background:var(--navy);color:#fff;padding:14px;font-size:17px;font-weight:900}
+@media(max-width:760px){
+  .consult-section{grid-template-columns:1fr;padding:31px 15px 42px;gap:22px}
+  .consult-copy{text-align:center}
+  .kakao-large{text-align:left}
+  .lead-form{padding:20px 16px}
+  .lead-form label{grid-template-columns:1fr;gap:7px}
+}
