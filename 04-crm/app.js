@@ -102,14 +102,14 @@ function getLastTouchDate(customer){
   const latest=history.map(x=>dateOnly(x.updated_at||x.created_at)).filter(Boolean).sort().pop();
   return latest||dateOnly(customer.created_at);
 }
-function hasConsultationAfterPromiseDay(customer,targetDate){
+function hasConsultationOnOrAfterPromiseDay(customer,targetDate){
   const due=dateOnly(targetDate);
   if(!due)return false;
-  // 약속일이 지난 뒤 새로 작성된 상담 기록만 처리 완료로 봅니다.
-  // 약속일 당일의 기존 기록이나 과거 기록의 수정일 때문에 누락되지 않도록 created_at만 사용합니다.
+  // 약속일 당일 이후에 "새로 작성된" 상담 기록만 완료 처리합니다.
+  // 과거 상담기록을 나중에 수정한 updated_at 때문에 약속일 경과 고객이 숨겨지지 않도록 created_at을 우선합니다.
   return getConsultHistory(customer).some(item=>{
-    const recorded=dateOnly(item.created_at);
-    return Boolean(recorded&&recorded>due);
+    const recorded=dateOnly(item.created_at||item.date||item.consulted_at);
+    return Boolean(recorded&&recorded>=due);
   });
 }
 function customerTasks(customer){
@@ -193,14 +193,14 @@ function renderDashboard(){
   customers.forEach(customer=>{
     const promisedDate=dateOnly(customer.follow_up_date);
     const remaining=daysUntil(promisedDate);
-    // 다음 연락일이 어제 이전이고, 약속일 다음 날 이후 새 상담 기록이 없으면 표시합니다.
+    // 다음 연락일이 어제 이전이고, 약속일 당일 이후 상담 기록이 없으면 표시합니다.
     if(!promisedDate||remaining===null||remaining>=0)return;
-    if(hasConsultationAfterPromiseDay(customer,promisedDate))return;
+    if(hasConsultationOnOrAfterPromiseDay(customer,promisedDate))return;
     const overdueDays=Math.abs(remaining);
     attention.push({
       id:customer.id,
       name:customer.name||"이름 없음",
-      text:`약속일 ${overdueDays}일 경과 · 이후 상담 기록 없음`,
+      text:`약속일 ${overdueDays}일 경과 · 상담 기록 없음`,
       days:overdueDays
     });
   });
@@ -1246,7 +1246,7 @@ $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.g
 $("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
 $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});
 
-// 5.5.2: 약속일 경과 건수는 renderDashboard에서 실시간 표시합니다.
+// 5.6.3: 약속일 경과 건수는 renderDashboard에서 실시간 표시합니다.
 
 
 // 5.4.21: 숫자 날짜 입력을 YYYY-MM-DD로 자동 변환합니다.
