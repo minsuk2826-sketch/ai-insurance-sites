@@ -1,0 +1,786 @@
+'use strict';
+
+let customers = [];
+let currentPage = 1;
+const pageSize = 10;
+const selectedIds = new Set();
+let todayOnly = false;
+let activeStatsFilter = "all";
+let activeConsultCustomerId = null;
+let editingHistoryIndex = null;
+let activeContractFilter = "all";
+let contractsColumnAvailable = true;
+
+const $ = id => document.getElementById(id);
+const today = () => new Date().toISOString().slice(0,10);
+const esc = s => String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const num = v => Number(v || 0);
+const formatWon = v => Math.round(num(v)).toLocaleString("ko-KR") + "원";
+const cleanPhone = v => String(v || "").replace(/[^0-9+]/g,"");
+function getContracts(customer){
+  if(Array.isArray(customer?.contracts)) return customer.contracts;
+  if(typeof customer?.contracts==="string"){ try{const x=JSON.parse(customer.contracts); if(Array.isArray(x))return x;}catch(e){} }
+  if(customer?.contract_date) return [{id:"legacy",company:"",product:"",date:dateOnly(customer.contract_date),amount:num(customer.monthly_premium),status:"유지"}];
+  return [];
+}
+function contractTotal(customer){return getContracts(customer).reduce((s,c)=>s+num(c.amount),0)}
+function latestContractDate(customer){return getContracts(customer).map(c=>dateOnly(c.date)).filter(Boolean).sort().pop()||""}
+function contractReached(contract,days){const date=dateOnly(contract.date); return date && daysBetween(date)>=days}
+
+
+const taskStorageKey = "ai-crm-completed-tasks-v1";
+const readCompletedTasks = () => { try { return JSON.parse(localStorage.getItem(taskStorageKey)||"{}"); } catch(e) { return {}; } };
+const writeCompletedTasks = value => localStorage.setItem(taskStorageKey, JSON.stringify(value));
+const dateOnly = value => value ? String(value).slice(0,10) : "";
+const parseLocalDate = value => { if(!value)return null; const [y,m,d]=dateOnly(value).split("-").map(Number); return y&&m&&d?new Date(y,m-1,d):null; };
+const addDays = (value,days) => { const d=parseLocalDate(value); if(!d)return ""; d.setDate(d.getDate()+days); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const addYears = (value,years) => { const d=parseLocalDate(value); if(!d)return ""; d.setFullYear(d.getFullYear()+years); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const daysBetween = (from,to=today()) => { const a=parseLocalDate(from),b=parseLocalDate(to); return a&&b?Math.floor((b-a)/86400000):0; };
+function getLastTouchDate(customer){
+  const history=getConsultHistory(customer);
+  const latest=history.map(x=>dateOnly(x.updated_at||x.created_at)).filter(Boolean).sort().pop();
+  return latest||dateOnly(customer.created_at);
+}
+function customerTasks(customer){
+  const completed=readCompletedTasks();
+  const items=[];
+  const add=(key,due,title,badge)=>{ const unique=`${customer.id}:${key}`; if(due&&due<=today()&&!completed[unique]) items.push({unique,key,due,title,badge,customer,overdue:Math.max(0,daysBetween(due))}); };
+  getContracts(customer).forEach((contract,index)=>{
+    if(!contract.date)return;
+    const contractKey=contract.id||index;
+    add(`contract_${contractKey}_30d`,addDays(contract.date,30),`${index+1}번째 계약 30일 경과 확인`,`30일`);
+    add(`contract_${contractKey}_90d`,addDays(contract.date,90),`${index+1}번째 계약 90일 경과 확인`,`90일`);
+    add(`contract_${contractKey}_1y`,addYears(contract.date,1),`${index+1}번째 계약 1주년 고객 관리`,`1년`);
+  });
+  const insurance=getInsuranceInfo(customer);
+  if(insurance.auto_expiry_date&&insurance.auto_renewal_status!=="갱신 완료"){
+    add(`auto_30:${insurance.auto_expiry_date}`,addDays(insurance.auto_expiry_date,-30),`자동차보험 만기 30일 전 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 30일`);
+    add(`auto_15:${insurance.auto_expiry_date}`,addDays(insurance.auto_expiry_date,-15),`자동차보험 만기 15일 전 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 15일`);
+    add(`auto_7:${insurance.auto_expiry_date}`,addDays(insurance.auto_expiry_date,-7),`자동차보험 만기 7일 전 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 7일`);
+    add(`auto_0:${insurance.auto_expiry_date}`,insurance.auto_expiry_date,`자동차보험 만기 당일 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 만기`);
+  }
+  const lastTouch=getLastTouchDate(customer);
+  if(lastTouch) add(`no_touch_14d:${lastTouch}`,addDays(lastTouch,14),"마지막 상담 후 2주 경과","미접촉");
+  if(customer.follow_up_date) add(`follow_up:${customer.follow_up_date}`,customer.follow_up_date,customer.follow_up_date===today()?"오늘 연락 예정":"연락 예정일 경과","연락");
+  return items;
+}
+function getAllTasks(){ return customers.flatMap(customerTasks).sort((a,b)=>a.due.localeCompare(b.due)); }
+function completeTask(unique){ const completed=readCompletedTasks(); completed[unique]=new Date().toISOString(); writeCompletedTasks(completed); renderTasks(); }
+function renderTasks(){
+  const tasks=getAllTasks();
+  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=tasks.length;
+  $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">오늘 처리할 자동 업무가 없습니다.</div>';
+  $("taskList")._tasks=tasks;
+}
+function showListView(){ $("formView").classList.add("hidden"); $("listView").classList.remove("hidden"); $("taskPanel").classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); }
+function showFormView(){ $("listView").classList.add("hidden"); $("taskPanel").classList.add("hidden"); $("formView").classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); setTimeout(()=>$('name').focus(),50); }
+
+
+let crmView="dashboard";
+function applyCrmView(view){
+  crmView=view;
+  document.body.classList.remove("page-mode-dashboard","page-mode-customers","page-mode-tasks","page-mode-contracts","page-mode-recruiting");
+  document.body.classList.add(`page-mode-${view}`);
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.crmView===view));
+  const titles={
+    dashboard:["업무 대시보드","오늘 처리할 고객과 계약 현황을 한눈에 확인합니다."],
+    customers:["고객 관리","전체 고객을 검색하고 상담 상태를 관리합니다."],
+    tasks:["오늘 할 일","계약 경과일·미접촉 고객·연락 예정일을 자동 계산합니다."],
+    contracts:["계약 관리","계약 완료 고객의 여러 계약과 경과일을 관리합니다."],
+    recruiting:["리크루팅 관리","설계사 지원자와 리크루팅 유입 고객을 관리합니다."]
+  };
+  $("pageTitle").textContent=titles[view][0]; $("pageSubtitle").textContent=titles[view][1];
+  $("newBtn").textContent=view==="recruiting"?"+ 지원자 등록":"+ 신규 고객 등록";
+  $("contractTabs").classList.toggle("hidden",view!=="contracts");
+  todayOnly=false; activeStatsFilter="all";
+  if(view==="contracts") { $("statusFilter").value=""; }
+  if(view==="recruiting") { $("statusFilter").value=""; }
+  currentPage=1; render();
+}
+function getViewScopedCustomers(list){
+  if(crmView==="contracts") return list.filter(c=>{
+    const contracts=getContracts(c);
+    if(activeContractFilter==="auto")return isAutoRenewalDue(c);
+    if(!contracts.length)return false;
+    if(activeContractFilter==="30")return contracts.some(x=>contractReached(x,30));
+    if(activeContractFilter==="90")return contracts.some(x=>contractReached(x,90));
+    if(activeContractFilter==="365")return contracts.some(x=>contractReached(x,365));
+    if(activeContractFilter==="maintenance")return contracts.some(x=>["유지관리","확인필요","실효위험"].includes(x.status));
+    return true;
+  });
+  if(crmView==="recruiting") return list.filter(c=>/리크루팅|육아|경단|사업설명회|설계사/i.test(`${c.source||""} ${c.interest||""} ${c.memo||""}`));
+  return list;
+}
+document.querySelectorAll(".nav-item").forEach(button=>button.addEventListener("click",()=>{ showListView(); applyCrmView(button.dataset.crmView); }));
+
+async function checkSession(){
+  const {data} = await db.auth.getSession();
+  if(data.session) showApp(); else showLogin();
+}
+function showLogin(){ $("loginScreen").classList.remove("hidden"); $("app").classList.add("hidden"); }
+async function showApp(){ $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden"); applyCrmView("dashboard"); await loadCustomers(); }
+
+$("loginForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const email=$("loginEmail").value.trim(), password=$("loginPassword").value;
+  const {error} = await db.auth.signInWithPassword({email,password});
+  const msg=$("loginMsg");
+  if(error){msg.textContent="로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.";msg.classList.remove("hidden");msg.style.background="#fff0f0";msg.style.color="#b52d2d";}
+  else{msg.classList.add("hidden");showApp();}
+});
+$("logoutBtn").addEventListener("click", async()=>{await db.auth.signOut();showLogin();});
+
+async function loadCustomers(){
+  const {data,error} = await db.from("customers").select("*").order("created_at",{ascending:false});
+  if(error){alert("고객 목록을 불러오지 못했습니다: "+error.message);return}
+  customers=data||[]; populateSourceFilter(); render();
+}
+function populateSourceFilter(){
+  const select=$("sourceFilter");
+  const current=select.value;
+  const preferred=["AI보험점검 랜딩페이지","리크루팅랜딩페이지1","육아경단녀 랜딩페이지","랜딩페이지","CRM","카카오톡","전화","소개","기타"];
+  const values=[...new Set(customers.map(c=>c.source).filter(Boolean))];
+  values.sort((a,b)=>{const ai=preferred.indexOf(a),bi=preferred.indexOf(b);if(ai!==-1||bi!==-1)return (ai===-1?999:ai)-(bi===-1?999:bi);return a.localeCompare(b);});
+  select.innerHTML='<option value="">전체 유입경로</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  if(values.includes(current)) select.value=current;
+}
+function getFilteredCustomers(){
+  const q=$("search").value.trim().toLowerCase();
+  const sf=$("statusFilter").value;
+  const sourcef=$("sourceFilter").value;
+  const sort=$("sortBy").value;
+
+  let list=getViewScopedCustomers(customers).filter(c=>
+    (!q||(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q)) &&
+    (!sf||c.status===sf) &&
+    (!sourcef||(c.source||"")===sourcef) &&
+    (!todayOnly||c.follow_up_date===today()) &&
+    (
+      activeStatsFilter==="all" ||
+      (activeStatsFilter==="new" && (c.status||"신규")==="신규") ||
+      (activeStatsFilter==="today" && c.follow_up_date===today()) ||
+      (activeStatsFilter==="analysis" && ["분석대기","분석진행"].includes(c.status)) ||
+      (activeStatsFilter==="done" && c.status==="계약완료")
+    )
+  );
+
+  if(sort==="createdDesc") list.sort((a,b)=>(b.created_at||"").localeCompare(a.created_at||""));
+  if(sort==="followAsc") list.sort((a,b)=>(a.follow_up_date||"9999").localeCompare(b.follow_up_date||"9999"));
+  if(sort==="nameAsc") list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  return list;
+}
+
+function render(){
+  const list=getFilteredCustomers();
+  const totalPages=Math.max(1,Math.ceil(list.length/pageSize));
+  if(currentPage>totalPages) currentPage=totalPages;
+  if(currentPage<1) currentPage=1;
+
+  const start=(currentPage-1)*pageSize;
+  const pageList=list.slice(start,start+pageSize);
+
+  $("customerBody").innerHTML=pageList.map(c=>{
+    const checked=selectedIds.has(String(c.id));
+    return `<tr class="customer-row ${checked?"selected-row":""}" data-customer-id="${esc(c.id)}">
+      <td class="select-col"><input type="checkbox" class="row-check" data-id="${esc(c.id)}" ${checked?"checked":""}></td>
+      <td>${esc((c.created_at||"").slice(0,10))}</td><td><b>${esc(c.name)}</b></td>
+      <td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td><td>${esc(c.source||"-")}</td><td>${esc(c.age_group||"-")}</td>
+      <td><span class="status ${esc(c.status||"신규")}">${esc(c.status||"신규")}</span></td>
+      <td>${esc(c.available_time||"-")}</td><td>${esc(c.follow_up_date||"-")}</td>
+      <td>${getContracts(c).length}건</td>
+      <td>${esc(latestContractDate(c)||"-")}</td>
+      <td class="money">${formatWon(contractTotal(c))}</td>
+      <td title="${esc(c.memo||c.message||"")}">${esc((c.memo||c.message||"").slice(0,24))}</td>
+      <td><div class="actions-cell">
+        <button type="button" class="icon-btn" data-action="edit" data-id="${esc(c.id)}">수정</button>
+        <button type="button" class="icon-btn del" data-action="delete" data-id="${esc(c.id)}">삭제</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+
+  $("emptyState").style.display=list.length?"none":"block";
+  $("sTotal").textContent=customers.length;
+  $("sNew").textContent=customers.filter(c=>c.status==="신규").length;
+  $("sToday").textContent=customers.filter(c=>c.follow_up_date===today()).length;
+  $("sAnalysis").textContent=customers.filter(c=>["분석대기","분석진행"].includes(c.status)).length;
+  $("sDone").textContent=customers.filter(c=>c.status==="계약완료").length;
+
+  const month=today().slice(0,7);
+  const thisMonthTotal=customers.flatMap(getContracts).filter(c=>(dateOnly(c.date)||"").slice(0,7)===month).reduce((sum,c)=>sum+num(c.amount),0);
+  $("sPremium").textContent=formatWon(thisMonthTotal);
+
+  renderPagination(totalPages);
+  updateSelectAll(pageList);
+  renderTasks();
+}
+
+function renderPagination(totalPages){
+  const parts=[];
+  parts.push(`<button type="button" class="page-btn" data-page="${currentPage-1}" ${currentPage===1?"disabled":""}>이전</button>`);
+  for(let p=1;p<=totalPages;p++){
+    parts.push(`<button type="button" class="page-btn ${p===currentPage?"active":""}" data-page="${p}">${p}</button>`);
+  }
+  parts.push(`<button type="button" class="page-btn" data-page="${currentPage+1}" ${currentPage===totalPages?"disabled":""}>다음</button>`);
+  parts.push(`<span class="selected-count">선택 ${selectedIds.size}명</span>`);
+  $("pagination").innerHTML=parts.join("");
+}
+
+function updateSelectAll(pageList){
+  const selectAll=$("selectAll");
+  const ids=pageList.map(c=>String(c.id));
+  const selected=ids.filter(id=>selectedIds.has(id)).length;
+  selectAll.checked=ids.length>0&&selected===ids.length;
+  selectAll.indeterminate=selected>0&&selected<ids.length;
+}
+
+function clearForm(){$("customerForm").reset();$("customerId").value="";$("formTitle").textContent="신규 고객 등록";$("status").value="신규";$("source").value="CRM";toggleAutoInsuranceBox();}
+function getSensitiveInfo(customer){const raw=customer?.payment_identity_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {}}
+function getInsuranceInfo(customer){const raw=customer?.insurance_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {types:[]}}
+function daysUntil(value){const a=parseLocalDate(today()),b=parseLocalDate(value);return a&&b?Math.ceil((b-a)/86400000):null}
+function isAutoRenewalDue(customer){const info=getInsuranceInfo(customer);const d=daysUntil(info.auto_expiry_date);return info.auto_expiry_date&&info.auto_renewal_status!=="갱신 완료"&&d!==null&&d>=0&&d<=30}
+function toggleAutoInsuranceBox(){const checked=$("autoInsuranceCheck").checked;$("autoInsuranceBox").classList.toggle("hidden",!checked)}
+function editCustomer(id){
+  const c=customers.find(x=>String(x.id)===String(id));
+  if(!c){alert("고객 정보를 찾지 못했습니다.");return;}
+  $("customerId").value=c.id;
+  $("name").value=c.name||"";
+  $("phone").value=c.phone||"";
+  $("age").value=c.age_group||"";
+  $("status").value=c.status||"신규";
+  $("source").value=c.source||"CRM";
+  $("availableTime").value=c.available_time||"";
+  $("followUp").value=c.follow_up_date||"";
+  $("interest").value=c.interest||"";
+  const sensitive=getSensitiveInfo(c);
+  $("paymentBank").value=sensitive.payment_bank||"";
+  $("paymentAccount").value=sensitive.payment_account||"";
+  $("paymentDay").value=sensitive.payment_day||"";
+  $("cardNumber").value=sensitive.card_number||"";
+  $("cardExpiry").value=sensitive.card_expiry||"";
+  $("identityVerified").checked=Boolean(sensitive.identity_verified);
+  $("driverLicense").value=sensitive.driver_license||"";
+  $("residentIssueDate").value=sensitive.resident_issue_date||"";
+  const insurance=getInsuranceInfo(c);
+  const types=Array.isArray(insurance.types)?insurance.types:[];
+  document.querySelectorAll('input[name="insuranceType"]').forEach(x=>x.checked=types.includes(x.value));
+  $("autoCompany").value=insurance.auto_company||"";
+  $("vehicleNumber").value=insurance.vehicle_number||"";
+  $("autoExpiryDate").value=insurance.auto_expiry_date||"";
+  $("autoRenewalStatus").value=insurance.auto_renewal_status||"갱신 예정";
+  toggleAutoInsuranceBox();
+  $("memo").value=c.memo||c.message||"";
+  $("formTitle").textContent="고객 정보 수정";
+  showFormView();
+}
+
+function formatDateTime(value){
+  if(!value)return "";
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return String(value);
+  return d.toLocaleString("ko-KR",{
+    year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit"
+  });
+}
+
+function getConsultHistory(customer){
+  const raw=customer?.consultation_history;
+  if(Array.isArray(raw))return raw;
+  if(typeof raw==="string"){
+    try{
+      const parsed=JSON.parse(raw);
+      return Array.isArray(parsed)?parsed:[];
+    }catch(e){return [];}
+  }
+  return [];
+}
+
+function renderConsultHistory(customer){
+  const history=getConsultHistory(customer);
+  const reversed=history.map((item,index)=>({item,index})).reverse();
+
+  $("consultHistory").innerHTML=reversed.length
+    ? reversed.map(({item,index})=>`
+      <div class="history-item" data-history-index="${index}">
+        <div class="history-item-head">
+          <div class="time">${esc(formatDateTime(item.created_at))}</div>
+          <div class="history-actions">
+            <button type="button" class="history-btn edit" data-history-action="edit" data-history-index="${index}">수정</button>
+            <button type="button" class="history-btn delete" data-history-action="delete" data-history-index="${index}">삭제</button>
+          </div>
+        </div>
+        <div class="content">${esc(item.content||"")}</div>
+      </div>
+    `).join("")
+    : '<div class="history-empty">아직 저장된 상담 기록이 없습니다.</div>';
+}
+
+function openConsultation(id){
+  const customer=customers.find(c=>String(c.id)===String(id));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  activeConsultCustomerId=String(customer.id);
+  $("consultName").textContent=customer.name||"-";
+  $("consultPhone").textContent=customer.phone||"-";
+  $("consultStatus").textContent=customer.status||"신규";
+  $("consultFollowUp").textContent=customer.follow_up_date||"-";
+  $("consultAvailableTime").textContent=customer.available_time||"-";
+  const insurance=getInsuranceInfo(customer);
+  const expiry=insurance.auto_expiry_date||"";
+  const remain=daysUntil(expiry);
+  $("consultAutoExpiry").innerHTML=expiry?(esc(expiry)+(remain!==null&&remain>=0?` <span class="${remain<=30?'expiry-alert':''}">(D-${remain})</span>`:" 만기 경과")):"-";
+  $("consultFollowUpInput").value=customer.follow_up_date||"";
+  $("consultMemo").value="";
+  editingHistoryIndex=null;
+  $("consultSave").textContent="상담 기록 저장";
+  renderConsultHistory(customer);
+  renderContracts(customer);
+
+  $("consultModal").classList.add("open");
+  $("consultModal").setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>$("consultMemo").focus(),100);
+}
+
+function closeConsultation(){
+  $("consultModal").classList.remove("open");
+  $("consultModal").setAttribute("aria-hidden","true");
+  document.body.style.overflow="";
+  activeConsultCustomerId=null;
+  editingHistoryIndex=null;
+  $("consultMemo").value="";
+  $("consultSave").textContent="상담 기록 저장";
+}
+
+async function saveConsultation(){
+  if(!activeConsultCustomerId)return;
+
+  const content=$("consultMemo").value.trim();
+  if(!content){alert("상담 내용을 입력해주세요.");return;}
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  const history=getConsultHistory(customer);
+  let nextHistory;
+
+  if(editingHistoryIndex!==null){
+    nextHistory=history.map((item,index)=>
+      index===editingHistoryIndex
+        ? {...item,content,updated_at:new Date().toISOString()}
+        : item
+    );
+  }else{
+    nextHistory=[
+      ...history,
+      {
+        created_at:new Date().toISOString(),
+        content
+      }
+    ];
+  }
+
+  const saveBtn=$("consultSave");
+  const originalText=saveBtn.textContent;
+  saveBtn.disabled=true;
+  saveBtn.textContent="저장 중...";
+
+  const {error}=await db
+    .from("customers")
+    .update({consultation_history:nextHistory})
+    .eq("id",activeConsultCustomerId);
+
+  saveBtn.disabled=false;
+
+  if(error){
+    saveBtn.textContent=originalText;
+    alert("상담 기록 저장 실패: "+error.message);
+    return;
+  }
+
+  const oldTouch=getLastTouchDate(customer);
+  if(oldTouch){ const completed=readCompletedTasks(); completed[`${customer.id}:no_touch_14d:${oldTouch}`]=new Date().toISOString(); writeCompletedTasks(completed); }
+  customer.consultation_history=nextHistory;
+  $("consultMemo").value="";
+  editingHistoryIndex=null;
+  saveBtn.textContent="상담 기록 저장";
+  renderConsultHistory(customer);
+  renderTasks();
+  alert(originalText==="수정 내용 저장"?"상담 기록이 수정되었습니다.":"상담 기록이 저장되었습니다.");
+}
+
+async function deleteConsultationHistory(index){
+  if(!activeConsultCustomerId)return;
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  const history=getConsultHistory(customer);
+  const target=history[index];
+  if(!target)return;
+
+  if(!confirm("이 상담 기록을 삭제할까요?"))return;
+
+  const nextHistory=history.filter((_,i)=>i!==index);
+  const {error}=await db
+    .from("customers")
+    .update({consultation_history:nextHistory})
+    .eq("id",activeConsultCustomerId);
+
+  if(error){
+    alert("상담 기록 삭제 실패: "+error.message);
+    return;
+  }
+
+  customer.consultation_history=nextHistory;
+  if(editingHistoryIndex===index){
+    editingHistoryIndex=null;
+    $("consultMemo").value="";
+    $("consultSave").textContent="상담 기록 저장";
+  }
+  renderConsultHistory(customer);
+  alert("상담 기록이 삭제되었습니다.");
+}
+
+function editConsultationHistory(index){
+  if(!activeConsultCustomerId)return;
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer)return;
+
+  const history=getConsultHistory(customer);
+  const target=history[index];
+  if(!target)return;
+
+  editingHistoryIndex=index;
+  $("consultMemo").value=target.content||"";
+  $("consultSave").textContent="수정 내용 저장";
+  $("consultMemo").focus();
+  $("consultMemo").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+async function saveConsultFollowUp(){
+  if(!activeConsultCustomerId)return;
+
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
+  if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
+
+  const nextDate=$("consultFollowUpInput").value||null;
+  const button=$("consultFollowUpSave");
+  const originalText=button.textContent;
+  button.disabled=true;
+  button.textContent="저장 중...";
+
+  const {error}=await db
+    .from("customers")
+    .update({follow_up_date:nextDate})
+    .eq("id",activeConsultCustomerId);
+
+  button.disabled=false;
+  button.textContent=originalText;
+
+  if(error){
+    alert("다음 연락일 저장 실패: "+error.message);
+    return;
+  }
+
+  customer.follow_up_date=nextDate;
+  $("consultFollowUp").textContent=nextDate||"-";
+  render();
+  alert("다음 연락일이 저장되었습니다.");
+}
+
+
+function renderContracts(customer){
+  const contracts=getContracts(customer);
+  const warning=contractsColumnAvailable?"":'<div class="schema-warning">여러 계약 저장을 사용하려면 ZIP 안의 <b>Supabase_계약기능_SQL.txt</b> 내용을 한 번 실행해야 합니다.</div>';
+  $("contractList").innerHTML=warning+(contracts.length?contracts.map((contract,index)=>`
+    <div class="contract-card" data-contract-index="${index}">
+      <div class="contract-card-head"><strong>${index+1}번째 계약</strong><span class="task-badge">${esc(contract.status||"유지")}</span></div>
+      <div class="contract-grid">
+        <div class="field"><label>보험회사</label><input data-contract-field="company" value="${esc(contract.company||"")}" placeholder="보험회사"></div>
+        <div class="field"><label>상품명</label><input data-contract-field="product" value="${esc(contract.product||"")}" placeholder="상품명"></div>
+        <div class="field"><label>계약일</label><input type="date" data-contract-field="date" value="${esc(dateOnly(contract.date))}"></div>
+        <div class="field"><label>계약금액</label><input type="number" min="0" step="1000" data-contract-field="amount" value="${num(contract.amount)||""}" placeholder="원"></div>
+        <div class="field"><label>계약상태</label><select data-contract-field="status"><option ${contract.status==="유지"?"selected":""}>유지</option><option ${contract.status==="유지관리"?"selected":""}>유지관리</option><option ${contract.status==="확인필요"?"selected":""}>확인필요</option><option ${contract.status==="실효위험"?"selected":""}>실효위험</option><option ${contract.status==="해지"?"selected":""}>해지</option></select></div>
+      </div>
+      <div class="contract-actions"><button type="button" class="btn danger" data-contract-action="delete" data-contract-index="${index}">계약 삭제</button><button type="button" class="btn primary" data-contract-action="save" data-contract-index="${index}">계약 저장</button></div>
+    </div>`).join(""):'<div class="contract-empty">등록된 계약이 없습니다. 위의 <b>＋ 계약 추가</b>를 눌러주세요.</div>');
+}
+function newContract(){return {id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),company:"",product:"",date:"",amount:0,status:"유지"}}
+async function persistContracts(customer,nextContracts){
+  const {error}=await db.from("customers").update({contracts:nextContracts}).eq("id",customer.id);
+  if(error){
+    if(/contracts|column|schema cache/i.test(error.message||"")) contractsColumnAvailable=false;
+    renderContracts(customer);
+    alert("계약 저장 실패: "+error.message+"\n\nZIP 안의 Supabase_계약기능_SQL.txt를 Supabase SQL Editor에서 한 번 실행해주세요.");
+    return false;
+  }
+  contractsColumnAvailable=true;
+  customer.contracts=nextContracts;
+  customer.status=nextContracts.length?"계약완료":customer.status;
+  await db.from("customers").update({status:customer.status}).eq("id",customer.id);
+  renderContracts(customer); render(); renderTasks();
+  return true;
+}
+async function addContract(){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  const next=[...getContracts(customer),newContract()];
+  if(await persistContracts(customer,next)) setTimeout(()=>$("contractList").lastElementChild?.scrollIntoView({behavior:"smooth",block:"center"}),50);
+}
+async function saveContractFromCard(index){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  const card=$("contractList").querySelector(`[data-contract-index="${index}"]`); if(!card)return;
+  const current=[...getContracts(customer)];
+  const updated={...current[index]};
+  card.querySelectorAll("[data-contract-field]").forEach(input=>{updated[input.dataset.contractField]=input.dataset.contractField==="amount"?num(input.value):input.value;});
+  if(!updated.date){alert("계약일을 입력해주세요.");return;}
+  current[index]=updated;
+  if(await persistContracts(customer,current)) alert("계약이 저장되었습니다.");
+}
+async function deleteContractAt(index){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  if(!confirm(`${index+1}번째 계약을 삭제할까요?`))return;
+  const next=getContracts(customer).filter((_,i)=>i!==index);
+  if(await persistContracts(customer,next)) alert("계약이 삭제되었습니다.");
+}
+
+async function deleteCustomer(id){
+  const c=customers.find(x=>String(x.id)===String(id));
+  const customerName=c?.name||"선택한 고객";
+  if(!confirm(customerName+" 정보를 삭제할까요?"))return;
+
+  const {error}=await db.from("customers").delete().eq("id",id);
+  if(error){
+    alert("삭제 실패: "+error.message);
+    return;
+  }
+  await loadCustomers();
+  alert("삭제되었습니다.");
+}
+
+$("customerBody").addEventListener("click",async event=>{
+  const button=event.target.closest("button[data-action]");
+  if(!button)return;
+
+  const id=button.dataset.id;
+  const action=button.dataset.action;
+
+  if(action==="edit") editCustomer(id);
+  if(action==="delete") await deleteCustomer(id);
+});
+$("cardNumber").addEventListener("input",e=>{const digits=e.target.value.replace(/\D/g,"").slice(0,16);e.target.value=digits.replace(/(.{4})/g,"$1 ").trim();});
+$("cardExpiry").addEventListener("input",e=>{const digits=e.target.value.replace(/\D/g,"").slice(0,4);e.target.value=digits.length>2?digits.slice(0,2)+"/"+digits.slice(2):digits;});
+$("paymentAccount").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9-]/g,"");});
+$("autoInsuranceCheck").addEventListener("change",toggleAutoInsuranceBox);
+
+$("customerForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const id=$("customerId").value;
+  const payload={
+    name:$("name").value.trim(),
+    phone:$("phone").value.trim(),
+    age_group:$("age").value,
+    status:$("status").value,
+    source:$("source").value||"CRM",
+    available_time:$("availableTime").value.trim(),
+    follow_up_date:$("followUp").value||null,
+    interest:$("interest").value.trim(),
+    insurance_info:{
+      types:[...document.querySelectorAll('input[name="insuranceType"]:checked')].map(x=>x.value),
+      auto_company:$("autoCompany").value.trim(),
+      vehicle_number:$("vehicleNumber").value.trim(),
+      auto_expiry_date:$("autoExpiryDate").value||null,
+      auto_renewal_status:$("autoRenewalStatus").value
+    },
+    payment_identity_info:{
+      payment_bank:$("paymentBank").value.trim(),
+      payment_account:$("paymentAccount").value.trim(),
+      payment_day:$("paymentDay").value,
+      card_number:$("cardNumber").value.replace(/\s|-/g,""),
+      card_expiry:$("cardExpiry").value.trim(),
+      identity_verified:$("identityVerified").checked,
+      driver_license:$("driverLicense").value.trim(),
+      resident_issue_date:$("residentIssueDate").value||null
+    },
+    memo:$("memo").value.trim()
+  };
+  const res=id
+    ? await db.from("customers").update(payload).eq("id",id).select().single()
+    : await db.from("customers").insert(payload).select().single();
+
+  if(res.error){
+    alert("저장 실패: "+res.error.message);
+  }else{
+    const wasEdit=Boolean(id);
+    const savedId=res.data?.id||id;
+    clearForm();
+    await loadCustomers();
+    if(savedId){
+      showListView();
+      openConsultation(savedId);
+      alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다. 상담기록과 계약정보를 입력해주세요.");
+    }else{
+      showListView();
+      alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다.");
+    }
+  }
+});
+["search","statusFilter","sourceFilter","sortBy"].forEach(id=>$(id).addEventListener("input",()=>{
+  currentPage=1;
+  render();
+}));
+$("cancelBtn").addEventListener("click",()=>{clearForm();showListView();});
+$("newBtn").addEventListener("click",()=>{clearForm();showFormView();});
+$("backToListBtn").addEventListener("click",()=>{clearForm();showListView();});
+$("taskList").addEventListener("click",event=>{
+  const button=event.target.closest("button[data-task-action]"); if(!button)return;
+  const task=($("taskList")._tasks||[])[Number(button.dataset.taskIndex)]; if(!task)return;
+  if(button.dataset.taskAction==="open") openConsultation(task.customer.id);
+  if(button.dataset.taskAction==="done") completeTask(task.unique);
+});
+
+
+function getSelectedCustomers(){
+  return customers.filter(c=>selectedIds.has(String(c.id)));
+}
+
+function buildMessage(selected){
+  const names=selected.map(c=>c.name).filter(Boolean);
+  const nameText=names.length===1?names[0]+" 고객님":"고객님";
+  return `안녕하세요. ${nameText}
+AI보험 미래전략사업부 김민석 사업단장입니다.
+
+상담 신청 감사합니다.
+확인 후 상담 가능 시간에 맞춰 연락드리겠습니다.
+
+문의: 010-8795-8502`;
+}
+
+$("todayBtn").addEventListener("click",()=>{
+  todayOnly=!todayOnly;
+  activeStatsFilter=todayOnly?"today":"all";
+  currentPage=1;
+
+  $("todayBtn").classList.toggle("today-active",todayOnly);
+  $("todayBtn").textContent=todayOnly?"전체 고객 보기":"오늘 연락 예정만 보기";
+
+  document.querySelectorAll(".stat-filter").forEach(card=>{
+    card.classList.toggle("active",card.dataset.filter===activeStatsFilter);
+  });
+
+  render();
+});
+
+$("smsBtn").addEventListener("click",()=>{
+  const selected=getSelectedCustomers();
+  if(!selected.length){alert("문자를 보낼 고객을 먼저 체크해주세요.");return;}
+
+  const phones=selected.map(c=>cleanPhone(c.phone)).filter(Boolean);
+  if(!phones.length){alert("선택한 고객의 휴대폰 번호가 없습니다.");return;}
+
+  const body=encodeURIComponent(buildMessage(selected));
+  const separator=/iPhone|iPad|iPod/i.test(navigator.userAgent)?"&":"?";
+  location.href=`sms:${phones.join(",")}${separator}body=${body}`;
+});
+
+
+document.querySelectorAll(".stat-filter").forEach(card=>{
+  card.addEventListener("click",()=>{
+    activeStatsFilter=card.dataset.filter||"all";
+    currentPage=1;
+
+    document.querySelectorAll(".stat-filter").forEach(item=>{
+      item.classList.toggle("active",item===card);
+    });
+
+    if(activeStatsFilter==="today"){
+      todayOnly=true;
+      $("todayBtn").classList.add("today-active");
+      $("todayBtn").textContent="전체 고객 보기";
+    }else{
+      todayOnly=false;
+      $("todayBtn").classList.remove("today-active");
+      $("todayBtn").textContent="오늘 연락 예정만 보기";
+    }
+
+    render();
+  });
+});
+
+
+$("customerBody").addEventListener("dblclick",event=>{
+  if(event.target.closest("button,a,input,select,textarea"))return;
+  const row=event.target.closest("tr[data-customer-id]");
+  if(!row)return;
+  openConsultation(row.dataset.customerId);
+});
+
+$("addContractBtn").addEventListener("click",addContract);
+$("contractList").addEventListener("click",event=>{
+  const button=event.target.closest("button[data-contract-action]"); if(!button)return;
+  const index=Number(button.dataset.contractIndex);
+  if(button.dataset.contractAction==="save")saveContractFromCard(index);
+  if(button.dataset.contractAction==="delete")deleteContractAt(index);
+});
+document.querySelectorAll(".contract-tab").forEach(button=>button.addEventListener("click",()=>{
+  activeContractFilter=button.dataset.contractFilter||"all";
+  document.querySelectorAll(".contract-tab").forEach(x=>x.classList.toggle("active",x===button));
+  currentPage=1; render();
+}));
+
+$("consultClose").addEventListener("click",closeConsultation);
+$("consultCancel").addEventListener("click",closeConsultation);
+$("consultSave").addEventListener("click",saveConsultation);
+$("consultFollowUpSave").addEventListener("click",saveConsultFollowUp);
+
+$("consultHistory").addEventListener("click",event=>{
+  const button=event.target.closest("button[data-history-action]");
+  if(!button)return;
+
+  const index=Number(button.dataset.historyIndex);
+  const action=button.dataset.historyAction;
+
+  if(action==="edit") editConsultationHistory(index);
+  if(action==="delete") deleteConsultationHistory(index);
+});
+
+$("consultModal").addEventListener("click",event=>{
+  if(event.target===$("consultModal"))closeConsultation();
+});
+
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&$("consultModal").classList.contains("open")){
+    closeConsultation();
+  }
+});
+
+$("pagination").addEventListener("click",event=>{
+  const btn=event.target.closest("button[data-page]");
+  if(!btn||btn.disabled)return;
+  currentPage=Number(btn.dataset.page);
+  render();
+});
+
+$("customerBody").addEventListener("change",event=>{
+  const checkbox=event.target.closest(".row-check");
+  if(!checkbox)return;
+  const id=String(checkbox.dataset.id);
+  checkbox.checked?selectedIds.add(id):selectedIds.delete(id);
+  checkbox.closest("tr")?.classList.toggle("selected-row",checkbox.checked);
+  renderPagination(Math.max(1,Math.ceil(getFilteredCustomers().length/pageSize)));
+  updateSelectAll(getFilteredCustomers().slice((currentPage-1)*pageSize,currentPage*pageSize));
+});
+
+$("selectAll").addEventListener("change",event=>{
+  document.querySelectorAll(".row-check").forEach(checkbox=>{
+    checkbox.checked=event.target.checked;
+    const id=String(checkbox.dataset.id);
+    event.target.checked?selectedIds.add(id):selectedIds.delete(id);
+    checkbox.closest("tr")?.classList.toggle("selected-row",event.target.checked);
+  });
+  renderPagination(Math.max(1,Math.ceil(getFilteredCustomers().length/pageSize)));
+});
+
+document.querySelector('.stat-filter[data-filter="all"]')?.classList.add("active");
+checkSession();
