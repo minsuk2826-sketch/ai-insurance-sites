@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 3.0</title>
+  <title>AI보험 CRM 3.3</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{--blue:#1769ff;--blue2:#0e52d8;--navy:#14213a;--muted:#6c7890;--line:#dfe8f5;--soft:#f5f9ff;--white:#fff;--green:#1aa36f;--orange:#f59e0b;--red:#e44848;--shadow:0 14px 40px rgba(48,88,145,.10)}
@@ -21,7 +21,7 @@
     input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(23,105,255,.09)} textarea{min-height:90px;resize:vertical}
     .msg{margin-top:12px;padding:11px;border-radius:10px;font-size:14px;font-weight:700}
     .title-row{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:20px} h1{font-size:30px;margin:0} .sub{color:var(--muted);margin-top:6px}
-    .stats{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-bottom:20px} .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+    .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:20px} .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
     .stat small{color:var(--muted);font-weight:800} .stat strong{display:block;font-size:30px;margin-top:6px}
     .layout{display:block}.list-view .panel{width:100%} .panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
     .panel-head{padding:18px;border-bottom:1px solid var(--line)} .panel-head h2{margin:0;font-size:20px}
@@ -110,12 +110,20 @@
       #app>header{margin-left:0}.wrap{margin-left:0;padding:16px 12px 90px}.stats{grid-template-columns:1fr 1fr}.title-row .primary{width:100%}
     }
 
+    .sensitive-guide{padding:12px 14px;border:1px solid #f0c36b;background:#fff8e8;color:#75520a;border-radius:12px;font-size:13px;line-height:1.55}.check-row{display:flex;align-items:center;gap:9px;min-height:42px}.check-row input{width:18px;height:18px}.section-label{grid-column:1/-1;margin:8px 0 0;padding-top:12px;border-top:1px solid var(--line);font-weight:900;color:#243b5a}.form-guide{padding:14px;border:1px solid #cfe0ff;background:#f3f7ff;border-radius:14px;color:#35547f;font-size:14px}
+    .insurance-types{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.insurance-check{display:flex;align-items:center;gap:7px;padding:10px;border:1px solid var(--line);border-radius:11px;background:#fbfdff}.insurance-check input{width:17px;height:17px}.auto-box{padding:14px;border:1px solid #bfd5ff;border-radius:14px;background:#f6f9ff}.auto-box.hidden{display:none!important}.expiry-alert{color:#c43b3b;font-weight:900}
+    @media(max-width:700px){.insurance-types{grid-template-columns:1fr 1fr}}
+    .contract-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.contract-tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font-weight:800;color:#49617f}.contract-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+    .contract-section{margin:20px 0;padding:18px;border:1px solid var(--line);border-radius:18px;background:#fbfdff}.section-title-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.section-title-row h3{margin:0}.section-title-row p{margin:4px 0 0;color:var(--muted);font-size:13px}.contract-list{display:grid;gap:12px}.contract-card{padding:14px;border:1px solid var(--line);border-radius:15px;background:#fff}.contract-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.contract-card-head strong{font-size:16px}.contract-grid{display:grid;grid-template-columns:1.2fr 1.2fr 1fr 1fr;gap:9px}.contract-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px}.contract-empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed #cad8ea;border-radius:14px;background:#fff}.schema-warning{padding:12px;margin-bottom:12px;border-radius:12px;background:#fff4e5;color:#8a5a00;font-weight:700;font-size:13px}
+    .consult-modal{background:#f5f9ff;align-items:stretch;justify-content:stretch;padding:0}.consult-card{width:100%;height:100vh;max-height:none;border-radius:0;box-shadow:none}.consult-head{padding-left:max(20px,calc((100vw - 1180px)/2));padding-right:max(20px,calc((100vw - 1180px)/2))}.consult-body{max-width:1180px;margin:0 auto;padding:24px 20px 60px}.customer-summary{grid-template-columns:repeat(5,1fr)}
+    @media(max-width:800px){.contract-grid{grid-template-columns:1fr 1fr}.customer-summary{grid-template-columns:1fr 1fr}.section-title-row{align-items:flex-start;flex-direction:column}.section-title-row .btn{width:100%}}
+
   </style>
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card">
-    <h1>AI보험 CRM 3.0</h1>
+    <h1>AI보험 CRM 3.3</h1>
     <p>관리자 계정으로 로그인하세요.</p>
     <div class="field"><label>이메일</label><input id="loginEmail" type="email" required></div>
     <div class="field"><label>비밀번호</label><input id="loginPassword" type="password" required></div>
@@ -126,14 +134,14 @@
 
 <div id="app" class="hidden">
 <nav class="crm-sidebar" aria-label="CRM 메뉴">
-  <div class="side-logo"><span>AI</span><div>보험 CRM<small>3.0</small></div></div>
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>3.3</small></div></div>
   <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
   <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
   <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
-  <button class="nav-item" data-crm-view="contracts"><b>₩</b><span>계약관리</span></button>
+  <button class="nav-item" data-crm-view="contracts"><b>▤</b><span>계약관리</span></button>
   <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
 </nav>
-<header><div class="top"><div class="brand"><b>AI보험</b> CRM 2.0</div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
+<header><div class="top"><div class="brand"><b>AI보험</b> CRM 3.1</div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
 <main class="wrap">
   <div class="title-row"><div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
   <section id="statsPanel" class="stats">
@@ -143,7 +151,6 @@
     <div class="stat stat-filter" data-filter="analysis"><small>분석 진행</small><strong id="sAnalysis">0</strong></div>
     <div class="stat stat-filter" data-filter="done"><small>계약 완료</small><strong id="sDone">0</strong></div>
     <div class="stat"><small>이번 달 월보험료</small><strong id="sPremium" class="money">0원</strong></div>
-    <div class="stat"><small>이번 달 수수료</small><strong id="sCommission" class="money">0원</strong></div>
   </section>
 
   <section id="taskPanel" class="task-panel">
@@ -151,8 +158,16 @@
     <div id="taskList" class="task-list"></div>
   </section>
 
-  <div class="workspace-note contract-note">계약일이 입력된 고객만 표시됩니다. 고객 수정 화면에서 계약일·월보험료·수수료를 관리할 수 있습니다.</div>
+  <div class="workspace-note contract-note">계약이 1건 이상 등록된 고객만 표시됩니다. 고객 상담기록 화면에서 계약을 여러 건 추가·수정할 수 있습니다.</div>
   <div class="workspace-note recruit-note">리크루팅 랜딩페이지 또는 육아·경력단절 유입 고객을 모아 보여줍니다.</div>
+  <div id="contractTabs" class="contract-tabs hidden">
+    <button type="button" class="contract-tab active" data-contract-filter="all">전체 계약</button>
+    <button type="button" class="contract-tab" data-contract-filter="30">30일 경과</button>
+    <button type="button" class="contract-tab" data-contract-filter="90">90일 경과</button>
+    <button type="button" class="contract-tab" data-contract-filter="365">1년 경과</button>
+    <button type="button" class="contract-tab" data-contract-filter="maintenance">유지관리 예정</button>
+    <button type="button" class="contract-tab" data-contract-filter="auto">자동차보험 갱신 예정</button>
+  </div>
   <section id="listView" class="layout list-view">
     <div class="panel">
       <div class="panel-head"><h2>고객 목록</h2>
@@ -171,7 +186,7 @@
       <div class="table-wrap">
         <table><thead><tr>
           <th class="select-col"><input id="selectAll" class="select-all" type="checkbox" aria-label="현재 페이지 전체 선택"></th>
-          <th>등록일</th><th>이름</th><th>연락처</th><th>유입경로</th><th>나이대</th><th>상태</th><th>상담 가능 시간</th><th>다음 연락일</th><th>계약일</th><th>월보험료</th><th>수수료</th><th>메모</th><th>관리</th>
+          <th>등록일</th><th>이름</th><th>연락처</th><th>유입경로</th><th>나이대</th><th>상태</th><th>상담 가능 시간</th><th>다음 연락일</th><th>계약건수</th><th>최근 계약일</th><th>총 계약금액</th><th>메모</th><th>관리</th>
         </tr></thead><tbody id="customerBody"></tbody></table>
         <div id="pagination" class="pagination"></div>
         <div id="emptyState" class="empty">등록된 고객이 없습니다.</div>
@@ -193,14 +208,51 @@
           <div class="field"><label>나이대</label><select id="age"><option value="">선택</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></div>
           <div class="field"><label>상태</label><select id="status"><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>보류</option></select></div>
         </div>
-        <div class="field"><label>상담 가능 시간</label><input id="availableTime"></div>
+        <div class="field"><label>상담 가능 시간</label><select id="availableTime"><option value="">선택</option><option>오전 10시~12시</option><option>오후 12시~2시</option><option>오후 2시~4시</option><option>오후 4시~6시</option><option>오후 6시 이후</option><option>시간 상관없음</option></select></div>
         <div class="field"><label>다음 연락일</label><input id="followUp" type="date"></div>
         <div class="field"><label>관심 분야</label><input id="interest"></div>
-        <div class="two">
-          <div class="field"><label>계약일</label><input id="contractDate" type="date"></div>
-          <div class="field"><label>월보험료</label><input id="monthlyPremium" type="number" min="0" step="1000" placeholder="예: 150000"></div>
+
+        <div class="section-label">보유·관심 보험</div>
+        <div class="insurance-types">
+          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="생명보험">생명보험</label>
+          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="건강보험">건강보험</label>
+          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="암보험">암보험</label>
+          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="실손보험">실손보험</label>
+          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="운전자보험">운전자보험</label>
+          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="화재보험">화재보험</label>
+          <label class="insurance-check"><input id="autoInsuranceCheck" type="checkbox" name="insuranceType" value="자동차보험">자동차보험</label>
         </div>
-        <div class="field"><label>수수료</label><input id="commission" type="number" min="0" step="1000" placeholder="예: 1200000"></div>
+        <div id="autoInsuranceBox" class="auto-box hidden">
+          <div class="two">
+            <div class="field"><label>자동차보험 보험사</label><input id="autoCompany" placeholder="보험사"></div>
+            <div class="field"><label>차량번호</label><input id="vehicleNumber" placeholder="예: 12가3456"></div>
+          </div>
+          <div class="two">
+            <div class="field"><label>자동차보험 만기일</label><input id="autoExpiryDate" type="date"></div>
+            <div class="field"><label>갱신 상태</label><select id="autoRenewalStatus"><option>갱신 예정</option><option>상담 진행</option><option>갱신 완료</option><option>타사 가입</option><option>보류</option></select></div>
+          </div>
+          <div class="form-guide">만기일 기준 30일·15일·7일 전과 만기 당일에 오늘 할 일 알림이 자동 생성됩니다.</div>
+        </div>
+
+        <div class="section-label">결제 정보</div>
+        <div class="two">
+          <div class="field"><label>결제 은행</label><input id="paymentBank" autocomplete="off" placeholder="예: 국민은행"></div>
+          <div class="field"><label>결제 계좌번호</label><input id="paymentAccount" autocomplete="off" inputmode="numeric" placeholder="계좌번호 입력"></div>
+        </div>
+        <div class="field"><label>결제일</label><select id="paymentDay"><option value="">선택</option><option value="5">5일</option><option value="10">10일</option><option value="15">15일</option><option value="20">20일</option><option value="25">25일</option></select></div>
+        <div class="two">
+          <div class="field"><label>카드번호</label><input id="cardNumber" autocomplete="off" inputmode="numeric" maxlength="19" placeholder="숫자만 입력"></div>
+          <div class="field"><label>카드 유효기간</label><input id="cardExpiry" autocomplete="off" inputmode="numeric" maxlength="5" placeholder="MM/YY"></div>
+        </div>
+
+        <div class="section-label">신분증 확인</div>
+        <div class="field check-row"><input id="identityVerified" type="checkbox"><label for="identityVerified">신분증 확인 완료</label></div>
+        <div class="two">
+          <div class="field"><label>운전면허번호</label><input id="driverLicense" autocomplete="off" placeholder="운전면허번호"></div>
+          <div class="field"><label>주민등록증 발급일자</label><input id="residentIssueDate" type="date" autocomplete="off"></div>
+        </div>
+        <div class="sensitive-guide">보안 주의: 계좌번호·카드번호·신분증 정보는 매우 민감한 개인정보입니다. Supabase 접근권한과 RLS를 반드시 제한하고, 카드 CVC·주민등록번호는 저장하지 마세요.</div>
+        <div class="form-guide">계약 정보는 고객 등록 후 열리는 <b>고객 상담기록 화면</b>에서 여러 건 추가할 수 있습니다.</div>
         <div class="field"><label>상담 메모</label><textarea id="memo"></textarea></div>
         <div class="form-actions"><button class="btn light" type="button" id="cancelBtn">초기화</button><button class="btn primary" type="submit">저장하기</button></div>
       </form>
@@ -221,6 +273,8 @@
         <div class="summary-box"><small>연락처</small><strong id="consultPhone">-</strong></div>
         <div class="summary-box"><small>상태</small><strong id="consultStatus">-</strong></div>
         <div class="summary-box"><small>다음 연락일</small><strong id="consultFollowUp">-</strong></div>
+        <div class="summary-box"><small>상담 가능 시간</small><strong id="consultAvailableTime">-</strong></div>
+        <div class="summary-box"><small>자동차보험 만기</small><strong id="consultAutoExpiry">-</strong></div>
       </div>
 
       <div class="consult-follow-box">
@@ -230,6 +284,11 @@
         </div>
         <button type="button" class="btn primary" id="consultFollowUpSave">다음 연락일 저장</button>
       </div>
+
+      <section class="contract-section">
+        <div class="section-title-row"><div><h3>계약 정보</h3><p>한 고객에게 여러 계약을 등록할 수 있습니다.</p></div><button type="button" class="btn primary" id="addContractBtn">＋ 계약 추가</button></div>
+        <div id="contractList" class="contract-list"></div>
+      </section>
 
       <h3>상담 기록</h3>
       <div id="consultHistory" class="history-list"></div>
@@ -257,6 +316,8 @@ let todayOnly = false;
 let activeStatsFilter = "all";
 let activeConsultCustomerId = null;
 let editingHistoryIndex = null;
+let activeContractFilter = "all";
+let contractsColumnAvailable = true;
 
 const $ = id => document.getElementById(id);
 const today = () => new Date().toISOString().slice(0,10);
@@ -264,6 +325,16 @@ const esc = s => String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">
 const num = v => Number(v || 0);
 const formatWon = v => Math.round(num(v)).toLocaleString("ko-KR") + "원";
 const cleanPhone = v => String(v || "").replace(/[^0-9+]/g,"");
+function getContracts(customer){
+  if(Array.isArray(customer?.contracts)) return customer.contracts;
+  if(typeof customer?.contracts==="string"){ try{const x=JSON.parse(customer.contracts); if(Array.isArray(x))return x;}catch(e){} }
+  if(customer?.contract_date) return [{id:"legacy",company:"",product:"",date:dateOnly(customer.contract_date),amount:num(customer.monthly_premium),status:"유지"}];
+  return [];
+}
+function contractTotal(customer){return getContracts(customer).reduce((s,c)=>s+num(c.amount),0)}
+function latestContractDate(customer){return getContracts(customer).map(c=>dateOnly(c.date)).filter(Boolean).sort().pop()||""}
+function contractReached(contract,days){const date=dateOnly(contract.date); return date && daysBetween(date)>=days}
+
 
 const taskStorageKey = "ai-crm-completed-tasks-v1";
 const readCompletedTasks = () => { try { return JSON.parse(localStorage.getItem(taskStorageKey)||"{}"); } catch(e) { return {}; } };
@@ -282,10 +353,19 @@ function customerTasks(customer){
   const completed=readCompletedTasks();
   const items=[];
   const add=(key,due,title,badge)=>{ const unique=`${customer.id}:${key}`; if(due&&due<=today()&&!completed[unique]) items.push({unique,key,due,title,badge,customer,overdue:Math.max(0,daysBetween(due))}); };
-  if(customer.contract_date){
-    add("contract_30d",addDays(customer.contract_date,30),"계약 30일 경과 확인","30일");
-    add("contract_90d",addDays(customer.contract_date,90),"계약 90일 경과 확인","90일");
-    add("contract_1y",addYears(customer.contract_date,1),"계약 1주년 고객 관리","1년");
+  getContracts(customer).forEach((contract,index)=>{
+    if(!contract.date)return;
+    const contractKey=contract.id||index;
+    add(`contract_${contractKey}_30d`,addDays(contract.date,30),`${index+1}번째 계약 30일 경과 확인`,`30일`);
+    add(`contract_${contractKey}_90d`,addDays(contract.date,90),`${index+1}번째 계약 90일 경과 확인`,`90일`);
+    add(`contract_${contractKey}_1y`,addYears(contract.date,1),`${index+1}번째 계약 1주년 고객 관리`,`1년`);
+  });
+  const insurance=getInsuranceInfo(customer);
+  if(insurance.auto_expiry_date&&insurance.auto_renewal_status!=="갱신 완료"){
+    add(`auto_30:${insurance.auto_expiry_date}`,addDays(insurance.auto_expiry_date,-30),`자동차보험 만기 30일 전 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 30일`);
+    add(`auto_15:${insurance.auto_expiry_date}`,addDays(insurance.auto_expiry_date,-15),`자동차보험 만기 15일 전 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 15일`);
+    add(`auto_7:${insurance.auto_expiry_date}`,addDays(insurance.auto_expiry_date,-7),`자동차보험 만기 7일 전 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 7일`);
+    add(`auto_0:${insurance.auto_expiry_date}`,insurance.auto_expiry_date,`자동차보험 만기 당일 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 만기`);
   }
   const lastTouch=getLastTouchDate(customer);
   if(lastTouch) add(`no_touch_14d:${lastTouch}`,addDays(lastTouch,14),"마지막 상담 후 2주 경과","미접촉");
@@ -314,18 +394,28 @@ function applyCrmView(view){
     dashboard:["업무 대시보드","오늘 처리할 고객과 계약 현황을 한눈에 확인합니다."],
     customers:["고객 관리","전체 고객을 검색하고 상담 상태를 관리합니다."],
     tasks:["오늘 할 일","계약 경과일·미접촉 고객·연락 예정일을 자동 계산합니다."],
-    contracts:["계약 관리","계약 고객의 월보험료와 예상 수수료를 관리합니다."],
+    contracts:["계약 관리","계약 완료 고객의 여러 계약과 경과일을 관리합니다."],
     recruiting:["리크루팅 관리","설계사 지원자와 리크루팅 유입 고객을 관리합니다."]
   };
   $("pageTitle").textContent=titles[view][0]; $("pageSubtitle").textContent=titles[view][1];
   $("newBtn").textContent=view==="recruiting"?"+ 지원자 등록":"+ 신규 고객 등록";
+  $("contractTabs").classList.toggle("hidden",view!=="contracts");
   todayOnly=false; activeStatsFilter="all";
   if(view==="contracts") { $("statusFilter").value=""; }
   if(view==="recruiting") { $("statusFilter").value=""; }
   currentPage=1; render();
 }
 function getViewScopedCustomers(list){
-  if(crmView==="contracts") return list.filter(c=>Boolean(c.contract_date)||c.status==="계약완료");
+  if(crmView==="contracts") return list.filter(c=>{
+    const contracts=getContracts(c);
+    if(activeContractFilter==="auto")return isAutoRenewalDue(c);
+    if(!contracts.length)return false;
+    if(activeContractFilter==="30")return contracts.some(x=>contractReached(x,30));
+    if(activeContractFilter==="90")return contracts.some(x=>contractReached(x,90));
+    if(activeContractFilter==="365")return contracts.some(x=>contractReached(x,365));
+    if(activeContractFilter==="maintenance")return contracts.some(x=>["유지관리","확인필요","실효위험"].includes(x.status));
+    return true;
+  });
   if(crmView==="recruiting") return list.filter(c=>/리크루팅|육아|경단|사업설명회|설계사/i.test(`${c.source||""} ${c.interest||""} ${c.memo||""}`));
   return list;
 }
@@ -405,9 +495,9 @@ function render(){
       <td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td><td>${esc(c.source||"-")}</td><td>${esc(c.age_group||"-")}</td>
       <td><span class="status ${esc(c.status||"신규")}">${esc(c.status||"신규")}</span></td>
       <td>${esc(c.available_time||"-")}</td><td>${esc(c.follow_up_date||"-")}</td>
-      <td>${esc(c.contract_date||"-")}</td>
-      <td class="money">${formatWon(c.monthly_premium)}</td>
-      <td class="money">${formatWon(c.commission)}</td>
+      <td>${getContracts(c).length}건</td>
+      <td>${esc(latestContractDate(c)||"-")}</td>
+      <td class="money">${formatWon(contractTotal(c))}</td>
       <td title="${esc(c.memo||c.message||"")}">${esc((c.memo||c.message||"").slice(0,24))}</td>
       <td><div class="actions-cell">
         <button type="button" class="icon-btn" data-action="edit" data-id="${esc(c.id)}">수정</button>
@@ -424,9 +514,8 @@ function render(){
   $("sDone").textContent=customers.filter(c=>c.status==="계약완료").length;
 
   const month=today().slice(0,7);
-  const thisMonthContracts=customers.filter(c=>(c.contract_date||"").slice(0,7)===month);
-  $("sPremium").textContent=formatWon(thisMonthContracts.reduce((sum,c)=>sum+num(c.monthly_premium),0));
-  $("sCommission").textContent=formatWon(thisMonthContracts.reduce((sum,c)=>sum+num(c.commission),0));
+  const thisMonthTotal=customers.flatMap(getContracts).filter(c=>(dateOnly(c.date)||"").slice(0,7)===month).reduce((sum,c)=>sum+num(c.amount),0);
+  $("sPremium").textContent=formatWon(thisMonthTotal);
 
   renderPagination(totalPages);
   updateSelectAll(pageList);
@@ -452,7 +541,12 @@ function updateSelectAll(pageList){
   selectAll.indeterminate=selected>0&&selected<ids.length;
 }
 
-function clearForm(){$("customerForm").reset();$("customerId").value="";$("formTitle").textContent="신규 고객 등록";$("status").value="신규";$("source").value="CRM";}
+function clearForm(){$("customerForm").reset();$("customerId").value="";$("formTitle").textContent="신규 고객 등록";$("status").value="신규";$("source").value="CRM";toggleAutoInsuranceBox();}
+function getSensitiveInfo(customer){const raw=customer?.payment_identity_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {}}
+function getInsuranceInfo(customer){const raw=customer?.insurance_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {types:[]}}
+function daysUntil(value){const a=parseLocalDate(today()),b=parseLocalDate(value);return a&&b?Math.ceil((b-a)/86400000):null}
+function isAutoRenewalDue(customer){const info=getInsuranceInfo(customer);const d=daysUntil(info.auto_expiry_date);return info.auto_expiry_date&&info.auto_renewal_status!=="갱신 완료"&&d!==null&&d>=0&&d<=30}
+function toggleAutoInsuranceBox(){const checked=$("autoInsuranceCheck").checked;$("autoInsuranceBox").classList.toggle("hidden",!checked)}
 function editCustomer(id){
   const c=customers.find(x=>String(x.id)===String(id));
   if(!c){alert("고객 정보를 찾지 못했습니다.");return;}
@@ -465,9 +559,23 @@ function editCustomer(id){
   $("availableTime").value=c.available_time||"";
   $("followUp").value=c.follow_up_date||"";
   $("interest").value=c.interest||"";
-  $("contractDate").value=c.contract_date||"";
-  $("monthlyPremium").value=c.monthly_premium||"";
-  $("commission").value=c.commission||"";
+  const sensitive=getSensitiveInfo(c);
+  $("paymentBank").value=sensitive.payment_bank||"";
+  $("paymentAccount").value=sensitive.payment_account||"";
+  $("paymentDay").value=sensitive.payment_day||"";
+  $("cardNumber").value=sensitive.card_number||"";
+  $("cardExpiry").value=sensitive.card_expiry||"";
+  $("identityVerified").checked=Boolean(sensitive.identity_verified);
+  $("driverLicense").value=sensitive.driver_license||"";
+  $("residentIssueDate").value=sensitive.resident_issue_date||"";
+  const insurance=getInsuranceInfo(c);
+  const types=Array.isArray(insurance.types)?insurance.types:[];
+  document.querySelectorAll('input[name="insuranceType"]').forEach(x=>x.checked=types.includes(x.value));
+  $("autoCompany").value=insurance.auto_company||"";
+  $("vehicleNumber").value=insurance.vehicle_number||"";
+  $("autoExpiryDate").value=insurance.auto_expiry_date||"";
+  $("autoRenewalStatus").value=insurance.auto_renewal_status||"갱신 예정";
+  toggleAutoInsuranceBox();
   $("memo").value=c.memo||c.message||"";
   $("formTitle").textContent="고객 정보 수정";
   showFormView();
@@ -524,11 +632,17 @@ function openConsultation(id){
   $("consultPhone").textContent=customer.phone||"-";
   $("consultStatus").textContent=customer.status||"신규";
   $("consultFollowUp").textContent=customer.follow_up_date||"-";
+  $("consultAvailableTime").textContent=customer.available_time||"-";
+  const insurance=getInsuranceInfo(customer);
+  const expiry=insurance.auto_expiry_date||"";
+  const remain=daysUntil(expiry);
+  $("consultAutoExpiry").innerHTML=expiry?(esc(expiry)+(remain!==null&&remain>=0?` <span class="${remain<=30?'expiry-alert':''}">(D-${remain})</span>`:" 만기 경과")):"-";
   $("consultFollowUpInput").value=customer.follow_up_date||"";
   $("consultMemo").value="";
   editingHistoryIndex=null;
   $("consultSave").textContent="상담 기록 저장";
   renderConsultHistory(customer);
+  renderContracts(customer);
 
   $("consultModal").classList.add("open");
   $("consultModal").setAttribute("aria-hidden","false");
@@ -684,6 +798,61 @@ async function saveConsultFollowUp(){
   alert("다음 연락일이 저장되었습니다.");
 }
 
+
+function renderContracts(customer){
+  const contracts=getContracts(customer);
+  const warning=contractsColumnAvailable?"":'<div class="schema-warning">여러 계약 저장을 사용하려면 ZIP 안의 <b>Supabase_계약기능_SQL.txt</b> 내용을 한 번 실행해야 합니다.</div>';
+  $("contractList").innerHTML=warning+(contracts.length?contracts.map((contract,index)=>`
+    <div class="contract-card" data-contract-index="${index}">
+      <div class="contract-card-head"><strong>${index+1}번째 계약</strong><span class="task-badge">${esc(contract.status||"유지")}</span></div>
+      <div class="contract-grid">
+        <div class="field"><label>보험회사</label><input data-contract-field="company" value="${esc(contract.company||"")}" placeholder="보험회사"></div>
+        <div class="field"><label>상품명</label><input data-contract-field="product" value="${esc(contract.product||"")}" placeholder="상품명"></div>
+        <div class="field"><label>계약일</label><input type="date" data-contract-field="date" value="${esc(dateOnly(contract.date))}"></div>
+        <div class="field"><label>계약금액</label><input type="number" min="0" step="1000" data-contract-field="amount" value="${num(contract.amount)||""}" placeholder="원"></div>
+        <div class="field"><label>계약상태</label><select data-contract-field="status"><option ${contract.status==="유지"?"selected":""}>유지</option><option ${contract.status==="유지관리"?"selected":""}>유지관리</option><option ${contract.status==="확인필요"?"selected":""}>확인필요</option><option ${contract.status==="실효위험"?"selected":""}>실효위험</option><option ${contract.status==="해지"?"selected":""}>해지</option></select></div>
+      </div>
+      <div class="contract-actions"><button type="button" class="btn danger" data-contract-action="delete" data-contract-index="${index}">계약 삭제</button><button type="button" class="btn primary" data-contract-action="save" data-contract-index="${index}">계약 저장</button></div>
+    </div>`).join(""):'<div class="contract-empty">등록된 계약이 없습니다. 위의 <b>＋ 계약 추가</b>를 눌러주세요.</div>');
+}
+function newContract(){return {id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),company:"",product:"",date:"",amount:0,status:"유지"}}
+async function persistContracts(customer,nextContracts){
+  const {error}=await db.from("customers").update({contracts:nextContracts}).eq("id",customer.id);
+  if(error){
+    if(/contracts|column|schema cache/i.test(error.message||"")) contractsColumnAvailable=false;
+    renderContracts(customer);
+    alert("계약 저장 실패: "+error.message+"\n\nZIP 안의 Supabase_계약기능_SQL.txt를 Supabase SQL Editor에서 한 번 실행해주세요.");
+    return false;
+  }
+  contractsColumnAvailable=true;
+  customer.contracts=nextContracts;
+  customer.status=nextContracts.length?"계약완료":customer.status;
+  await db.from("customers").update({status:customer.status}).eq("id",customer.id);
+  renderContracts(customer); render(); renderTasks();
+  return true;
+}
+async function addContract(){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  const next=[...getContracts(customer),newContract()];
+  if(await persistContracts(customer,next)) setTimeout(()=>$("contractList").lastElementChild?.scrollIntoView({behavior:"smooth",block:"center"}),50);
+}
+async function saveContractFromCard(index){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  const card=$("contractList").querySelector(`[data-contract-index="${index}"]`); if(!card)return;
+  const current=[...getContracts(customer)];
+  const updated={...current[index]};
+  card.querySelectorAll("[data-contract-field]").forEach(input=>{updated[input.dataset.contractField]=input.dataset.contractField==="amount"?num(input.value):input.value;});
+  if(!updated.date){alert("계약일을 입력해주세요.");return;}
+  current[index]=updated;
+  if(await persistContracts(customer,current)) alert("계약이 저장되었습니다.");
+}
+async function deleteContractAt(index){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  if(!confirm(`${index+1}번째 계약을 삭제할까요?`))return;
+  const next=getContracts(customer).filter((_,i)=>i!==index);
+  if(await persistContracts(customer,next)) alert("계약이 삭제되었습니다.");
+}
+
 async function deleteCustomer(id){
   const c=customers.find(x=>String(x.id)===String(id));
   const customerName=c?.name||"선택한 고객";
@@ -708,6 +877,11 @@ $("customerBody").addEventListener("click",async event=>{
   if(action==="edit") editCustomer(id);
   if(action==="delete") await deleteCustomer(id);
 });
+$("cardNumber").addEventListener("input",e=>{const digits=e.target.value.replace(/\D/g,"").slice(0,16);e.target.value=digits.replace(/(.{4})/g,"$1 ").trim();});
+$("cardExpiry").addEventListener("input",e=>{const digits=e.target.value.replace(/\D/g,"").slice(0,4);e.target.value=digits.length>2?digits.slice(0,2)+"/"+digits.slice(2):digits;});
+$("paymentAccount").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9-]/g,"");});
+$("autoInsuranceCheck").addEventListener("change",toggleAutoInsuranceBox);
+
 $("customerForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const id=$("customerId").value;
@@ -720,23 +894,44 @@ $("customerForm").addEventListener("submit",async e=>{
     available_time:$("availableTime").value.trim(),
     follow_up_date:$("followUp").value||null,
     interest:$("interest").value.trim(),
-    contract_date:$("contractDate").value||null,
-    monthly_premium:num($("monthlyPremium").value),
-    commission:num($("commission").value),
+    insurance_info:{
+      types:[...document.querySelectorAll('input[name="insuranceType"]:checked')].map(x=>x.value),
+      auto_company:$("autoCompany").value.trim(),
+      vehicle_number:$("vehicleNumber").value.trim(),
+      auto_expiry_date:$("autoExpiryDate").value||null,
+      auto_renewal_status:$("autoRenewalStatus").value
+    },
+    payment_identity_info:{
+      payment_bank:$("paymentBank").value.trim(),
+      payment_account:$("paymentAccount").value.trim(),
+      payment_day:$("paymentDay").value,
+      card_number:$("cardNumber").value.replace(/\s|-/g,""),
+      card_expiry:$("cardExpiry").value.trim(),
+      identity_verified:$("identityVerified").checked,
+      driver_license:$("driverLicense").value.trim(),
+      resident_issue_date:$("residentIssueDate").value||null
+    },
     memo:$("memo").value.trim()
   };
   const res=id
-    ? await db.from("customers").update(payload).eq("id",id)
-    : await db.from("customers").insert(payload);
+    ? await db.from("customers").update(payload).eq("id",id).select().single()
+    : await db.from("customers").insert(payload).select().single();
 
   if(res.error){
     alert("저장 실패: "+res.error.message);
   }else{
     const wasEdit=Boolean(id);
+    const savedId=res.data?.id||id;
     clearForm();
     await loadCustomers();
-    showListView();
-    alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다.");
+    if(savedId){
+      showListView();
+      openConsultation(savedId);
+      alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다. 상담기록과 계약정보를 입력해주세요.");
+    }else{
+      showListView();
+      alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다.");
+    }
   }
 });
 ["search","statusFilter","sourceFilter","sortBy"].forEach(id=>$(id).addEventListener("input",()=>{
@@ -828,6 +1023,19 @@ $("customerBody").addEventListener("dblclick",event=>{
   if(!row)return;
   openConsultation(row.dataset.customerId);
 });
+
+$("addContractBtn").addEventListener("click",addContract);
+$("contractList").addEventListener("click",event=>{
+  const button=event.target.closest("button[data-contract-action]"); if(!button)return;
+  const index=Number(button.dataset.contractIndex);
+  if(button.dataset.contractAction==="save")saveContractFromCard(index);
+  if(button.dataset.contractAction==="delete")deleteContractAt(index);
+});
+document.querySelectorAll(".contract-tab").forEach(button=>button.addEventListener("click",()=>{
+  activeContractFilter=button.dataset.contractFilter||"all";
+  document.querySelectorAll(".contract-tab").forEach(x=>x.classList.toggle("active",x===button));
+  currentPage=1; render();
+}));
 
 $("consultClose").addEventListener("click",closeConsultation);
 $("consultCancel").addEventListener("click",closeConsultation);
