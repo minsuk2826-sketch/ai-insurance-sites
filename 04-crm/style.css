@@ -414,3 +414,120 @@ button:disabled{cursor:not-allowed;opacity:.68}
     padding-right:2px;
   }
 }
+
+
+/* CRM 5.4.14: 실제 DOM 구조 기준 강제 UI 정렬 */
+#consultModal .consult-card{
+  width:min(920px,calc(100vw - 48px)) !important;
+  height:auto !important;
+  max-height:92vh !important;
+  margin:auto !important;
+  border-radius:22px !important;
+  box-shadow:0 24px 70px rgba(20,33,58,.28) !important;
+  overflow:auto !important;
+}
+#consultModal .consult-head{
+  position:sticky !important;
+  top:0 !important;
+  z-index:20 !important;
+  display:grid !important;
+  grid-template-columns:46px minmax(0,1fr) 46px !important;
+  align-items:center !important;
+  width:100% !important;
+  min-height:74px !important;
+  padding:14px 20px !important;
+  background:#fff !important;
+  border-bottom:1px solid var(--line) !important;
+}
+#consultModal .consult-head-spacer{
+  display:block !important;
+  width:46px !important;
+  height:46px !important;
+  grid-column:1 !important;
+}
+#consultModal #consultTitle{
+  grid-column:2 !important;
+  justify-self:center !important;
+  align-self:center !important;
+  width:auto !important;
+  max-width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  text-align:center !important;
+  font-size:24px !important;
+  line-height:1.2 !important;
+  white-space:nowrap !important;
+}
+#consultModal #consultClose{
+  grid-column:3 !important;
+  justify-self:end !important;
+  position:static !important;
+  inset:auto !important;
+  transform:none !important;
+  width:42px !important;
+  height:42px !important;
+  margin:0 !important;
+}
+#consultModal .consult-body{
+  max-width:none !important;
+  width:100% !important;
+  margin:0 !important;
+  padding:18px 20px 42px !important;
+}
+#consultModal .customer-detail-tabs{
+  position:sticky !important;
+  top:74px !important;
+  z-index:10 !important;
+  display:grid !important;
+  grid-template-columns:minmax(240px,1.55fr) minmax(150px,1fr) minmax(180px,1.15fr) !important;
+  gap:10px !important;
+  width:100% !important;
+  margin:0 0 18px !important;
+  padding:10px 0 14px !important;
+  overflow:visible !important;
+  background:#f5f9ff !important;
+}
+#consultModal .customer-detail-tab{
+  width:100% !important;
+  min-width:0 !important;
+  min-height:48px !important;
+  padding:11px 16px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  font-size:15px !important;
+  line-height:1.2 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+}
+#consultModal .customer-detail-tab span{
+  flex:0 0 auto !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+#consultModal .consult-composer-toolbar{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:8px !important;
+}
+#consultModal .consult-status-control{
+  margin-left:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+#consultModal #consultResultStatus{
+  width:205px !important;
+  min-width:205px !important;
+}
+@media(max-width:700px){
+  #consultModal .consult-card{width:100% !important;height:100% !important;max-height:none !important;border-radius:0 !important}
+  #consultModal .consult-head{grid-template-columns:42px minmax(0,1fr) 42px !important;padding:12px 14px !important;min-height:68px !important}
+  #consultModal #consultTitle{font-size:21px !important}
+  #consultModal .customer-detail-tabs{top:68px !important;display:flex !important;overflow-x:auto !important;justify-content:flex-start !important}
+  #consultModal .customer-detail-tab{width:auto !important;flex:0 0 auto !important;padding:10px 18px !important}
+}
