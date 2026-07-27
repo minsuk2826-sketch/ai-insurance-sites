@@ -1057,6 +1057,7 @@ document.querySelectorAll(".customer-detail-tab").forEach(button=>{
 });
 
 $("consultClose").addEventListener("click",closeConsultation);
+$("consultBack")?.addEventListener("click",closeConsultation);
 $("consultSave").addEventListener("click",saveConsultation);
 $("consultComposerClose").addEventListener("click",()=>{
   const current=$("consultMemo").value.trim();

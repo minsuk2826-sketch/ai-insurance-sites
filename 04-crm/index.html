@@ -3,9 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 5.4.5 대시보드 바로가기</title>
+  <title>AI보험 CRM 5.4.15 고객상세 UI 수정</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=5.4.14">
+    <link rel="stylesheet" href="style.css?v=5.4.15">
+
+<style id="crm-5-4-15-critical-ui">
+/* 고객 상세창: 뒤로가기 / 중앙 제목 / 탭 글자 잘림 방지 */
+#consultModal{align-items:center!important;justify-content:center!important;padding:20px!important;background:rgba(17,30,52,.48)!important}
+#consultModal .consult-card{width:min(920px,calc(100vw - 40px))!important;height:auto!important;max-height:92vh!important;border-radius:22px!important;overflow:auto!important}
+#consultModal .consult-head{display:grid!important;grid-template-columns:90px minmax(0,1fr) 90px!important;align-items:center!important;min-height:72px!important;padding:12px 18px!important}
+#consultModal .consult-back{grid-column:1!important;justify-self:start!important;display:inline-flex!important;align-items:center!important;gap:6px!important;height:40px!important;padding:0 12px!important;border:1px solid #d9e4f2!important;border-radius:10px!important;background:#fff!important;color:#17375e!important;font-size:14px!important;font-weight:800!important;cursor:pointer!important}
+#consultModal #consultTitle{grid-column:2!important;justify-self:center!important;margin:0!important;text-align:center!important;font-size:23px!important;white-space:nowrap!important}
+#consultModal #consultClose{grid-column:3!important;justify-self:end!important;position:static!important;transform:none!important;width:42px!important;height:42px!important}
+#consultModal .customer-detail-tabs{display:grid!important;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1.15fr)!important;gap:10px!important;width:100%!important;overflow:visible!important}
+#consultModal .customer-detail-tab{width:100%!important;min-width:0!important;min-height:48px!important;padding:10px 12px!important;font-size:14px!important;white-space:nowrap!important;overflow:visible!important}
+@media(max-width:700px){
+ #consultModal{padding:0!important}
+ #consultModal .consult-card{width:100%!important;height:100%!important;max-height:none!important;border-radius:0!important}
+ #consultModal .consult-head{grid-template-columns:52px minmax(0,1fr) 52px!important;padding:10px 12px!important}
+ #consultModal .consult-back{width:42px!important;padding:0!important;justify-content:center!important}
+ #consultModal .consult-back span{display:none!important}
+ #consultModal #consultTitle{font-size:20px!important}
+ #consultModal .customer-detail-tabs{display:flex!important;overflow-x:auto!important}
+ #consultModal .customer-detail-tab{width:auto!important;flex:0 0 auto!important;padding:10px 16px!important}
+}
+</style>
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -137,7 +159,7 @@
 <div id="consultModal" class="consult-modal" aria-hidden="true">
   <div class="consult-card" role="dialog" aria-modal="true" aria-labelledby="consultTitle">
     <div class="consult-head">
-      <span class="consult-head-spacer" aria-hidden="true"></span>
+      <button type="button" id="consultBack" class="consult-back" aria-label="이전 화면으로 돌아가기">← <span>뒤로</span></button>
       <h2 id="consultTitle">고객 상세 관리</h2>
       <button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button>
     </div>
@@ -248,7 +270,7 @@
 </div>
 
 <script src="supabase.js?v=5.4.7"></script>
-<script src="app.js?v=5.4.14"></script>
+<script src="app.js?v=5.4.15"></script>
 <div id="saveToast" class="save-toast" role="status" aria-live="polite"></div>
 </body>
 </html>
