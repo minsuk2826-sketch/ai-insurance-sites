@@ -10,6 +10,7 @@ let activeConsultCustomerId = null;
 let editingHistoryIndex = null;
 let activeContractFilter = "all";
 let contractsColumnAvailable = true;
+let calendarDate = new Date();
 
 const $ = id => document.getElementById(id);
 const today = () => new Date().toISOString().slice(0,10);
@@ -62,13 +63,15 @@ function customerTasks(customer){
   const lastTouch=getLastTouchDate(customer);
   if(lastTouch) add(`no_touch_14d:${lastTouch}`,addDays(lastTouch,14),"마지막 상담 후 2주 경과","미접촉");
   if(customer.follow_up_date) add(`follow_up:${customer.follow_up_date}`,customer.follow_up_date,customer.follow_up_date===today()?"오늘 연락 예정":"연락 예정일 경과","연락");
+  const birthday=getProfileInfo(customer).birthday;
+  if(birthday){const mmdd=birthday.slice(5); const year=today().slice(0,4); let due=`${year}-${mmdd}`; if(due<today()) due=`${Number(year)+1}-${mmdd}`; add(`birthday:${due}`,addDays(due,-7),`생일 7일 전 연락 · 생일 ${mmdd.replace("-","월 ")}일`,`생일`); add(`birthday_today:${due}`,due,`생일 축하 연락`,`생일`);}
   return items;
 }
 function getAllTasks(){ return customers.flatMap(customerTasks).sort((a,b)=>a.due.localeCompare(b.due)); }
 function completeTask(unique){ const completed=readCompletedTasks(); completed[unique]=new Date().toISOString(); writeCompletedTasks(completed); renderTasks(); }
 function renderTasks(){
   const tasks=getAllTasks();
-  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=tasks.length;
+  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=tasks.length; if($("navCallCount")) $("navCallCount").textContent=customers.filter(c=>c.follow_up_date&&c.follow_up_date<=today()).length;
   $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">오늘 처리할 자동 업무가 없습니다.</div>';
   $("taskList")._tasks=tasks;
 }
@@ -79,13 +82,19 @@ function showFormView(){ $("listView").classList.add("hidden"); $("taskPanel").c
 let crmView="dashboard";
 function applyCrmView(view){
   crmView=view;
-  document.body.classList.remove("page-mode-dashboard","page-mode-customers","page-mode-tasks","page-mode-contracts","page-mode-recruiting");
+  document.body.classList.remove("page-mode-dashboard","page-mode-customers","page-mode-tasks","page-mode-calls","page-mode-calendar","page-mode-contracts","page-mode-recruiting");
   document.body.classList.add(`page-mode-${view}`);
+  if($("calendarView")) $("calendarView").classList.toggle("hidden",view!=="calendar");
+  if($("listView")) $("listView").classList.toggle("hidden",view==="calendar");
+  if(view==="calendar") renderCalendar();
+  if(view==="calls"){todayOnly=true; activeStatsFilter="today";} else if(view!=="tasks"&&view!=="dashboard") todayOnly=false;
   document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.crmView===view));
   const titles={
     dashboard:["업무 대시보드","오늘 처리할 고객과 계약 현황을 한눈에 확인합니다."],
     customers:["고객 관리","전체 고객을 검색하고 상담 상태를 관리합니다."],
     tasks:["오늘 할 일","계약 경과일·미접촉 고객·연락 예정일을 자동 계산합니다."],
+    calls:["오늘 해야 할 전화","오늘 연락해야 할 고객을 전화 중심으로 모아봅니다."],
+    calendar:["업무 캘린더","상담일·생일·계약·자동차보험 만기를 월별로 확인합니다."],
     contracts:["계약 관리","계약 완료 고객의 여러 계약과 경과일을 관리합니다."],
     recruiting:["리크루팅 관리","설계사 지원자와 리크루팅 유입 고객을 관리합니다."]
   };
@@ -113,6 +122,26 @@ function getViewScopedCustomers(list){
 }
 document.querySelectorAll(".nav-item").forEach(button=>button.addEventListener("click",()=>{ showListView(); applyCrmView(button.dataset.crmView); }));
 
+
+function getCalendarEvents(){
+  const events=[];
+  customers.forEach(c=>{
+    const profile=getProfileInfo(c);
+    if(c.follow_up_date) events.push({date:c.follow_up_date,label:`전화 · ${c.name}`,type:'call',customer:c});
+    if(profile.birthday){const y=calendarDate.getFullYear(); events.push({date:`${y}-${profile.birthday.slice(5)}`,label:`생일 · ${c.name}`,type:'birthday',customer:c});}
+    getContracts(c).forEach((ct,i)=>{if(ct.date) events.push({date:dateOnly(ct.date),label:`계약 · ${c.name} (${i+1})`,type:'contract',customer:c});});
+    const ins=getInsuranceInfo(c); if(ins.auto_expiry_date) events.push({date:ins.auto_expiry_date,label:`자동차 만기 · ${c.name}`,type:'auto',customer:c});
+  }); return events;
+}
+function renderCalendar(){
+  if(!$("calendarGrid"))return; const y=calendarDate.getFullYear(),m=calendarDate.getMonth(); $("calTitle").textContent=`${y}년 ${m+1}월`;
+  const first=new Date(y,m,1), last=new Date(y,m+1,0), start=first.getDay(); const events=getCalendarEvents();
+  const heads=['일','월','화','수','목','금','토'].map(x=>`<div class="cal-head">${x}</div>`).join(''); let cells='';
+  for(let i=0;i<start;i++)cells+='<div class="cal-cell muted"></div>';
+  for(let d=1;d<=last.getDate();d++){const date=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const dayEvents=events.filter(e=>e.date===date); cells+=`<div class="cal-cell ${date===today()?'today':''}"><b>${d}</b>${dayEvents.map(e=>`<button class="cal-event ${e.type}" data-cal-id="${esc(e.customer.id)}">${esc(e.label)}</button>`).join('')}</div>`;}
+  $("calendarGrid").innerHTML=heads+cells;
+}
+
 async function checkSession(){
   const {data} = await db.auth.getSession();
   if(data.session) showApp(); else showLogin();
@@ -133,7 +162,7 @@ $("logoutBtn").addEventListener("click", async()=>{await db.auth.signOut();showL
 async function loadCustomers(){
   const {data,error} = await db.from("customers").select("*").order("created_at",{ascending:false});
   if(error){alert("고객 목록을 불러오지 못했습니다: "+error.message);return}
-  customers=data||[]; populateSourceFilter(); render();
+  customers=data||[]; populateSourceFilter(); populateReferrers(); render();
 }
 function populateSourceFilter(){
   const select=$("sourceFilter");
@@ -233,8 +262,10 @@ function updateSelectAll(pageList){
   selectAll.indeterminate=selected>0&&selected<ids.length;
 }
 
-function clearForm(){$("customerForm").reset();$("customerId").value="";$("formTitle").textContent="신규 고객 등록";$("status").value="신규";$("source").value="CRM";toggleAutoInsuranceBox();}
+function populateReferrers(selected=""){const s=$("referrerId"); if(!s)return; s.innerHTML='<option value="">없음</option>'+customers.map(c=>`<option value="${esc(c.id)}">${esc(c.name||"이름없음")} · ${esc(c.phone||"")}</option>`).join(""); s.value=selected||"";}
+function clearForm(){$("customerForm").reset();$("customerId").value="";$("formTitle").textContent="신규 고객 등록";$("status").value="신규";$("source").value="CRM";$("customerGrade").value="B";populateReferrers();toggleAutoInsuranceBox();}
 function getSensitiveInfo(customer){const raw=customer?.payment_identity_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {}}
+function getProfileInfo(customer){const raw=customer?.profile_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {}}
 function getInsuranceInfo(customer){const raw=customer?.insurance_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {types:[]}}
 function daysUntil(value){const a=parseLocalDate(today()),b=parseLocalDate(value);return a&&b?Math.ceil((b-a)/86400000):null}
 function isAutoRenewalDue(customer){const info=getInsuranceInfo(customer);const d=daysUntil(info.auto_expiry_date);return info.auto_expiry_date&&info.auto_renewal_status!=="갱신 완료"&&d!==null&&d>=0&&d<=30}
@@ -251,6 +282,8 @@ function editCustomer(id){
   $("availableTime").value=c.available_time||"";
   $("followUp").value=c.follow_up_date||"";
   $("interest").value=c.interest||"";
+  const profile=getProfileInfo(c);
+  $("birthday").value=profile.birthday||""; $("customerGrade").value=profile.grade||"B"; populateReferrers(profile.referrer_id||""); $("familyInfo").value=profile.family_info||"";
   const sensitive=getSensitiveInfo(c);
   $("paymentBank").value=sensitive.payment_bank||"";
   $("paymentAccount").value=sensitive.payment_account||"";
@@ -328,6 +361,8 @@ function openConsultation(id){
   const insurance=getInsuranceInfo(customer);
   const expiry=insurance.auto_expiry_date||"";
   const remain=daysUntil(expiry);
+  const profile=getProfileInfo(customer); const referrer=customers.find(x=>String(x.id)===String(profile.referrer_id));
+  $("consultGrade").textContent=profile.grade||"B"; $("consultBirthday").textContent=profile.birthday||"-"; $("consultReferrer").textContent=referrer?.name||"-"; $("consultFamily").textContent=profile.family_info||"-";
   $("consultAutoExpiry").innerHTML=expiry?(esc(expiry)+(remain!==null&&remain>=0?` <span class="${remain<=30?'expiry-alert':''}">(D-${remain})</span>`:" 만기 경과")):"-";
   $("consultFollowUpInput").value=customer.follow_up_date||"";
   $("consultMemo").value="";
@@ -586,6 +621,7 @@ $("customerForm").addEventListener("submit",async e=>{
     available_time:$("availableTime").value.trim(),
     follow_up_date:$("followUp").value||null,
     interest:$("interest").value.trim(),
+    profile_info:{birthday:$("birthday").value||null,grade:$("customerGrade").value||"B",referrer_id:$("referrerId").value||null,family_info:$("familyInfo").value.trim()},
     insurance_info:{
       types:[...document.querySelectorAll('input[name="insuranceType"]:checked')].map(x=>x.value),
       auto_company:$("autoCompany").value.trim(),
@@ -784,3 +820,7 @@ $("selectAll").addEventListener("change",event=>{
 
 document.querySelector('.stat-filter[data-filter="all"]')?.classList.add("active");
 checkSession();
+
+$("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()-1,1);renderCalendar();});
+$("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
+$("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});

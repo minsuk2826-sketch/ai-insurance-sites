@@ -24,3 +24,11 @@ add column if not exists insurance_info jsonb not null default '{"types":[]}'::j
 
 comment on column public.customers.insurance_info is
 '보유·관심 보험 및 자동차보험 정보: types, auto_company, vehicle_number, auto_expiry_date, auto_renewal_status';
+
+
+-- CRM 4.1 고객 관계·생일·등급 정보
+alter table public.customers
+add column if not exists profile_info jsonb not null default '{"grade":"B"}'::jsonb;
+
+comment on column public.customers.profile_info is
+'고객 추가정보: birthday, grade, referrer_id, family_info';

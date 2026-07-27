@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 4.0</title>
+  <title>AI보험 CRM 4.1</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=4.0">
+    <link rel="stylesheet" href="style.css?v=4.1">
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card">
-    <h1>AI보험 CRM 4.0</h1>
+    <h1>AI보험 CRM 4.1</h1>
     <p>관리자 계정으로 로그인하세요.</p>
     <div class="field"><label>이메일</label><input id="loginEmail" type="email" required></div>
     <div class="field"><label>비밀번호</label><input id="loginPassword" type="password" required></div>
@@ -21,14 +21,16 @@
 
 <div id="app" class="hidden">
 <nav class="crm-sidebar" aria-label="CRM 메뉴">
-  <div class="side-logo"><span>AI</span><div>보험 CRM<small>4.0</small></div></div>
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>4.1</small></div></div>
   <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
   <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
   <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
+  <button class="nav-item" data-crm-view="calls"><b>☎</b><span>오늘 전화</span><em id="navCallCount">0</em></button>
+  <button class="nav-item" data-crm-view="calendar"><b>▦</b><span>캘린더</span></button>
   <button class="nav-item" data-crm-view="contracts"><b>▤</b><span>계약관리</span></button>
   <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
 </nav>
-<header><div class="top"><div class="brand"><b>AI보험</b> CRM 4.0</div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
+<header><div class="top"><div class="brand"><b>AI보험</b> CRM 4.1</div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
 <main class="wrap">
   <div class="title-row"><div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
   <section id="statsPanel" class="stats">
@@ -55,6 +57,8 @@
     <button type="button" class="contract-tab" data-contract-filter="maintenance">유지관리 예정</button>
     <button type="button" class="contract-tab" data-contract-filter="auto">자동차보험 갱신 예정</button>
   </div>
+  <section id="calendarView" class="hidden"><div class="panel"><div class="panel-head"><h2>업무 캘린더</h2><div class="calendar-nav"><button id="calPrev" class="btn light">이전</button><strong id="calTitle"></strong><button id="calNext" class="btn light">다음</button></div></div><div id="calendarGrid" class="calendar-grid"></div></div></section>
+
   <section id="listView" class="layout list-view">
     <div class="panel">
       <div class="panel-head"><h2>고객 목록</h2>
@@ -90,6 +94,10 @@
           <div class="field"><label>이름</label><input id="name" required></div>
           <div class="field"><label>휴대폰 번호</label><input id="phone" required></div>
         </div>
+        <div class="section-label">고객 관계 및 등급</div>
+        <div class="two"><div class="field"><label>생년월일</label><input id="birthday" type="date"></div><div class="field"><label>고객등급</label><select id="customerGrade"><option value="B">B</option><option value="VIP">VIP</option><option value="A">A</option><option value="C">C</option></select></div></div>
+        <div class="field"><label>소개해준 고객</label><select id="referrerId"><option value="">없음</option></select></div>
+        <div class="field"><label>가족관계</label><input id="familyInfo" placeholder="예: 배우자 김영희, 자녀 김민준"></div>
         <div class="field"><label>유입경로</label><select id="source"><option value="CRM">CRM 직접등록</option><option>AI보험점검 랜딩페이지</option><option>리크루팅랜딩페이지1</option><option>육아경단녀 랜딩페이지</option><option>랜딩페이지</option><option>카카오톡</option><option>전화</option><option>소개</option><option>기타</option></select></div>
         <div class="two">
           <div class="field"><label>나이대</label><select id="age"><option value="">선택</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></div>
@@ -162,6 +170,10 @@
         <div class="summary-box"><small>다음 연락일</small><strong id="consultFollowUp">-</strong></div>
         <div class="summary-box"><small>상담 가능 시간</small><strong id="consultAvailableTime">-</strong></div>
         <div class="summary-box"><small>자동차보험 만기</small><strong id="consultAutoExpiry">-</strong></div>
+        <div class="summary-box"><small>고객등급</small><strong id="consultGrade">-</strong></div>
+        <div class="summary-box"><small>생년월일</small><strong id="consultBirthday">-</strong></div>
+        <div class="summary-box"><small>소개자</small><strong id="consultReferrer">-</strong></div>
+        <div class="summary-box"><small>가족관계</small><strong id="consultFamily">-</strong></div>
       </div>
 
       <div class="consult-follow-box">
@@ -192,7 +204,7 @@
   </div>
 </div>
 
-<script src="supabase.js?v=4.0"></script>
-<script src="app.js?v=4.0"></script>
+<script src="supabase.js?v=4.1"></script>
+<script src="app.js?v=4.1"></script>
 </body>
 </html>
