@@ -1,0 +1,7 @@
+AI보험 CRM 5.6.2 배포 확인
+
+정상 배포 화면 왼쪽 상단: 보험 CRM 5.6.2
+Vercel 프로젝트 Root Directory: 04-crm
+Git Branch: main
+
+화면이 5.4.20이면 파일 문제가 아니라 다른 Vercel 프로젝트/배포 주소를 보고 있는 것입니다.
