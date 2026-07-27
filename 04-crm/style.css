@@ -206,3 +206,11 @@
   .customer-form-card .form-page-head{top:-18px;margin:-18px -18px 16px;padding:17px 18px 14px;border-radius:0;}
   .customer-form-card .form-actions{bottom:-18px;margin:8px -18px -18px;padding:12px 18px 18px;}
 }
+
+
+/* CRM 5.4 실사용 최적화 */
+.favorite-btn{border:0;background:transparent;font-size:22px;line-height:1;color:#aab4c3;cursor:pointer;vertical-align:middle;margin-right:5px;padding:2px}.favorite-btn.active{color:#f4a900}.last-contact{display:block;margin-top:4px;color:#7b8797;font-size:11px;font-weight:700;white-space:nowrap}.expiry-pill{display:inline-flex;margin-left:5px;padding:3px 7px;border-radius:999px;font-size:12px;font-weight:900}.expiry-d30{background:#e8f1ff;color:#145fc5}.expiry-d15{background:#fff1df;color:#b45b00}.expiry-d7,.expiry-today{background:#ffe7e7;color:#c52f2f}.expiry-today{animation:expiryPulse 1.3s infinite}.expiry-expired{background:#edf0f4;color:#4b5563}@keyframes expiryPulse{50%{transform:scale(1.06)}}
+.task-badge.category-자동차{border:1px solid #ffd0a8}.task-item:has(.task-badge.category-자동차){border-left:4px solid #f18a2d}
+@media(max-width:700px){.last-contact{white-space:normal}.favorite-btn{font-size:20px}}
+
+.task-item.auto-d30{border-left:5px solid #2f73d9;background:#f7fbff}.task-item.auto-d15{border-left:5px solid #ed8b21;background:#fffaf4}.task-item.auto-d7{border-left:5px solid #d84545;background:#fff7f7}.task-item.auto-today{border-left:5px solid #a71919;background:#fff0f0;box-shadow:inset 0 0 0 1px #ffd0d0}
