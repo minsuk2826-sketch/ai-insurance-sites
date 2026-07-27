@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 5.4.21 날짜 자동입력</title>
+  <title>AI보험 CRM 5.5 통합 수정본</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=5.4.21">
+    <link rel="stylesheet" href="style.css?v=5.5.0">
 
 <style id="crm-5-4-15-critical-ui">
 /* 고객 상세창: 뒤로가기 / 중앙 제목 / 탭 글자 잘림 방지 */
@@ -43,7 +43,7 @@
 
 <div id="app" class="hidden">
 <nav class="crm-sidebar" aria-label="CRM 메뉴">
-  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.4.21</small></div></div>
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.5.0</small></div></div>
   <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
   <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
   <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
@@ -51,9 +51,18 @@
     <button class="nav-item" data-crm-view="statistics"><b>▥</b><span>통계</span></button>
     <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
 </nav>
-<header><div class="top"><div class="brand"><b>AI보험</b> CRM 5.4 <small>실사용 최적화</small></div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
+<header><div class="top"><div class="brand"><b>AI보험</b> CRM 5.5 <small>실사용 최적화</small></div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
 <main class="wrap">
-  <div class="title-row"><div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
+  <div class="title-row">
+    <div class="page-title-group">
+      <div id="globalNavigation" class="global-navigation">
+        <button type="button" id="globalBackBtn" class="btn light nav-back-btn" aria-label="이전 화면">← 뒤로</button>
+        <button type="button" id="globalHomeBtn" class="btn light nav-home-btn" aria-label="대시보드로 이동">⌂ 홈</button>
+      </div>
+      <div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div>
+    </div>
+    <button class="btn primary" id="newBtn">+ 신규 고객 등록</button>
+  </div>
   <section id="statsPanel" class="stats">
     <div class="stat stat-filter dashboard-jump" data-filter="all" data-jump-view="customers" title="더블클릭하면 전체 고객으로 이동"><small>전체 고객</small><strong id="sTotal">0</strong></div>
     <div class="stat stat-filter dashboard-jump" data-filter="new" data-jump-view="customers" data-jump-status="신규" title="더블클릭하면 신규 문의 고객으로 이동"><small>신규 문의</small><strong id="sNew">0</strong></div>
@@ -132,7 +141,14 @@
 
   <section id="formView" class="customer-form-modal hidden" aria-hidden="true">
     <div class="customer-form-card" role="dialog" aria-modal="true" aria-labelledby="formTitle">
-      <div class="form-page-head"><div><h2 id="formTitle">신규 고객 등록</h2><p>필수 정보만 빠르게 등록하고, 상담·계약 정보는 고객 상세에서 관리합니다.</p></div><button type="button" id="backToListBtn" class="consult-close" aria-label="닫기">×</button></div>
+      <div class="form-page-head">
+        <div class="form-head-navigation">
+          <button type="button" id="backToListBtn" class="btn light form-back-btn">← 뒤로</button>
+          <button type="button" id="formHomeBtn" class="btn light form-home-btn">⌂ 홈</button>
+        </div>
+        <div class="form-title-copy"><h2 id="formTitle">신규 고객 등록</h2><p>필수 정보만 빠르게 등록하고, 상담·계약 정보는 고객 상세에서 관리합니다.</p></div>
+        <button type="button" id="formCloseBtn" class="consult-close" aria-label="닫기">×</button>
+      </div>
       <form id="customerForm" class="form-grid compact-form">
         <input type="hidden" id="customerId">
         <div class="two"><div class="field"><label>이름 *</label><input id="name" required autofocus></div><div class="field"><label>휴대폰 번호 *</label><input id="phone" inputmode="tel" required placeholder="010-0000-0000"></div></div>
@@ -170,7 +186,7 @@
     <div class="consult-head">
       <button type="button" id="consultBack" class="consult-back" aria-label="이전 화면으로 돌아가기">← <span>뒤로</span></button>
       <h2 id="consultTitle">고객 상세 관리</h2>
-      <button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button>
+      <div class="consult-head-actions"><button type="button" id="consultHome" class="consult-home" aria-label="대시보드로 이동">⌂ 홈</button><button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button></div>
     </div>
     <div class="consult-body">
       <div class="customer-detail-tabs" role="tablist" aria-label="고객 상세 메뉴">

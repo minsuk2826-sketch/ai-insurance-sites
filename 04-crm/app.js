@@ -235,10 +235,17 @@ function showFormView(){ $("formView").classList.remove("hidden"); $("formView")
 
 
 let crmView="dashboard";
-function applyCrmView(view){
+let crmViewHistory=[];
+function applyCrmView(view,options={}){
+  const previous=crmView;
+  if(!options.skipHistory&&previous&&previous!==view){
+    crmViewHistory.push(previous);
+    if(crmViewHistory.length>30)crmViewHistory.shift();
+  }
   crmView=view;
   document.body.classList.remove("page-mode-dashboard","page-mode-customers","page-mode-tasks","page-mode-calls","page-mode-calendar","page-mode-statistics","page-mode-contracts","page-mode-recruiting");
   document.body.classList.add(`page-mode-${view}`);
+  $("globalNavigation")?.classList.toggle("is-dashboard",view==="dashboard");
   if($("calendarView")) $("calendarView").classList.toggle("hidden",view!=="calendar");
   if($("statisticsView")) $("statisticsView").classList.toggle("hidden",view!=="statistics");
   if($("listView")) $("listView").classList.toggle("hidden",view==="calendar"||view==="statistics");
@@ -279,7 +286,21 @@ function getViewScopedCustomers(list){
   if(crmView==="recruiting") return list.filter(c=>/리크루팅|육아|경단|사업설명회|설계사/i.test(`${c.source||""} ${c.interest||""} ${c.memo||""}`));
   return list;
 }
+function goCrmBack(){
+  if($("consultModal")?.classList.contains("open")){closeConsultation();return;}
+  if(!$("formView")?.classList.contains("hidden")){clearForm();showListView();return;}
+  const previous=crmViewHistory.pop();
+  applyCrmView(previous||"dashboard",{skipHistory:true});
+}
+function goCrmHome(){
+  if($("consultModal")?.classList.contains("open")&&!closeConsultation())return;
+  if(!$("formView")?.classList.contains("hidden")){clearForm();showListView();}
+  crmViewHistory=[];
+  applyCrmView("dashboard",{skipHistory:true});
+}
 document.querySelectorAll(".nav-item").forEach(button=>button.addEventListener("click",()=>{ showListView(); applyCrmView(button.dataset.crmView); }));
+$("globalBackBtn")?.addEventListener("click",goCrmBack);
+$("globalHomeBtn")?.addEventListener("click",goCrmHome);
 
 
 function getCalendarEvents(){
@@ -306,7 +327,7 @@ async function checkSession(){
   if(data.session) showApp(); else showLogin();
 }
 function showLogin(){ $("loginScreen").classList.remove("hidden"); $("app").classList.add("hidden"); }
-async function showApp(){ $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden"); applyCrmView("dashboard"); await loadCustomers(); }
+async function showApp(){ $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden"); crmViewHistory=[]; applyCrmView("dashboard",{skipHistory:true}); await loadCustomers(); }
 
 $("loginForm").addEventListener("submit", async e=>{
   e.preventDefault();
@@ -983,6 +1004,8 @@ $("phone").addEventListener("blur",e=>{e.target.value=formatPhoneNumber(e.target
 $("cancelBtn").addEventListener("click",()=>{clearForm();showListView();});
 $("newBtn").addEventListener("click",()=>{clearForm();showFormView();});
 $("backToListBtn").addEventListener("click",()=>{clearForm();showListView();});
+$("formCloseBtn")?.addEventListener("click",()=>{clearForm();showListView();});
+$("formHomeBtn")?.addEventListener("click",goCrmHome);
 document.querySelectorAll(".task-filter").forEach(button=>button.addEventListener("click",()=>{activeTaskFilter=button.dataset.taskFilter;document.querySelectorAll(".task-filter").forEach(b=>b.classList.toggle("active",b===button));renderTasks();}));
 $("taskSort")?.addEventListener("change",()=>{activeTaskSort=$("taskSort").value;renderTasks();});
 $("priorityList")?.addEventListener("click",e=>{const b=e.target.closest("[data-priority-id]");if(b)openConsultation(b.dataset.priorityId);});
@@ -1139,6 +1162,7 @@ document.querySelectorAll(".customer-detail-tab").forEach(button=>{
 
 $("consultClose").addEventListener("click",closeConsultation);
 $("consultBack")?.addEventListener("click",closeConsultation);
+$("consultHome")?.addEventListener("click",goCrmHome);
 $("consultSave").addEventListener("click",saveConsultation);
 $("consultComposerClose").addEventListener("click",()=>{
   const current=$("consultMemo").value.trim();
