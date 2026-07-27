@@ -347,3 +347,112 @@ button:disabled{cursor:not-allowed;opacity:.68}
 
 .consult-composer-toolbar{justify-content:flex-end;}
 .consult-status-control label{font-size:14px;font-weight:600;white-space:nowrap;}
+
+/* 5.4.10: 오늘 할 일 행 더블클릭으로 고객 상세 열기 */
+.task-item[data-task-index]{cursor:pointer;}
+.task-item[data-task-index]:hover{box-shadow:0 0 0 1px rgba(37,99,235,.12) inset;}
+
+
+/* CRM 5.4.11: 고객 상세 UI 균형 및 탭/상태 선택 가독성 개선 */
+.consult-head{
+  position:sticky;
+  top:0;
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) 42px;
+  align-items:center;
+  gap:12px;
+  min-height:72px;
+  padding-top:14px;
+  padding-bottom:14px;
+}
+.consult-head::before{
+  content:"";
+  grid-column:1;
+  width:42px;
+  height:42px;
+}
+.consult-head h2{
+  grid-column:2;
+  width:auto;
+  margin:0;
+  text-align:center;
+  line-height:1.25;
+}
+.consult-head .consult-close{
+  position:static;
+  grid-column:3;
+  justify-self:end;
+  transform:none;
+}
+
+.customer-detail-tabs{
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  padding:12px 16px 16px;
+}
+.customer-detail-tab{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:42px;
+  padding:10px 22px;
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:visible;
+}
+.customer-detail-tab:first-child{min-width:190px}
+.customer-detail-tab:nth-child(2){min-width:118px}
+.customer-detail-tab:nth-child(3){min-width:150px}
+.customer-detail-tab span{
+  flex:0 0 auto;
+  margin-left:7px;
+}
+
+.consult-composer-toolbar{
+  width:100%;
+  justify-content:flex-end;
+  gap:10px;
+}
+.consult-composer-toolbar .consult-status-control{
+  margin-left:0;
+  flex:0 1 auto;
+}
+.consult-composer-toolbar .consult-status-control select{
+  width:220px;
+  min-width:220px;
+  padding-right:36px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.consult-composer-toolbar .consult-composer-close{
+  width:30px;
+  height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+@media(max-width:700px){
+  .consult-head{
+    grid-template-columns:38px minmax(0,1fr) 38px;
+    min-height:64px;
+  }
+  .consult-head::before{width:38px;height:38px}
+  .consult-head h2{font-size:20px}
+  .customer-detail-tabs{
+    justify-content:flex-start;
+    flex-wrap:nowrap;
+    padding-left:4px;
+    padding-right:4px;
+  }
+  .customer-detail-tab{
+    min-width:max-content !important;
+    padding:10px 18px;
+  }
+  .consult-composer-toolbar .consult-status-control select{
+    width:100%;
+    min-width:0;
+  }
+}

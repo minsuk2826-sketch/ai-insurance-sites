@@ -160,7 +160,7 @@ function renderTasks(){
   const tasks=getAllTasks();
   const allCount=customers.flatMap(customerTasks).length;
   $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=allCount;
-  $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item ${t.overdue>=7?'task-critical':''} ${taskUrgencyClass(t)}"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge category-${taskCategory(t)}">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><a class="task-call" href="tel:${esc(cleanPhone(t.customer.phone))}">전화</a><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">선택한 조건에 해당하는 업무가 없습니다.</div>';
+  $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item ${t.overdue>=7?'task-critical':''} ${taskUrgencyClass(t)}" data-task-index="${i}" title="더블클릭하면 고객 상세 관리가 열립니다"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge category-${taskCategory(t)}">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><a class="task-call" href="tel:${esc(cleanPhone(t.customer.phone))}">전화</a><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">선택한 조건에 해당하는 업무가 없습니다.</div>';
   $("taskList")._tasks=tasks;
 }
 function monthKey(date){return dateOnly(date).slice(0,7)}
@@ -912,6 +912,14 @@ $("taskList").addEventListener("click",event=>{
   const task=($("taskList")._tasks||[])[Number(button.dataset.taskIndex)]; if(!task)return;
   if(button.dataset.taskAction==="open") openConsultation(task.customer.id);
   if(button.dataset.taskAction==="done") completeTask(task.unique);
+});
+
+$("taskList").addEventListener("dblclick",event=>{
+  if(event.target.closest("button, a, input, select, textarea")) return;
+  const row=event.target.closest(".task-item[data-task-index]");
+  if(!row) return;
+  const task=($("taskList")._tasks||[])[Number(row.dataset.taskIndex)];
+  if(task) openConsultation(task.customer.id);
 });
 
 
