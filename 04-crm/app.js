@@ -1154,3 +1154,7 @@ checkSession();
 $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()-1,1);renderCalendar();});
 $("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
 $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});
+
+// 5.4.18: 대시보드 약속일 경과 카드 제목을 항상 정확히 표시합니다.
+const missedScheduleTitle = document.getElementById("missedScheduleTitle");
+if (missedScheduleTitle) missedScheduleTitle.textContent = "놓치기 쉬운 일정 (약속일경과)";
