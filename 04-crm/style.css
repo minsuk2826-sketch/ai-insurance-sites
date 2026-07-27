@@ -615,3 +615,11 @@ button:disabled{cursor:not-allowed;opacity:.68}
 .contract-auto-check{display:flex!important;align-items:center;gap:8px;font-weight:800;margin-bottom:12px}
 .contract-auto-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media(max-width:800px){.contract-auto-grid{grid-template-columns:1fr}}
+
+/* 5.4.22 고객 상세 고객정보 수정 버튼 */
+#consultModal .consult-edit-customer{height:40px;padding:0 14px;border:1px solid #1f66ff;border-radius:10px;background:#1f66ff;color:#fff;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(31,102,255,.18)}
+#consultModal .consult-edit-customer:hover{filter:brightness(.96)}
+@media(max-width:700px){
+ #consultModal .consult-edit-customer{width:42px;padding:0;font-size:0}
+ #consultModal .consult-edit-customer::before{content:'✎';font-size:18px}
+}

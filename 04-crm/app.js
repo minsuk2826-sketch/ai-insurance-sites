@@ -105,10 +105,9 @@ function getLastTouchDate(customer){
 function hasConsultationOnOrAfterPromiseDay(customer,targetDate){
   const due=dateOnly(targetDate);
   if(!due)return false;
-  // 약속일 당일 이후에 "새로 작성된" 상담 기록만 완료 처리합니다.
-  // 과거 상담기록을 나중에 수정한 updated_at 때문에 약속일 경과 고객이 숨겨지지 않도록 created_at을 우선합니다.
+  // 약속일 당일 또는 그 이후에 작성·수정된 상담 기록이 있으면 처리 완료로 봅니다.
   return getConsultHistory(customer).some(item=>{
-    const recorded=dateOnly(item.created_at||item.date||item.consulted_at);
+    const recorded=dateOnly(item.updated_at||item.created_at);
     return Boolean(recorded&&recorded>=due);
   });
 }
@@ -1164,6 +1163,12 @@ document.querySelectorAll(".customer-detail-tab").forEach(button=>{
   button.addEventListener("click",()=>setCustomerDetailTab(button.dataset.detailTab));
 });
 
+$("consultEditCustomer")?.addEventListener("click",()=>{
+  const customerId=activeConsultCustomerId;
+  if(!customerId){ alert("고객 정보를 찾지 못했습니다."); return; }
+  if(!closeConsultation()) return;
+  editCustomer(customerId);
+});
 $("consultClose").addEventListener("click",closeConsultation);
 $("consultBack")?.addEventListener("click",closeConsultation);
 $("consultHome")?.addEventListener("click",goCrmHome);
@@ -1246,7 +1251,7 @@ $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.g
 $("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
 $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});
 
-// 5.6.3: 약속일 경과 건수는 renderDashboard에서 실시간 표시합니다.
+// 5.5.2: 약속일 경과 건수는 renderDashboard에서 실시간 표시합니다.
 
 
 // 5.4.21: 숫자 날짜 입력을 YYYY-MM-DD로 자동 변환합니다.

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 5.6.3 약속일경과·자동차보험·전체 뒤로가기 실제수정본</title>
+  <title>AI보험 CRM 5.4.22 고객정보수정 최종본</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=5.6.3-20260727">
+    <link rel="stylesheet" href="style.css?v=5.4.22">
 
 <style id="crm-5-4-15-critical-ui">
 /* 고객 상세창: 뒤로가기 / 중앙 제목 / 탭 글자 잘림 방지 */
@@ -32,7 +32,7 @@
 <body>
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card">
-    <h1>AI보험 CRM 5.6.3</h1>
+    <h1>AI보험 CRM 5.4.22</h1>
     <p>관리자 계정으로 로그인하세요.</p>
     <div class="field"><label>이메일</label><input id="loginEmail" type="email" required></div>
     <div class="field"><label>비밀번호</label><input id="loginPassword" type="password" required></div>
@@ -43,7 +43,7 @@
 
 <div id="app" class="hidden">
 <nav class="crm-sidebar" aria-label="CRM 메뉴">
-  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.6.3</small></div></div>
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.4.22</small></div></div>
   <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
   <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
   <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
@@ -51,7 +51,7 @@
     <button class="nav-item" data-crm-view="statistics"><b>▥</b><span>통계</span></button>
     <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
 </nav>
-<header><div class="top"><div class="brand"><b>AI보험</b> CRM 5.6.3 <small>약속일경과·자동차보험·뒤로가기 실제수정</small></div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
+<header><div class="top"><div class="brand"><b>AI보험</b> CRM 5.4.22 <small>고객정보수정·자동차보험·약속일경과</small></div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
 <main class="wrap">
   <div class="title-row">
     <div class="page-title-group">
@@ -186,7 +186,7 @@
     <div class="consult-head">
       <button type="button" id="consultBack" class="consult-back" aria-label="이전 화면으로 돌아가기">← <span>뒤로</span></button>
       <h2 id="consultTitle">고객 상세 관리</h2>
-      <div class="consult-head-actions"><button type="button" id="consultHome" class="consult-home" aria-label="대시보드로 이동">⌂ 홈</button><button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button></div>
+      <div class="consult-head-actions"><button type="button" id="consultEditCustomer" class="consult-edit-customer" aria-label="고객정보 수정">✎ 고객정보 수정</button><button type="button" id="consultHome" class="consult-home" aria-label="대시보드로 이동">⌂ 홈</button><button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button></div>
     </div>
     <div class="consult-body">
       <div class="customer-detail-tabs" role="tablist" aria-label="고객 상세 메뉴">
@@ -294,8 +294,8 @@
   </div>
 </div>
 
-<script src="supabase.js?v=5.6.3-20260727"></script>
-<script src="app.js?v=5.6.3-20260727"></script>
+<script src="supabase.js?v=5.4.22"></script>
+<script src="app.js?v=5.4.22"></script>
 <div id="saveToast" class="save-toast" role="status" aria-live="polite"></div>
 </body>
 </html>
