@@ -99,6 +99,14 @@ function getLastTouchDate(customer){
   const latest=history.map(x=>dateOnly(x.updated_at||x.created_at)).filter(Boolean).sort().pop();
   return latest||dateOnly(customer.created_at);
 }
+function hasConsultationOnOrAfter(customer,targetDate){
+  const due=dateOnly(targetDate);
+  if(!due)return false;
+  return getConsultHistory(customer).some(item=>{
+    const recorded=dateOnly(item.created_at||item.updated_at);
+    return recorded&&recorded>=due;
+  });
+}
 function customerTasks(customer){
   const completed=readCompletedTasks();
   const items=[];
@@ -177,9 +185,20 @@ function renderDashboard(){
   const conversion=newCustomers?Math.round(contractedCustomers/newCustomers*100):0;
   $("monthlySummary").innerHTML=`<div><small>신규 고객</small><strong>${newCustomers}명</strong></div><div><small>신규 계약</small><strong>${monthContracts.length}건</strong></div><div><small>월보험료</small><strong>${formatWon(monthContracts.reduce((s,c)=>s+num(c.amount),0))}</strong></div><div><small>단순 전환율</small><strong>${conversion}%</strong></div>`;
   const attention=[];
-  customers.forEach(c=>{const ins=getInsuranceInfo(c); const auto=daysUntil(ins.auto_expiry_date); if(auto!==null&&auto>=0&&auto<=30)attention.push({id:c.id,name:c.name,text:`자동차보험 만기 ${auto}일 전`,days:auto}); const noTouch=daysBetween(getLastTouchDate(c));if(noTouch>=14)attention.push({id:c.id,name:c.name,text:`마지막 상담 후 ${noTouch}일`,days:noTouch});});
-  attention.sort((a,b)=>a.days-b.days);
-  $("attentionList").innerHTML=attention.slice(0,6).map(x=>`<button data-attention-id="${esc(x.id)}"><b>${esc(x.name)}</b><span>${esc(x.text)}</span></button>`).join('')||'<div class="dashboard-empty">주의가 필요한 고객이 없습니다.</div>';
+  customers.forEach(customer=>{
+    const promisedDate=dateOnly(customer.follow_up_date);
+    if(!promisedDate||promisedDate>=today())return;
+    if(hasConsultationOnOrAfter(customer,promisedDate))return;
+    const overdueDays=daysBetween(promisedDate);
+    attention.push({
+      id:customer.id,
+      name:customer.name,
+      text:`약속일 ${overdueDays}일 경과 · 상담 기록 없음`,
+      days:overdueDays
+    });
+  });
+  attention.sort((a,b)=>b.days-a.days);
+  $("attentionList").innerHTML=attention.slice(0,6).map(x=>`<button data-attention-id="${esc(x.id)}" title="클릭하면 고객 상세를 엽니다"><b>${esc(x.name)}</b><span>${esc(x.text)}</span></button>`).join('')||'<div class="dashboard-empty">약속일이 지난 미기록 고객이 없습니다.</div>';
 }
 function renderStatistics(){
   if(!$("statisticsView")) return;
