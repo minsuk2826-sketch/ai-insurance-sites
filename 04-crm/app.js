@@ -972,6 +972,35 @@ document.querySelectorAll(".stat-filter").forEach(card=>{
 });
 
 
+function openDashboardJump(card){
+  const view=card?.dataset.jumpView;
+  if(!view)return;
+  showListView();
+  applyCrmView(view);
+
+  const status=card.dataset.jumpStatus||"";
+  if($("statusFilter")) $("statusFilter").value=status;
+
+  const taskFilter=card.dataset.jumpTask||"";
+  if(view==="tasks"){
+    activeTaskFilter=taskFilter||"all";
+    document.querySelectorAll(".task-filter").forEach(button=>{
+      button.classList.toggle("active",button.dataset.taskFilter===activeTaskFilter);
+    });
+    renderTasks();
+  }else{
+    render();
+  }
+}
+
+document.querySelectorAll(".dashboard-jump").forEach(card=>{
+  card.addEventListener("dblclick",event=>{
+    if(event.target.closest("button,a,input,select,textarea"))return;
+    openDashboardJump(card);
+  });
+});
+
+
 $("customerBody").addEventListener("dblclick",event=>{
   if(event.target.closest("button,a,input,select,textarea"))return;
   const row=event.target.closest("tr[data-customer-id]");

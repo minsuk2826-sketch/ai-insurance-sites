@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 5.1 알림·가족관리 완성본</title>
+  <title>AI보험 CRM 5.4.5 대시보드 바로가기</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=5.1.0">
+    <link rel="stylesheet" href="style.css?v=5.4.5">
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -33,16 +33,16 @@
 <main class="wrap">
   <div class="title-row"><div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
   <section id="statsPanel" class="stats">
-    <div class="stat stat-filter" data-filter="all"><small>전체 고객</small><strong id="sTotal">0</strong></div>
-    <div class="stat stat-filter" data-filter="new"><small>신규 문의</small><strong id="sNew">0</strong></div>
-    <div class="stat stat-filter" data-filter="today"><small>오늘 상담 고객</small><strong id="sToday">0</strong></div>
-    <div class="stat"><small>자동차 만기 30일 이내</small><strong id="sAuto">0</strong></div>
-    <div class="stat"><small>이번 주 생일</small><strong id="sBirthday">0</strong></div>
-    <div class="stat"><small>이번 달 월보험료</small><strong id="sPremium" class="money">0원</strong></div>
+    <div class="stat stat-filter dashboard-jump" data-filter="all" data-jump-view="customers" title="더블클릭하면 전체 고객으로 이동"><small>전체 고객</small><strong id="sTotal">0</strong></div>
+    <div class="stat stat-filter dashboard-jump" data-filter="new" data-jump-view="customers" data-jump-status="신규" title="더블클릭하면 신규 문의 고객으로 이동"><small>신규 문의</small><strong id="sNew">0</strong></div>
+    <div class="stat stat-filter dashboard-jump" data-filter="today" data-jump-view="tasks" data-jump-task="연락" title="더블클릭하면 오늘 연락 업무로 이동"><small>오늘 상담 고객</small><strong id="sToday">0</strong></div>
+    <div class="stat dashboard-jump" data-jump-view="tasks" data-jump-task="자동차" title="더블클릭하면 자동차 만기 업무로 이동"><small>자동차 만기 30일 이내</small><strong id="sAuto">0</strong></div>
+    <div class="stat dashboard-jump" data-jump-view="tasks" data-jump-task="생일" title="더블클릭하면 생일 업무로 이동"><small>이번 주 생일</small><strong id="sBirthday">0</strong></div>
+    <div class="stat dashboard-jump" data-jump-view="contracts" title="더블클릭하면 계약 관리로 이동"><small>이번 달 월보험료</small><strong id="sPremium" class="money">0원</strong></div>
   </section>
 
   <section id="dashboardOverview" class="dashboard-overview">
-    <div class="dashboard-card priority-card">
+    <div class="dashboard-card priority-card dashboard-jump" data-jump-view="tasks" title="빈 공간을 더블클릭하면 오늘 할 일로 이동">
       <div class="dashboard-card-head"><div><small>오늘의 우선순위</small><h3>지금 먼저 처리할 업무</h3></div><span id="priorityCount">0건</span></div>
       <div id="priorityList" class="priority-list"></div>
     </div>

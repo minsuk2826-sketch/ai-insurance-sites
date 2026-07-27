@@ -254,3 +254,10 @@ button:disabled{cursor:not-allowed;opacity:.68}
   .sticky-consult-title span{display:none}
   .sticky-consult-input textarea{min-height:72px}
 }
+
+/* CRM 5.4.5 대시보드 더블클릭 바로가기 */
+.dashboard-jump{cursor:pointer;position:relative}
+.dashboard-jump:hover{box-shadow:0 8px 22px rgba(32,88,180,.12);transform:translateY(-1px)}
+.dashboard-jump::after{content:"더블클릭 이동";position:absolute;right:10px;bottom:7px;font-size:10px;color:#7b8da8;opacity:0;transition:opacity .15s}
+.dashboard-jump:hover::after{opacity:.9}
+.priority-card.dashboard-jump::after{right:14px;bottom:10px}
