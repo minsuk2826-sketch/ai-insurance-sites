@@ -296,3 +296,47 @@ button:disabled{cursor:not-allowed;opacity:.68}
   font-weight:800;
 }
 .contract-sensitive-section{margin-top:18px}
+
+
+/* CRM 5.4.8: 상담 후 상태를 입력창 우측 상단으로 이동 + 30일 미접촉 */
+.consult-composer-toolbar{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:8px;
+  min-height:40px;
+  margin-bottom:8px;
+  padding-right:2px;
+}
+.consult-composer-toolbar .consult-status-control{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+.consult-composer-toolbar .consult-status-control label{
+  margin:0;
+  font-size:12px;
+  white-space:nowrap;
+}
+.consult-composer-toolbar .consult-status-control select{
+  width:180px;
+  min-width:180px;
+  height:38px;
+}
+.consult-composer-toolbar .consult-composer-close{
+  position:static;
+  flex:0 0 auto;
+}
+.sticky-consult-input textarea{
+  padding-right:12px;
+}
+.consult-save-row{
+  justify-content:flex-end;
+}
+@media(max-width:700px){
+  .consult-composer-toolbar{align-items:stretch;gap:6px}
+  .consult-composer-toolbar .consult-status-control{flex:1}
+  .consult-composer-toolbar .consult-status-control select{width:100%;min-width:0;flex:1}
+}

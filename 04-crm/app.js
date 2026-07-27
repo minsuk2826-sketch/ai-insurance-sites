@@ -118,7 +118,7 @@ function customerTasks(customer){
     add(`auto_0:${insurance.auto_expiry_date}`,insurance.auto_expiry_date,`자동차보험 만기 당일 · ${insurance.vehicle_number||"차량번호 미등록"}`,`자동차 만기`);
   }
   const lastTouch=getLastTouchDate(customer);
-  if(lastTouch) add(`no_touch_14d:${lastTouch}`,addDays(lastTouch,14),"마지막 상담 후 2주 경과","미접촉");
+  if(lastTouch) add(`no_touch_30d:${lastTouch}`,addDays(lastTouch,30),"마지막 상담 후 30일 미접촉","미접촉 30일");
   if(customer.follow_up_date) add(`follow_up:${customer.follow_up_date}`,customer.follow_up_date,customer.follow_up_date===today()?"오늘 연락 예정":"연락 예정일 경과","연락");
   const birthday=getProfileInfo(customer).birthday;
   if(birthday){
@@ -225,7 +225,7 @@ function applyCrmView(view){
   const titles={
     dashboard:["업무 대시보드","오늘 처리할 고객과 계약 현황을 한눈에 확인합니다."],
     customers:["고객 관리","전체 고객을 검색하고 상담 상태를 관리합니다."],
-    tasks:["오늘 할 일","계약 경과일·미접촉 고객·연락 예정일을 자동 계산합니다."],
+    tasks:["오늘 할 일","계약 경과일·30일 미접촉 고객·연락 예정일을 자동 계산합니다."],
     calls:["오늘 해야 할 전화","생일·후속 연락·계약 관리·자동차보험 만기 고객을 한 번에 확인합니다."],
     calendar:["업무 캘린더","상담일·생일·계약·자동차보험 만기를 월별로 확인합니다."],
     statistics:["업무 통계","고객·계약·유입경로 성과를 한눈에 분석합니다."],

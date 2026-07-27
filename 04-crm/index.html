@@ -172,9 +172,7 @@
       <div id="consultHistory" class="history-list scroll-history-list"></div>
 
       <div class="consult-input sticky-consult-input" id="consultComposer">
-        <button type="button" class="consult-composer-close" id="consultComposerClose" aria-label="상담 기록창 닫기">×</button>
-        <textarea id="consultMemo" aria-label="상담 기록 입력" placeholder="통화 내용, 고객 요청사항, 다음 상담 계획 등을 입력해주세요."></textarea>
-        <div class="consult-actions consult-save-row">
+        <div class="consult-composer-toolbar">
           <div class="consult-status-control">
             <label for="consultResultStatus">상담 후 상태</label>
             <select id="consultResultStatus">
@@ -182,6 +180,10 @@
               <option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>상담종결</option><option>보류</option>
             </select>
           </div>
+          <button type="button" class="consult-composer-close" id="consultComposerClose" aria-label="상담 기록창 닫기">×</button>
+        </div>
+        <textarea id="consultMemo" aria-label="상담 기록 입력" placeholder="통화 내용, 고객 요청사항, 다음 상담 계획 등을 입력해주세요."></textarea>
+        <div class="consult-actions consult-save-row">
           <button type="button" class="btn primary" id="consultSave">상담 기록 저장</button>
         </div>
       </div>
