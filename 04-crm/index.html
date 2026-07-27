@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 5.0 완성본</title>
+  <title>AI보험 CRM 5.1 알림·가족관리 완성본</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=5.0.3">
+    <link rel="stylesheet" href="style.css?v=5.1.0">
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -21,7 +21,7 @@
 
 <div id="app" class="hidden">
 <nav class="crm-sidebar" aria-label="CRM 메뉴">
-  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.0</small></div></div>
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.1</small></div></div>
   <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
   <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
   <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
@@ -29,7 +29,7 @@
     <button class="nav-item" data-crm-view="statistics"><b>▥</b><span>통계</span></button>
     <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
 </nav>
-<header><div class="top"><div class="brand"><b>AI보험</b> CRM 5.0 <small>완성본</small></div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
+<header><div class="top"><div class="brand"><b>AI보험</b> CRM 5.1 <small>알림·가족관리</small></div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
 <main class="wrap">
   <div class="title-row"><div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
   <section id="statsPanel" class="stats">
@@ -137,14 +137,14 @@
 <div id="consultModal" class="consult-modal" aria-hidden="true">
   <div class="consult-card" role="dialog" aria-modal="true" aria-labelledby="consultTitle">
     <div class="consult-head">
-      <h2 id="consultTitle">고객 상담 기록</h2>
+      <h2 id="consultTitle">고객 상세 관리</h2>
       <button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button>
     </div>
     <div class="consult-body">
       <div class="customer-detail-tabs" role="tablist" aria-label="고객 상세 메뉴">
-        <button type="button" class="customer-detail-tab active" data-detail-tab="overview">고객 요약</button>
-        <button type="button" class="customer-detail-tab" data-detail-tab="consultation">상담 기록</button>
+        <button type="button" class="customer-detail-tab active" data-detail-tab="overview">고객 요약 · 상담 기록</button>
         <button type="button" class="customer-detail-tab" data-detail-tab="contracts">계약 관리 <span id="detailContractCount">0</span></button>
+        <button type="button" class="customer-detail-tab" data-detail-tab="family">가족 계약 트리 <span id="detailFamilyCount">0</span></button>
       </div>
 
       <div class="customer-detail-panel active" data-detail-panel="overview">
@@ -169,9 +169,13 @@
         <button type="button" class="btn primary" id="consultFollowUpSave">다음 연락일 저장</button>
       </div>
 
+      <div class="overview-consult-divider">
+        <div>
+          <h3>상담 기록</h3>
+          <p>고객 요약을 확인한 뒤 바로 아래에서 상담 내용을 이어서 관리합니다.</p>
+        </div>
       </div>
 
-      <div class="customer-detail-panel" data-detail-panel="consultation">
       <section class="sensitive-section">
         <div class="section-title-row"><div><h3>결제정보 · 신분증 확인</h3><p>상담 진행 중 필요한 시점에 입력합니다.</p></div><button type="button" class="btn primary" id="sensitiveSave">저장</button></div>
         <div class="sensitive-grid">
@@ -187,7 +191,6 @@
         <div class="sensitive-guide">카드 CVC와 주민등록번호는 저장하지 마세요. Supabase RLS 접근권한을 제한해야 합니다.</div>
       </section>
 
-      <h3>상담 기록</h3>
       <div id="consultHistory" class="history-list"></div>
 
       <div class="consult-input">
@@ -206,11 +209,26 @@
         <div id="contractList" class="contract-list"></div>
       </section>
       </div>
+
+      <div class="customer-detail-panel" data-detail-panel="family">
+        <section class="family-section">
+          <div class="section-title-row"><div><h3>가족 계약 트리</h3><p>가족 구성원과 각자의 계약을 한눈에 확인합니다.</p></div></div>
+          <div class="family-add-grid">
+            <div class="field"><label>가족 구성원</label><select id="familyLinkedCustomer"><option value="">직접 입력</option></select></div>
+            <div class="field"><label>관계</label><select id="familyRelation"><option>배우자</option><option>자녀</option><option>부</option><option>모</option><option>형제·자매</option><option>기타</option></select></div>
+            <div class="field"><label>이름</label><input id="familyMemberName" placeholder="직접 입력 시 이름"></div>
+            <div class="field"><label>연락처</label><input id="familyMemberPhone" inputmode="tel" placeholder="선택 입력"></div>
+            <button type="button" class="btn primary family-add-btn" id="familyMemberAdd">＋ 가족 추가</button>
+          </div>
+          <div id="familyTree" class="family-tree"></div>
+          <div class="family-guide">CRM에 등록된 고객을 연결하면 해당 고객의 계약이 자동으로 표시됩니다. 직접 입력한 가족은 이름과 연락처만 관리됩니다.</div>
+        </section>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="supabase.js?v=5.0.3"></script>
-<script src="app.js?v=5.0.3"></script>
+<script src="supabase.js?v=5.2.0"></script>
+<script src="app.js?v=5.2.0"></script>
 </body>
 </html>
