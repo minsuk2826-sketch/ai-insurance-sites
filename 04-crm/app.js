@@ -71,7 +71,7 @@ function getAllTasks(){ return customers.flatMap(customerTasks).sort((a,b)=>a.du
 function completeTask(unique){ const completed=readCompletedTasks(); completed[unique]=new Date().toISOString(); writeCompletedTasks(completed); renderTasks(); }
 function renderTasks(){
   const tasks=getAllTasks();
-  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=tasks.length; if($("navCallCount")) $("navCallCount").textContent=customers.filter(c=>c.follow_up_date&&c.follow_up_date<=today()).length;
+  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=tasks.length; if($("navCallCount")) $("navCallCount").textContent=new Set(tasks.map(t=>String(t.customer.id))).size;
   $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">오늘 처리할 자동 업무가 없습니다.</div>';
   $("taskList")._tasks=tasks;
 }
@@ -93,7 +93,7 @@ function applyCrmView(view){
     dashboard:["업무 대시보드","오늘 처리할 고객과 계약 현황을 한눈에 확인합니다."],
     customers:["고객 관리","전체 고객을 검색하고 상담 상태를 관리합니다."],
     tasks:["오늘 할 일","계약 경과일·미접촉 고객·연락 예정일을 자동 계산합니다."],
-    calls:["오늘 해야 할 전화","오늘 연락해야 할 고객을 전화 중심으로 모아봅니다."],
+    calls:["오늘 해야 할 전화","생일·후속 연락·계약 관리·자동차보험 만기 고객을 한 번에 확인합니다."],
     calendar:["업무 캘린더","상담일·생일·계약·자동차보험 만기를 월별로 확인합니다."],
     contracts:["계약 관리","계약 완료 고객의 여러 계약과 경과일을 관리합니다."],
     recruiting:["리크루팅 관리","설계사 지원자와 리크루팅 유입 고객을 관리합니다."]
@@ -117,6 +117,7 @@ function getViewScopedCustomers(list){
     if(activeContractFilter==="maintenance")return contracts.some(x=>["유지관리","확인필요","실효위험"].includes(x.status));
     return true;
   });
+  if(crmView==="calls") return list.filter(c=>customerTasks(c).length>0);
   if(crmView==="recruiting") return list.filter(c=>/리크루팅|육아|경단|사업설명회|설계사/i.test(`${c.source||""} ${c.interest||""} ${c.memo||""}`));
   return list;
 }
@@ -212,7 +213,7 @@ function render(){
     const checked=selectedIds.has(String(c.id));
     return `<tr class="customer-row ${checked?"selected-row":""}" data-customer-id="${esc(c.id)}">
       <td class="select-col"><input type="checkbox" class="row-check" data-id="${esc(c.id)}" ${checked?"checked":""}></td>
-      <td>${esc((c.created_at||"").slice(0,10))}</td><td><b>${esc(c.name)}</b></td>
+      <td>${esc((c.created_at||"").slice(0,10))}</td><td><span class="grade grade-${esc(getProfileInfo(c).grade||"B")}">${esc(getProfileInfo(c).grade||"B")}</span></td><td><b>${esc(c.name)}</b></td>
       <td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td><td>${esc(c.source||"-")}</td><td>${esc(c.age_group||"-")}</td>
       <td><span class="status ${esc(c.status||"신규")}">${esc(c.status||"신규")}</span></td>
       <td>${esc(c.available_time||"-")}</td><td>${esc(c.follow_up_date||"-")}</td>
