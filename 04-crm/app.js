@@ -16,6 +16,27 @@ let activeTaskSort = "urgent";
 let consultInitialMemo = "";
 const favoriteStorageKey = "ai-crm-favorites-v1";
 
+let saveToastTimer=null;
+function showSaveToast(message="저장되었습니다.",type="success"){
+  const toast=$("saveToast");
+  if(!toast)return;
+  clearTimeout(saveToastTimer);
+  toast.textContent=message;
+  toast.className=`save-toast show ${type}`;
+  saveToastTimer=setTimeout(()=>{toast.className="save-toast";},2200);
+}
+function setSaving(button,saving,defaultText){
+  if(!button)return;
+  if(saving){
+    if(!button.dataset.defaultText)button.dataset.defaultText=defaultText||button.textContent;
+    button.disabled=true;
+    button.textContent="저장 중...";
+  }else{
+    button.disabled=false;
+    button.textContent=defaultText||button.dataset.defaultText||"저장";
+  }
+}
+
 const $ = id => document.getElementById(id);
 const today = () => new Date().toISOString().slice(0,10);
 const esc = s => String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
@@ -405,11 +426,16 @@ async function addFamilyMember(){
   if(!name){alert("가족 구성원의 이름을 입력하거나 고객을 선택해주세요.");return;}
   const members=[...getFamilyMembers(customer)]; if(linkedId&&members.some(x=>String(x.customer_id)===String(linkedId))){alert("이미 연결된 가족 고객입니다.");return;}
   members.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),relation:$("familyRelation").value,customer_id:linkedId||null,name,phone:linked?.phone||$("familyMemberPhone").value.trim()});
-  if(await saveFamilyMembers(members)){$("familyLinkedCustomer").value="";$("familyMemberName").value="";$("familyMemberPhone").value="";}
+  const familyBtn=$("familyMemberAdd"); setSaving(familyBtn,true,"＋ 가족 추가");
+  if(await saveFamilyMembers(members)){
+    $("familyLinkedCustomer").value="";$("familyMemberName").value="";$("familyMemberPhone").value="";
+    showSaveToast("가족 정보가 저장되었습니다.");
+  }
+  setSaving(familyBtn,false,"＋ 가족 추가");
 }
 async function handleFamilyAction(event){
   const button=event.target.closest("button[data-family-action]");if(!button)return;const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));if(!customer)return;const index=Number(button.dataset.familyIndex);const member=getFamilyMembers(customer)[index];
-  if(button.dataset.familyAction==="delete"){if(confirm("이 가족 연결을 삭제할까요?")){const next=[...getFamilyMembers(customer)];next.splice(index,1);await saveFamilyMembers(next);}}
+  if(button.dataset.familyAction==="delete"){if(confirm("이 가족 연결을 삭제할까요?")){const next=[...getFamilyMembers(customer)];next.splice(index,1);if(await saveFamilyMembers(next))showSaveToast("가족 정보가 저장되었습니다.");}}
   if(button.dataset.familyAction==="open"&&member?.customer_id){openConsultation(member.customer_id);setCustomerDetailTab("overview");}
 }
 function getInsuranceInfo(customer){const raw=customer?.insurance_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {types:[]}}
@@ -582,7 +608,7 @@ async function saveConsultation(){
   saveBtn.textContent="상담 기록 저장";
   renderConsultHistory(customer);
   renderTasks();
-  alert(originalText==="수정 내용 저장"?"상담 기록이 수정되었습니다.":"상담 기록이 저장되었습니다.");
+  showSaveToast(originalText==="수정 내용 저장"?"상담 기록이 수정되었습니다.":"상담 기록이 저장되었습니다.");
 }
 
 async function deleteConsultationHistory(index){
@@ -664,15 +690,19 @@ async function saveConsultFollowUp(){
   customer.follow_up_date=nextDate;
   $("consultFollowUp").textContent=nextDate||"-";
   render();
-  alert("다음 연락일이 저장되었습니다.");
+  showSaveToast("다음 연락일이 저장되었습니다.");
 }
 
 
 async function saveSensitiveInfo(){
   const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
   const payload={payment_bank:$("consultPaymentBank").value.trim(),payment_account:$("consultPaymentAccount").value.trim(),payment_day:$("consultPaymentDay").value,card_number:$("consultCardNumber").value.replace(/\s|-/g,""),card_expiry:$("consultCardExpiry").value.trim(),identity_verified:$("consultIdentityVerified").checked,driver_license:$("consultDriverLicense").value.trim(),resident_issue_date:$("consultResidentIssueDate").value||null};
-  const btn=$("sensitiveSave"); btn.disabled=true; const {error}=await db.from("customers").update({payment_identity_info:payload}).eq("id",customer.id); btn.disabled=false;
-  if(error){alert("결제·신분증 정보 저장 실패: "+error.message);return;} customer.payment_identity_info=payload; alert("결제정보와 신분증 확인 내용이 저장되었습니다.");
+  const btn=$("sensitiveSave"); setSaving(btn,true,"저장");
+  const {error}=await db.from("customers").update({payment_identity_info:payload}).eq("id",customer.id);
+  setSaving(btn,false,"저장");
+  if(error){alert("결제·신분증 정보 저장 실패: "+error.message);return;}
+  customer.payment_identity_info=payload;
+  showSaveToast("결제정보와 신분증 확인 내용이 저장되었습니다.");
 }
 
 function renderContracts(customer){
@@ -721,7 +751,11 @@ async function saveContractFromCard(index){
   card.querySelectorAll("[data-contract-field]").forEach(input=>{updated[input.dataset.contractField]=input.dataset.contractField==="amount"?num(input.value):input.value;});
   if(!updated.date){alert("계약일을 입력해주세요.");return;}
   current[index]=updated;
-  if(await persistContracts(customer,current)) alert("계약이 저장되었습니다.");
+  const saveButton=card.querySelector('[data-contract-action="save"]');
+  setSaving(saveButton,true,"계약 저장");
+  const saved=await persistContracts(customer,current);
+  setSaving(saveButton,false,"계약 저장");
+  if(saved) showSaveToast("계약이 저장되었습니다.");
 }
 async function deleteContractAt(index){
   const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
@@ -772,9 +806,12 @@ $("customerForm").addEventListener("submit",async e=>{
     profile_info:{birthday:$("birthday").value||null,grade:$("customerGrade").value||"B",referrer_id:$("referrerId").value||null,family_info:$("familyInfo").value.trim(),landing_source:$("source").value==="랜딩페이지"?$("landingSource").value.trim():""},
     memo:$("memo").value.trim()
   };
+  const formSaveButton=$("customerForm").querySelector('button[type="submit"]');
+  setSaving(formSaveButton,true,id?"고객 수정 저장":"고객 저장");
   const res=id
     ? await db.from("customers").update(payload).eq("id",id).select().single()
     : await db.from("customers").insert(payload).select().single();
+  setSaving(formSaveButton,false,id?"고객 수정 저장":"고객 저장");
 
   if(res.error){
     alert("저장 실패: "+res.error.message);
@@ -786,10 +823,10 @@ $("customerForm").addEventListener("submit",async e=>{
     if(savedId){
       showListView();
       openConsultation(savedId);
-      alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다. 상담기록과 계약정보를 입력해주세요.");
+      showSaveToast(wasEdit?"고객 정보가 저장되었습니다.":"고객이 등록되었습니다.");
     }else{
       showListView();
-      alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다.");
+      showSaveToast(wasEdit?"고객 정보가 저장되었습니다.":"고객이 등록되었습니다.");
     }
   }
 });
