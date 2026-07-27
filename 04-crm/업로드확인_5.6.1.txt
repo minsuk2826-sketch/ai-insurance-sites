@@ -1,0 +1,8 @@
+AI보험 CRM 5.6.1 실제 수정본
+
+정상 업로드 확인:
+1. 화면 상단에 CRM 5.6.1 표시
+2. 브라우저 개발자도구 Console에 "AI보험 CRM 5.6.1 loaded" 표시
+3. index.html 하단 app.js 주소가 app.js?v=5.6.1-20260727
+
+GitHub 04-crm 폴더에 이 ZIP 내부 파일을 직접 덮어쓰고 Commit changes를 누르세요.

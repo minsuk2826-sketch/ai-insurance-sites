@@ -616,5 +616,6 @@ button:disabled{cursor:not-allowed;opacity:.68}
 .contract-auto-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media(max-width:800px){.contract-auto-grid{grid-template-columns:1fr}}
 
-
-/* CRM 5.6.0: 캐시 갱신 및 약속일 경과/자동차보험 계약 화면 검증 */
+/* CRM 5.6.1 실제 수정본 */
+.contract-auto-box .contract-auto-check{font-size:15px;font-weight:900;color:#174f9c}
+#missedScheduleTitle{white-space:normal!important}

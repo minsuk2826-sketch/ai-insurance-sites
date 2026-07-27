@@ -102,23 +102,18 @@ function getLastTouchDate(customer){
   const latest=history.map(x=>dateOnly(x.updated_at||x.created_at)).filter(Boolean).sort().pop();
   return latest||dateOnly(customer.created_at);
 }
-function koreaDateOnly(value){
-  if(!value)return "";
-  const raw=String(value);
-  // YYYY-MM-DD만 저장된 값은 시간대 변환 없이 그대로 사용합니다.
-  if(/^\d{4}-\d{2}-\d{2}$/.test(raw.slice(0,10))&&!raw.includes("T"))return raw.slice(0,10);
-  const parsed=new Date(raw);
-  if(Number.isNaN(parsed.getTime()))return dateOnly(raw);
-  return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(parsed);
+function historyRecordDate(item){
+  // 상담 기록을 나중에 수정했다고 과거 약속이 처리된 것으로 오인하지 않도록
+  // 최초 작성일(created_at)을 우선 사용합니다.
+  return dateOnly(item?.created_at || item?.date || item?.consulted_at || item?.updated_at);
 }
-function hasConsultationAfterPromiseDay(customer,targetDate){
+function hasConsultationOnOrAfterPromiseDay(customer,targetDate){
   const due=dateOnly(targetDate);
   if(!due)return false;
-  // 약속일 당일에 작성된 기존 상담은 약속 이행으로 보지 않습니다.
-  // 약속일이 지난 뒤 새로 작성된 상담 기록이 있을 때만 목록에서 제외합니다.
+  // 약속일 당일 또는 이후에 새로 작성된 상담 기록이 있을 때만 처리 완료입니다.
   return getConsultHistory(customer).some(item=>{
-    const recorded=koreaDateOnly(item.created_at||item.updated_at);
-    return Boolean(recorded&&recorded>due);
+    const recorded=historyRecordDate(item);
+    return Boolean(recorded && recorded >= due);
   });
 }
 function customerTasks(customer){
@@ -202,14 +197,14 @@ function renderDashboard(){
   customers.forEach(customer=>{
     const promisedDate=dateOnly(customer.follow_up_date);
     const remaining=daysUntil(promisedDate);
-    // 다음 연락일이 어제 이전이고, 약속일 다음 날 이후 새 상담 기록이 없으면 표시합니다.
+    // 다음 연락일이 어제 이전이고, 약속일 당일 이후 상담 기록이 없으면 표시합니다.
     if(!promisedDate||remaining===null||remaining>=0)return;
-    if(hasConsultationAfterPromiseDay(customer,promisedDate))return;
+    if(hasConsultationOnOrAfterPromiseDay(customer,promisedDate))return;
     const overdueDays=Math.abs(remaining);
     attention.push({
       id:customer.id,
       name:customer.name||"이름 없음",
-      text:`약속일 ${overdueDays}일 경과 · 약속일 이후 상담 기록 없음`,
+      text:`약속일 ${overdueDays}일 경과 · 상담 기록 없음`,
       days:overdueDays
     });
   });
@@ -1255,7 +1250,7 @@ $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.g
 $("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
 $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});
 
-// 5.6.0: 약속일 경과 건수는 renderDashboard에서 실시간 표시합니다.
+// 5.6.1: 약속일 경과 건수는 renderDashboard에서 실시간 표시합니다.
 
 
 // 5.4.21: 숫자 날짜 입력을 YYYY-MM-DD로 자동 변환합니다.
@@ -1324,3 +1319,5 @@ document.addEventListener("keydown",event=>{
   input.setCustomValidity("");
   focusNextFormControl(input);
 });
+
+console.info("AI보험 CRM 5.6.1 loaded - appointment overdue and auto insurance build");
