@@ -102,12 +102,14 @@ function getLastTouchDate(customer){
   const latest=history.map(x=>dateOnly(x.updated_at||x.created_at)).filter(Boolean).sort().pop();
   return latest||dateOnly(customer.created_at);
 }
-function hasConsultationOnOrAfter(customer,targetDate){
+function hasConsultationAfterPromiseDay(customer,targetDate){
   const due=dateOnly(targetDate);
   if(!due)return false;
+  // 약속일이 지난 뒤 새로 작성된 상담 기록만 완료 처리합니다.
+  // 약속일 당일의 기존 기록 때문에 다음 날 누락되는 문제를 방지합니다.
   return getConsultHistory(customer).some(item=>{
     const recorded=dateOnly(item.created_at||item.updated_at);
-    return recorded&&recorded>=due;
+    return recorded&&recorded>due;
   });
 }
 function customerTasks(customer){
@@ -191,14 +193,14 @@ function renderDashboard(){
   const todayDate=today();
   customers.forEach(customer=>{
     const promisedDate=dateOnly(customer.follow_up_date);
-    // 약속일 다음 날부터, 약속일 이후 상담기록이 없을 때 자동 표시
+    // 약속일 다음 날부터, 약속일이 지난 뒤 새 상담기록이 없을 때 자동 표시
     if(!promisedDate||promisedDate>=todayDate)return;
-    if(hasConsultationOnOrAfter(customer,promisedDate))return;
+    if(hasConsultationAfterPromiseDay(customer,promisedDate))return;
     const overdueDays=Math.max(1,daysBetween(promisedDate,todayDate));
     attention.push({
       id:customer.id,
       name:customer.name,
-      text:`약속일 ${overdueDays}일 경과 · 상담 기록 없음`,
+      text:`약속일 ${overdueDays}일 경과 · 이후 상담 기록 없음`,
       days:overdueDays
     });
   });
@@ -1242,7 +1244,7 @@ $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.g
 $("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
 $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});
 
-// 5.4.19: 대시보드 약속일 경과 카드 제목을 항상 정확히 표시합니다.
+// 5.5.1: 대시보드 약속일 경과 카드 제목을 항상 정확히 표시합니다.
 const missedScheduleTitle = document.getElementById("missedScheduleTitle");
 if (missedScheduleTitle) missedScheduleTitle.textContent = "놓치기 쉬운 일정 (약속일경과)";
 

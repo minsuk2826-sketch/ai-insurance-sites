@@ -1,11 +1,7 @@
-﻿AI보험 CRM 3.0 업로드 방법
+AI보험 CRM 5.5.1 업로드 방법
 
-1. 이 ZIP 파일의 압축을 풉니다.
-2. GitHub > ai-insurance-sites > 04-crm 폴더로 이동합니다.
-3. Add file > Upload files를 누릅니다.
-4. 이 폴더의 index.html과 netlify.toml을 업로드합니다.
-5. 같은 이름의 기존 파일을 덮어쓴 뒤 Commit changes를 누릅니다.
-6. Vercel 배포 완료 후 https://ai-insurance-crm.vercel.app/ 을 새로고침합니다.
-
-추가 Supabase SQL은 필요하지 않습니다. 기존 고객 데이터와 로그인 계정을 그대로 사용합니다.
-자동 업무 완료 상태는 현재 브라우저에 저장됩니다.
+1. ZIP 압축을 풉니다.
+2. 04-crm 폴더 안의 파일 전체를 GitHub 저장소의 04-crm 폴더에 덮어씁니다.
+3. 특히 index.html, app.js, style.css 3개가 모두 5.5.1 파일로 교체되어야 합니다.
+4. 배포 완료 후 Ctrl+Shift+R로 강력 새로고침합니다.
+5. 화면 왼쪽 위 버전이 5.5.1인지 확인합니다.

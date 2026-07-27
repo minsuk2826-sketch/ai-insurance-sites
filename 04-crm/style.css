@@ -608,3 +608,10 @@ button:disabled{cursor:not-allowed;opacity:.68}
  #consultModal .consult-home::before{content:'⌂';font-size:18px}
  .form-head-navigation .btn{padding-left:10px;padding-right:10px}
 }
+
+/* CRM 5.5.1 자동차보험 계약 입력 강조 */
+.contract-auto-box{border:2px solid #b9d4ff!important;background:#f4f8ff!important;padding:16px!important;border-radius:14px!important;margin-top:14px!important}
+.contract-auto-title{font-size:16px;font-weight:900;color:#1358bd;margin-bottom:10px}
+.contract-auto-check{display:flex!important;align-items:center;gap:8px;font-weight:800;margin-bottom:12px}
+.contract-auto-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:800px){.contract-auto-grid{grid-template-columns:1fr}}
