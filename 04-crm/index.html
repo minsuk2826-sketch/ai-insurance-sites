@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 4.2</title>
+  <title>AI보험 CRM 5.0 완성본</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=4.2">
+    <link rel="stylesheet" href="style.css?v=5.0.3">
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card">
-    <h1>AI보험 CRM 4.2</h1>
+    <h1>AI보험 CRM 5.0</h1>
     <p>관리자 계정으로 로그인하세요.</p>
     <div class="field"><label>이메일</label><input id="loginEmail" type="email" required></div>
     <div class="field"><label>비밀번호</label><input id="loginPassword" type="password" required></div>
@@ -21,16 +21,15 @@
 
 <div id="app" class="hidden">
 <nav class="crm-sidebar" aria-label="CRM 메뉴">
-  <div class="side-logo"><span>AI</span><div>보험 CRM<small>4.2</small></div></div>
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.0</small></div></div>
   <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
   <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
   <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
-  <button class="nav-item" data-crm-view="calls"><b>☎</b><span>오늘 전화</span><em id="navCallCount">0</em></button>
-  <button class="nav-item" data-crm-view="calendar"><b>▦</b><span>캘린더</span></button>
-  <button class="nav-item" data-crm-view="contracts"><b>▤</b><span>계약관리</span></button>
-  <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
+    <button class="nav-item" data-crm-view="calendar"><b>▦</b><span>캘린더</span></button>
+    <button class="nav-item" data-crm-view="statistics"><b>▥</b><span>통계</span></button>
+    <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
 </nav>
-<header><div class="top"><div class="brand"><b>AI보험</b> CRM 4.2</div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
+<header><div class="top"><div class="brand"><b>AI보험</b> CRM 5.0 <small>완성본</small></div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
 <main class="wrap">
   <div class="title-row"><div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
   <section id="statsPanel" class="stats">
@@ -42,8 +41,23 @@
     <div class="stat"><small>이번 달 월보험료</small><strong id="sPremium" class="money">0원</strong></div>
   </section>
 
+  <section id="dashboardOverview" class="dashboard-overview">
+    <div class="dashboard-card priority-card">
+      <div class="dashboard-card-head"><div><small>오늘의 우선순위</small><h3>지금 먼저 처리할 업무</h3></div><span id="priorityCount">0건</span></div>
+      <div id="priorityList" class="priority-list"></div>
+    </div>
+    <div class="dashboard-card">
+      <div class="dashboard-card-head"><div><small>이번 달 성과</small><h3>계약 및 고객 현황</h3></div></div>
+      <div id="monthlySummary" class="monthly-summary"></div>
+    </div>
+    <div class="dashboard-card">
+      <div class="dashboard-card-head"><div><small>주의가 필요한 고객</small><h3>놓치기 쉬운 일정</h3></div></div>
+      <div id="attentionList" class="attention-list"></div>
+    </div>
+  </section>
+
   <section id="taskPanel" class="task-panel">
-    <div class="task-head"><div><h2>오늘 할 일</h2><div class="sub">계약 경과일과 마지막 상담일을 자동 계산합니다.</div></div><div id="taskCount" class="task-count">0</div></div>
+    <div class="task-head"><div><h2>오늘 할 일</h2><div class="sub">연락·생일·계약·자동차보험 업무를 중요도순으로 확인합니다.</div></div><div id="taskCount" class="task-count">0</div></div><div class="task-toolbar"><div class="task-filters"><button class="task-filter active" data-task-filter="all">전체</button><button class="task-filter" data-task-filter="연락">연락</button><button class="task-filter" data-task-filter="생일">생일</button><button class="task-filter" data-task-filter="계약">계약</button><button class="task-filter" data-task-filter="자동차">자동차</button><button class="task-filter" data-task-filter="미접촉">미접촉</button></div><select id="taskSort"><option value="urgent">긴급순</option><option value="due">날짜순</option><option value="name">이름순</option></select></div>
     <div id="taskList" class="task-list"></div>
   </section>
 
@@ -77,7 +91,7 @@
       <div class="table-wrap">
         <table><thead><tr>
           <th class="select-col"><input id="selectAll" class="select-all" type="checkbox" aria-label="현재 페이지 전체 선택"></th>
-          <th>등록일</th><th>등급</th><th>이름</th><th>연락처</th><th>유입경로</th><th>나이대</th><th>상태</th><th>상담 가능 시간</th><th>다음 연락일</th><th>계약건수</th><th>최근 계약일</th><th>총 계약금액</th><th>메모</th><th>관리</th>
+          <th>등록일</th><th>등급</th><th>이름</th><th>연락처</th><th>유입경로</th><th>나이대</th><th>상태</th><th>상담 가능 시간</th><th>다음 연락일</th><th>계약건수</th><th>최근 계약일</th><th>총 계약금액</th><th>메모</th><th>고객관리</th>
         </tr></thead><tbody id="customerBody"></tbody></table>
         <div id="pagination" class="pagination"></div>
         <div id="emptyState" class="empty">등록된 고객이 없습니다.</div>
@@ -85,73 +99,37 @@
     </div>
   </section>
 
-  <section id="formView" class="hidden">
-    <aside class="panel side">
-      <div class="form-page-head"><h2 id="formTitle">신규 고객 등록</h2><button type="button" id="backToListBtn" class="btn light">← 고객 목록으로</button></div>
-      <form id="customerForm" class="form-grid">
+  <section id="statisticsView" class="hidden">
+    <div class="statistics-grid">
+      <div class="panel statistics-panel"><div class="panel-head"><h2>월별 계약 실적</h2><div class="sub">최근 6개월 계약 건수와 월보험료입니다.</div></div><div id="monthlyChart" class="bar-chart"></div></div>
+      <div class="panel statistics-panel"><div class="panel-head"><h2>고객 상태 분포</h2><div class="sub">현재 고객 진행상태를 한눈에 확인합니다.</div></div><div id="statusStats" class="stat-breakdown"></div></div>
+      <div class="panel statistics-panel"><div class="panel-head"><h2>유입경로 성과</h2><div class="sub">경로별 고객 수와 계약 전환을 비교합니다.</div></div><div id="sourceStats" class="stat-breakdown"></div></div>
+      <div class="panel statistics-panel"><div class="panel-head"><h2>연령대 분포</h2><div class="sub">등록 고객의 연령대 구성입니다.</div></div><div id="ageStats" class="stat-breakdown"></div></div>
+    </div>
+  </section>
+
+  <section id="formView" class="customer-form-modal hidden" aria-hidden="true">
+    <div class="customer-form-card" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+      <div class="form-page-head"><div><h2 id="formTitle">신규 고객 등록</h2><p>필수 정보만 빠르게 등록하고, 상담·계약 정보는 고객 상세에서 관리합니다.</p></div><button type="button" id="backToListBtn" class="consult-close" aria-label="닫기">×</button></div>
+      <form id="customerForm" class="form-grid compact-form">
         <input type="hidden" id="customerId">
-        <div class="two">
-          <div class="field"><label>이름</label><input id="name" required></div>
-          <div class="field"><label>휴대폰 번호</label><input id="phone" required></div>
+        <div class="two"><div class="field"><label>이름 *</label><input id="name" required autofocus></div><div class="field"><label>휴대폰 번호 *</label><input id="phone" inputmode="tel" required placeholder="010-0000-0000"></div></div>
+        <div class="section-label">기본 정보</div>
+        <div class="birthday-age-row">
+          <div class="field"><label>생년월일</label><div class="birthday-parts"><input id="birthYear" inputmode="numeric" maxlength="4" placeholder="YYYY" aria-label="생년"><span>-</span><input id="birthMonth" inputmode="numeric" maxlength="2" placeholder="MM" aria-label="생월"><span>-</span><input id="birthDay" inputmode="numeric" maxlength="2" placeholder="DD" aria-label="생일"></div><input id="birthday" type="hidden"></div>
+          <div class="field"><label>나이대</label><input id="age" readonly placeholder="생년월일 입력 시 자동"></div>
         </div>
-        <div class="section-label">고객 관계 및 등급</div>
-        <div class="two"><div class="field"><label>생년월일</label><input id="birthday" type="date"></div><div class="field"><label>고객등급</label><select id="customerGrade"><option value="B">B</option><option value="VIP">VIP</option><option value="A">A</option><option value="C">C</option></select></div></div>
+        <div class="two"><div class="field"><label>고객등급</label><select id="customerGrade"><option value="B">B</option><option value="VIP">VIP</option><option value="A">A</option><option value="C">C</option></select></div><div class="field"><label>상태</label><select id="status"><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>보류</option></select></div></div>
+        <div class="section-label">유입 및 관계</div>
+        <div class="source-row"><div class="field"><label>유입경로</label><select id="source"><option>DB</option><option>소개</option><option>기계약자</option><option>가망고객</option><option>랜딩페이지</option></select></div><div id="landingSourceField" class="field hidden"><label>랜딩페이지 경로</label><input id="landingSource" placeholder="예: 보험분석 / 리크루팅 / 배달"></div></div>
         <div class="field"><label>소개해준 고객</label><select id="referrerId"><option value="">없음</option></select></div>
         <div class="field"><label>가족관계</label><input id="familyInfo" placeholder="예: 배우자 김영희, 자녀 김민준"></div>
-        <div class="field"><label>유입경로</label><select id="source"><option value="CRM">CRM 직접등록</option><option>AI보험점검 랜딩페이지</option><option>리크루팅랜딩페이지1</option><option>육아경단녀 랜딩페이지</option><option>랜딩페이지</option><option>카카오톡</option><option>전화</option><option>소개</option><option>기타</option></select></div>
-        <div class="two">
-          <div class="field"><label>나이대</label><select id="age"><option value="">선택</option><option>20대</option><option>30대</option><option>40대</option><option>50대</option><option>60대 이상</option></select></div>
-          <div class="field"><label>상태</label><select id="status"><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>보류</option></select></div>
-        </div>
         <div class="field"><label>상담 가능 시간</label><select id="availableTime"><option value="">선택</option><option>오전 10시~12시</option><option>오후 12시~2시</option><option>오후 2시~4시</option><option>오후 4시~6시</option><option>오후 6시 이후</option><option>시간 상관없음</option></select></div>
-        <div class="field"><label>다음 연락일</label><input id="followUp" type="date"></div>
-        <div class="field"><label>관심 분야</label><input id="interest"></div>
-
-        <div class="section-label">보유·관심 보험</div>
-        <div class="insurance-types">
-          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="생명보험">생명보험</label>
-          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="건강보험">건강보험</label>
-          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="암보험">암보험</label>
-          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="실손보험">실손보험</label>
-          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="운전자보험">운전자보험</label>
-          <label class="insurance-check"><input type="checkbox" name="insuranceType" value="화재보험">화재보험</label>
-          <label class="insurance-check"><input id="autoInsuranceCheck" type="checkbox" name="insuranceType" value="자동차보험">자동차보험</label>
-        </div>
-        <div id="autoInsuranceBox" class="auto-box hidden">
-          <div class="two">
-            <div class="field"><label>자동차보험 보험사</label><input id="autoCompany" placeholder="보험사"></div>
-            <div class="field"><label>차량번호</label><input id="vehicleNumber" placeholder="예: 12가3456"></div>
-          </div>
-          <div class="two">
-            <div class="field"><label>자동차보험 만기일</label><input id="autoExpiryDate" type="date"></div>
-            <div class="field"><label>갱신 상태</label><select id="autoRenewalStatus"><option>갱신 예정</option><option>상담 진행</option><option>갱신 완료</option><option>타사 가입</option><option>보류</option></select></div>
-          </div>
-          <div class="form-guide">만기일 기준 30일·15일·7일 전과 만기 당일에 오늘 할 일 알림이 자동 생성됩니다.</div>
-        </div>
-
-        <div class="section-label">결제 정보</div>
-        <div class="two">
-          <div class="field"><label>결제 은행</label><input id="paymentBank" autocomplete="off" placeholder="예: 국민은행"></div>
-          <div class="field"><label>결제 계좌번호</label><input id="paymentAccount" autocomplete="off" inputmode="numeric" placeholder="계좌번호 입력"></div>
-        </div>
-        <div class="field"><label>결제일</label><select id="paymentDay"><option value="">선택</option><option value="5">5일</option><option value="10">10일</option><option value="15">15일</option><option value="20">20일</option><option value="25">25일</option></select></div>
-        <div class="two">
-          <div class="field"><label>카드번호</label><input id="cardNumber" autocomplete="off" inputmode="numeric" maxlength="19" placeholder="숫자만 입력"></div>
-          <div class="field"><label>카드 유효기간</label><input id="cardExpiry" autocomplete="off" inputmode="numeric" maxlength="5" placeholder="MM/YY"></div>
-        </div>
-
-        <div class="section-label">신분증 확인</div>
-        <div class="field check-row"><input id="identityVerified" type="checkbox"><label for="identityVerified">신분증 확인 완료</label></div>
-        <div class="two">
-          <div class="field"><label>운전면허번호</label><input id="driverLicense" autocomplete="off" placeholder="운전면허번호"></div>
-          <div class="field"><label>주민등록증 발급일자</label><input id="residentIssueDate" type="date" autocomplete="off"></div>
-        </div>
-        <div class="sensitive-guide">보안 주의: 계좌번호·카드번호·신분증 정보는 매우 민감한 개인정보입니다. Supabase 접근권한과 RLS를 반드시 제한하고, 카드 CVC·주민등록번호는 저장하지 마세요.</div>
-        <div class="form-guide">계약 정보는 고객 등록 후 열리는 <b>고객 상담기록 화면</b>에서 여러 건 추가할 수 있습니다.</div>
-        <div class="field"><label>상담 메모</label><textarea id="memo"></textarea></div>
-        <div class="form-actions"><button class="btn light" type="button" id="cancelBtn">초기화</button><button class="btn primary" type="submit">저장하기</button></div>
+        <div class="field"><label>간단 메모</label><textarea id="memo" placeholder="등록 시 꼭 필요한 메모만 입력하세요."></textarea></div>
+        <div class="form-guide">다음 연락일, 관심분야, 보험정보, 결제정보와 신분증 확인은 고객 상담기록 화면에서 입력합니다.</div>
+        <div class="form-actions"><button class="btn light" type="button" id="cancelBtn">취소</button><button class="btn primary" type="submit">고객 저장</button></div>
       </form>
-    </aside>
+    </div>
   </section>
 </main>
 </div>
@@ -163,6 +141,13 @@
       <button type="button" id="consultClose" class="consult-close" aria-label="상담 기록 닫기">×</button>
     </div>
     <div class="consult-body">
+      <div class="customer-detail-tabs" role="tablist" aria-label="고객 상세 메뉴">
+        <button type="button" class="customer-detail-tab active" data-detail-tab="overview">고객 요약</button>
+        <button type="button" class="customer-detail-tab" data-detail-tab="consultation">상담 기록</button>
+        <button type="button" class="customer-detail-tab" data-detail-tab="contracts">계약 관리 <span id="detailContractCount">0</span></button>
+      </div>
+
+      <div class="customer-detail-panel active" data-detail-panel="overview">
       <div class="customer-summary">
         <div class="summary-box"><small>이름</small><strong id="consultName">-</strong></div>
         <div class="summary-box"><small>연락처</small><strong id="consultPhone">-</strong></div>
@@ -184,9 +169,22 @@
         <button type="button" class="btn primary" id="consultFollowUpSave">다음 연락일 저장</button>
       </div>
 
-      <section class="contract-section">
-        <div class="section-title-row"><div><h3>계약 정보</h3><p>한 고객에게 여러 계약을 등록할 수 있습니다.</p></div><button type="button" class="btn primary" id="addContractBtn">＋ 계약 추가</button></div>
-        <div id="contractList" class="contract-list"></div>
+      </div>
+
+      <div class="customer-detail-panel" data-detail-panel="consultation">
+      <section class="sensitive-section">
+        <div class="section-title-row"><div><h3>결제정보 · 신분증 확인</h3><p>상담 진행 중 필요한 시점에 입력합니다.</p></div><button type="button" class="btn primary" id="sensitiveSave">저장</button></div>
+        <div class="sensitive-grid">
+          <div class="field"><label>결제 은행</label><input id="consultPaymentBank" autocomplete="off" placeholder="예: 국민은행"></div>
+          <div class="field"><label>결제 계좌번호</label><input id="consultPaymentAccount" autocomplete="off" inputmode="numeric"></div>
+          <div class="field"><label>결제일</label><select id="consultPaymentDay"><option value="">선택</option><option value="5">5일</option><option value="10">10일</option><option value="15">15일</option><option value="20">20일</option><option value="25">25일</option></select></div>
+          <div class="field"><label>카드번호</label><input id="consultCardNumber" autocomplete="off" inputmode="numeric" maxlength="19"></div>
+          <div class="field"><label>카드 유효기간</label><input id="consultCardExpiry" autocomplete="off" inputmode="numeric" maxlength="5" placeholder="MM/YY"></div>
+          <div class="field check-row"><input id="consultIdentityVerified" type="checkbox"><label for="consultIdentityVerified">신분증 확인 완료</label></div>
+          <div class="field"><label>운전면허번호</label><input id="consultDriverLicense" autocomplete="off"></div>
+          <div class="field"><label>주민등록증 발급일자</label><input id="consultResidentIssueDate" type="date"></div>
+        </div>
+        <div class="sensitive-guide">카드 CVC와 주민등록번호는 저장하지 마세요. Supabase RLS 접근권한을 제한해야 합니다.</div>
       </section>
 
       <h3>상담 기록</h3>
@@ -200,11 +198,19 @@
           <button type="button" class="btn primary" id="consultSave">상담 기록 저장</button>
         </div>
       </div>
+      </div>
+
+      <div class="customer-detail-panel" data-detail-panel="contracts">
+      <section class="contract-section">
+        <div class="section-title-row"><div><h3>계약 정보</h3><p>한 고객에게 여러 계약을 등록할 수 있습니다.</p></div><button type="button" class="btn primary" id="addContractBtn">＋ 계약 추가</button></div>
+        <div id="contractList" class="contract-list"></div>
+      </section>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="supabase.js?v=4.2"></script>
-<script src="app.js?v=4.2"></script>
+<script src="supabase.js?v=5.0.3"></script>
+<script src="app.js?v=5.0.3"></script>
 </body>
 </html>

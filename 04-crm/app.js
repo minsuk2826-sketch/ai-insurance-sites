@@ -11,6 +11,8 @@ let editingHistoryIndex = null;
 let activeContractFilter = "all";
 let contractsColumnAvailable = true;
 let calendarDate = new Date();
+let activeTaskFilter = "all";
+let activeTaskSort = "urgent";
 
 const $ = id => document.getElementById(id);
 const today = () => new Date().toISOString().slice(0,10);
@@ -67,26 +69,72 @@ function customerTasks(customer){
   if(birthday){const mmdd=birthday.slice(5); const year=today().slice(0,4); let due=`${year}-${mmdd}`; if(due<today()) due=`${Number(year)+1}-${mmdd}`; add(`birthday:${due}`,addDays(due,-7),`생일 7일 전 연락 · 생일 ${mmdd.replace("-","월 ")}일`,`생일`); add(`birthday_today:${due}`,due,`생일 축하 연락`,`생일`);}
   return items;
 }
-function getAllTasks(){ return customers.flatMap(customerTasks).sort((a,b)=>a.due.localeCompare(b.due)); }
-function completeTask(unique){ const completed=readCompletedTasks(); completed[unique]=new Date().toISOString(); writeCompletedTasks(completed); renderTasks(); }
+function taskCategory(task){
+  const badge=String(task.badge||"");
+  if(badge.includes("자동차")) return "자동차";
+  if(badge.includes("생일")) return "생일";
+  if(badge.includes("미접촉")) return "미접촉";
+  if(badge.includes("연락")) return "연락";
+  return "계약";
+}
+function getAllTasks(){
+  let list=customers.flatMap(customerTasks);
+  if(activeTaskFilter!=="all") list=list.filter(t=>taskCategory(t)===activeTaskFilter);
+  if(activeTaskSort==="name") list.sort((a,b)=>(a.customer.name||"").localeCompare(b.customer.name||"","ko"));
+  else if(activeTaskSort==="due") list.sort((a,b)=>a.due.localeCompare(b.due));
+  else list.sort((a,b)=>(b.overdue-a.overdue)||a.due.localeCompare(b.due));
+  return list;
+}
+function completeTask(unique){ const completed=readCompletedTasks(); completed[unique]=new Date().toISOString(); writeCompletedTasks(completed); renderTasks(); renderDashboard(); }
 function renderTasks(){
   const tasks=getAllTasks();
-  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=tasks.length; if($("navCallCount")) $("navCallCount").textContent=new Set(tasks.map(t=>String(t.customer.id))).size;
-  $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">오늘 처리할 자동 업무가 없습니다.</div>';
+  const allCount=customers.flatMap(customerTasks).length;
+  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=allCount;
+  $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item ${t.overdue>=7?'task-critical':''}"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge category-${taskCategory(t)}">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><a class="task-call" href="tel:${esc(cleanPhone(t.customer.phone))}">전화</a><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">선택한 조건에 해당하는 업무가 없습니다.</div>';
   $("taskList")._tasks=tasks;
 }
-function showListView(){ $("formView").classList.add("hidden"); $("listView").classList.remove("hidden"); $("taskPanel").classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); }
-function showFormView(){ $("listView").classList.add("hidden"); $("taskPanel").classList.add("hidden"); $("formView").classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); setTimeout(()=>$('name').focus(),50); }
+function monthKey(date){return dateOnly(date).slice(0,7)}
+function lastMonths(count=6){const out=[];const base=new Date();for(let i=count-1;i>=0;i--){const d=new Date(base.getFullYear(),base.getMonth()-i,1);out.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`)}return out}
+function renderDashboard(){
+  if(!$("dashboardOverview")) return;
+  const tasks=customers.flatMap(customerTasks).sort((a,b)=>(b.overdue-a.overdue)||a.due.localeCompare(b.due));
+  const priority=tasks.slice(0,5);
+  $("priorityCount").textContent=`${tasks.length}건`;
+  $("priorityList").innerHTML=priority.length?priority.map(t=>`<button class="priority-item" data-priority-id="${esc(t.customer.id)}"><span class="priority-icon">${taskCategory(t)==='연락'?'☎':taskCategory(t)==='생일'?'🎂':taskCategory(t)==='자동차'?'🚗':taskCategory(t)==='미접촉'?'!':'✓'}</span><span><b>${esc(t.customer.name)}</b><small>${esc(t.title)}</small></span><em>${t.overdue?`${t.overdue}일 지남`:'오늘'}</em></button>`).join(''):'<div class="dashboard-empty">오늘 긴급한 업무가 없습니다.</div>';
+  const month=today().slice(0,7); const monthContracts=customers.flatMap(c=>getContracts(c).map(x=>({...x,customer:c}))).filter(c=>monthKey(c.date)===month);
+  const newCustomers=customers.filter(c=>monthKey(c.created_at)===month).length;
+  const contractedCustomers=new Set(monthContracts.map(x=>String(x.customer.id))).size;
+  const conversion=newCustomers?Math.round(contractedCustomers/newCustomers*100):0;
+  $("monthlySummary").innerHTML=`<div><small>신규 고객</small><strong>${newCustomers}명</strong></div><div><small>신규 계약</small><strong>${monthContracts.length}건</strong></div><div><small>월보험료</small><strong>${formatWon(monthContracts.reduce((s,c)=>s+num(c.amount),0))}</strong></div><div><small>단순 전환율</small><strong>${conversion}%</strong></div>`;
+  const attention=[];
+  customers.forEach(c=>{const ins=getInsuranceInfo(c); const auto=daysUntil(ins.auto_expiry_date); if(auto!==null&&auto>=0&&auto<=30)attention.push({id:c.id,name:c.name,text:`자동차보험 만기 ${auto}일 전`,days:auto}); const noTouch=daysBetween(getLastTouchDate(c));if(noTouch>=14)attention.push({id:c.id,name:c.name,text:`마지막 상담 후 ${noTouch}일`,days:noTouch});});
+  attention.sort((a,b)=>a.days-b.days);
+  $("attentionList").innerHTML=attention.slice(0,6).map(x=>`<button data-attention-id="${esc(x.id)}"><b>${esc(x.name)}</b><span>${esc(x.text)}</span></button>`).join('')||'<div class="dashboard-empty">주의가 필요한 고객이 없습니다.</div>';
+}
+function renderStatistics(){
+  if(!$("statisticsView")) return;
+  const months=lastMonths(6); const data=months.map(m=>{const contracts=customers.flatMap(getContracts).filter(c=>monthKey(c.date)===m);return {m,count:contracts.length,amount:contracts.reduce((s,c)=>s+num(c.amount),0)}}); const max=Math.max(1,...data.map(x=>x.amount));
+  $("monthlyChart").innerHTML=data.map(x=>`<div class="bar-col"><div class="bar-value">${formatWon(x.amount)}</div><div class="bar-track"><div class="bar-fill" style="height:${Math.max(4,x.amount/max*100)}%"></div></div><b>${Number(x.m.slice(5))}월</b><small>${x.count}건</small></div>`).join('');
+  const breakdown=(id,groups)=>{const total=Math.max(1,groups.reduce((s,x)=>s+x.count,0));$(id).innerHTML=groups.sort((a,b)=>b.count-a.count).map(x=>`<div class="breakdown-row"><div><b>${esc(x.label)}</b><span>${x.count}명</span></div><div class="progress"><i style="width:${x.count/total*100}%"></i></div><em>${Math.round(x.count/total*100)}%</em></div>`).join('')||'<div class="dashboard-empty">데이터가 없습니다.</div>'};
+  const countBy=(fn)=>{const map={};customers.forEach(c=>{const key=fn(c)||'미입력';map[key]=(map[key]||0)+1});return Object.entries(map).map(([label,count])=>({label,count}))};
+  breakdown('statusStats',countBy(c=>c.status));
+  breakdown('sourceStats',countBy(c=>c.source));
+  breakdown('ageStats',countBy(c=>c.age_group));
+}
+function showListView(){ $("formView").classList.add("hidden"); $("formView").setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
+function showFormView(){ $("formView").classList.remove("hidden"); $("formView").setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; setTimeout(()=>$("name")?.focus(),50); }
 
 
 let crmView="dashboard";
 function applyCrmView(view){
   crmView=view;
-  document.body.classList.remove("page-mode-dashboard","page-mode-customers","page-mode-tasks","page-mode-calls","page-mode-calendar","page-mode-contracts","page-mode-recruiting");
+  document.body.classList.remove("page-mode-dashboard","page-mode-customers","page-mode-tasks","page-mode-calls","page-mode-calendar","page-mode-statistics","page-mode-contracts","page-mode-recruiting");
   document.body.classList.add(`page-mode-${view}`);
   if($("calendarView")) $("calendarView").classList.toggle("hidden",view!=="calendar");
-  if($("listView")) $("listView").classList.toggle("hidden",view==="calendar");
+  if($("statisticsView")) $("statisticsView").classList.toggle("hidden",view!=="statistics");
+  if($("listView")) $("listView").classList.toggle("hidden",view==="calendar"||view==="statistics");
   if(view==="calendar") renderCalendar();
+  if(view==="statistics") renderStatistics();
   if(view==="calls"){todayOnly=true; activeStatsFilter="today";} else if(view!=="tasks"&&view!=="dashboard") todayOnly=false;
   document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.crmView===view));
   const titles={
@@ -95,6 +143,7 @@ function applyCrmView(view){
     tasks:["오늘 할 일","계약 경과일·미접촉 고객·연락 예정일을 자동 계산합니다."],
     calls:["오늘 해야 할 전화","생일·후속 연락·계약 관리·자동차보험 만기 고객을 한 번에 확인합니다."],
     calendar:["업무 캘린더","상담일·생일·계약·자동차보험 만기를 월별로 확인합니다."],
+    statistics:["업무 통계","고객·계약·유입경로 성과를 한눈에 분석합니다."],
     contracts:["계약 관리","계약 완료 고객의 여러 계약과 경과일을 관리합니다."],
     recruiting:["리크루팅 관리","설계사 지원자와 리크루팅 유입 고객을 관리합니다."]
   };
@@ -222,7 +271,8 @@ function render(){
       <td class="money">${formatWon(contractTotal(c))}</td>
       <td title="${esc(c.memo||c.message||"")}">${esc((c.memo||c.message||"").slice(0,24))}</td>
       <td><div class="actions-cell">
-        <button type="button" class="icon-btn" data-action="edit" data-id="${esc(c.id)}">수정</button>
+        <button type="button" class="icon-btn customer-open-btn" data-action="open" data-id="${esc(c.id)}">상담·계약</button>
+        <button type="button" class="icon-btn" data-action="edit" data-id="${esc(c.id)}">기본정보</button>
         <button type="button" class="icon-btn del" data-action="delete" data-id="${esc(c.id)}">삭제</button>
       </div></td>
     </tr>`;
@@ -242,6 +292,8 @@ function render(){
   renderPagination(totalPages);
   updateSelectAll(pageList);
   renderTasks();
+  renderDashboard();
+  if(crmView==="statistics") renderStatistics();
 }
 
 function renderPagination(totalPages){
@@ -264,7 +316,15 @@ function updateSelectAll(pageList){
 }
 
 function populateReferrers(selected=""){const s=$("referrerId"); if(!s)return; s.innerHTML='<option value="">없음</option>'+customers.map(c=>`<option value="${esc(c.id)}">${esc(c.name||"이름없음")} · ${esc(c.phone||"")}</option>`).join(""); s.value=selected||"";}
-function clearForm(){$("customerForm").reset();$("customerId").value="";$("formTitle").textContent="신규 고객 등록";$("status").value="신규";$("source").value="CRM";$("customerGrade").value="B";populateReferrers();toggleAutoInsuranceBox();}
+function clearForm(){ $("customerForm").reset(); $("customerId").value=""; $("formTitle").textContent="신규 고객 등록"; $("status").value="신규"; $("source").value="DB"; $("customerGrade").value="B"; $("birthday").value=""; $("age").value=""; $("landingSourceField").classList.add("hidden"); populateReferrers(); }
+function syncBirthday(){
+  const y=$("birthYear").value.replace(/\D/g,"").slice(0,4),m=$("birthMonth").value.replace(/\D/g,"").slice(0,2),d=$("birthDay").value.replace(/\D/g,"").slice(0,2);
+  $("birthYear").value=y; $("birthMonth").value=m; $("birthDay").value=d;
+  if(y.length===4&&m.length===2&&d.length===2){ const date=`${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`; const parsed=parseLocalDate(date); if(parsed&&parsed.getFullYear()===Number(y)&&parsed.getMonth()+1===Number(m)&&parsed.getDate()===Number(d)){ $("birthday").value=date; const now=new Date(); let age=now.getFullYear()-Number(y); const before=(now.getMonth()+1<Number(m))||(now.getMonth()+1===Number(m)&&now.getDate()<Number(d)); if(before)age--; $("age").value=age<20?"10대 이하":age>=60?"60대 이상":`${Math.floor(age/10)*10}대`; return; }}
+  $("birthday").value=""; $("age").value="";
+}
+function setBirthdayParts(value=""){ const [y="",m="",d=""]=String(value||"").split("-"); $("birthYear").value=y; $("birthMonth").value=m; $("birthDay").value=d; syncBirthday(); }
+function toggleLandingSource(){ $("landingSourceField").classList.toggle("hidden",$("source").value!=="랜딩페이지"); if($("source").value!=="랜딩페이지") $("landingSource").value=""; }
 function getSensitiveInfo(customer){const raw=customer?.payment_identity_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {}}
 function getProfileInfo(customer){const raw=customer?.profile_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {}}
 function getInsuranceInfo(customer){const raw=customer?.insurance_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {types:[]}}
@@ -279,29 +339,10 @@ function editCustomer(id){
   $("phone").value=c.phone||"";
   $("age").value=c.age_group||"";
   $("status").value=c.status||"신규";
-  $("source").value=c.source||"CRM";
+  $("source").value=c.source||"DB";
   $("availableTime").value=c.available_time||"";
-  $("followUp").value=c.follow_up_date||"";
-  $("interest").value=c.interest||"";
-  const profile=getProfileInfo(c);
-  $("birthday").value=profile.birthday||""; $("customerGrade").value=profile.grade||"B"; populateReferrers(profile.referrer_id||""); $("familyInfo").value=profile.family_info||"";
-  const sensitive=getSensitiveInfo(c);
-  $("paymentBank").value=sensitive.payment_bank||"";
-  $("paymentAccount").value=sensitive.payment_account||"";
-  $("paymentDay").value=sensitive.payment_day||"";
-  $("cardNumber").value=sensitive.card_number||"";
-  $("cardExpiry").value=sensitive.card_expiry||"";
-  $("identityVerified").checked=Boolean(sensitive.identity_verified);
-  $("driverLicense").value=sensitive.driver_license||"";
-  $("residentIssueDate").value=sensitive.resident_issue_date||"";
-  const insurance=getInsuranceInfo(c);
-  const types=Array.isArray(insurance.types)?insurance.types:[];
-  document.querySelectorAll('input[name="insuranceType"]').forEach(x=>x.checked=types.includes(x.value));
-  $("autoCompany").value=insurance.auto_company||"";
-  $("vehicleNumber").value=insurance.vehicle_number||"";
-  $("autoExpiryDate").value=insurance.auto_expiry_date||"";
-  $("autoRenewalStatus").value=insurance.auto_renewal_status||"갱신 예정";
-  toggleAutoInsuranceBox();
+    const profile=getProfileInfo(c);
+   setBirthdayParts(profile.birthday||""); $("customerGrade").value=profile.grade||"B"; populateReferrers(profile.referrer_id||""); $("familyInfo").value=profile.family_info||""; $("landingSource").value=profile.landing_source||""; toggleLandingSource();
   $("memo").value=c.memo||c.message||"";
   $("formTitle").textContent="고객 정보 수정";
   showFormView();
@@ -366,11 +407,15 @@ function openConsultation(id){
   $("consultGrade").textContent=profile.grade||"B"; $("consultBirthday").textContent=profile.birthday||"-"; $("consultReferrer").textContent=referrer?.name||"-"; $("consultFamily").textContent=profile.family_info||"-";
   $("consultAutoExpiry").innerHTML=expiry?(esc(expiry)+(remain!==null&&remain>=0?` <span class="${remain<=30?'expiry-alert':''}">(D-${remain})</span>`:" 만기 경과")):"-";
   $("consultFollowUpInput").value=customer.follow_up_date||"";
+  const sensitive=getSensitiveInfo(customer);
+  $("consultPaymentBank").value=sensitive.payment_bank||""; $("consultPaymentAccount").value=sensitive.payment_account||""; $("consultPaymentDay").value=sensitive.payment_day||""; $("consultCardNumber").value=sensitive.card_number||""; $("consultCardExpiry").value=sensitive.card_expiry||""; $("consultIdentityVerified").checked=Boolean(sensitive.identity_verified); $("consultDriverLicense").value=sensitive.driver_license||""; $("consultResidentIssueDate").value=sensitive.resident_issue_date||"";
   $("consultMemo").value="";
   editingHistoryIndex=null;
   $("consultSave").textContent="상담 기록 저장";
   renderConsultHistory(customer);
   renderContracts(customer);
+  $("detailContractCount").textContent=getContracts(customer).length;
+  setCustomerDetailTab("overview");
 
   $("consultModal").classList.add("open");
   $("consultModal").setAttribute("aria-hidden","false");
@@ -527,6 +572,13 @@ async function saveConsultFollowUp(){
 }
 
 
+async function saveSensitiveInfo(){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  const payload={payment_bank:$("consultPaymentBank").value.trim(),payment_account:$("consultPaymentAccount").value.trim(),payment_day:$("consultPaymentDay").value,card_number:$("consultCardNumber").value.replace(/\s|-/g,""),card_expiry:$("consultCardExpiry").value.trim(),identity_verified:$("consultIdentityVerified").checked,driver_license:$("consultDriverLicense").value.trim(),resident_issue_date:$("consultResidentIssueDate").value||null};
+  const btn=$("sensitiveSave"); btn.disabled=true; const {error}=await db.from("customers").update({payment_identity_info:payload}).eq("id",customer.id); btn.disabled=false;
+  if(error){alert("결제·신분증 정보 저장 실패: "+error.message);return;} customer.payment_identity_info=payload; alert("결제정보와 신분증 확인 내용이 저장되었습니다.");
+}
+
 function renderContracts(customer){
   const contracts=getContracts(customer);
   const warning=contractsColumnAvailable?"":'<div class="schema-warning">여러 계약 저장을 사용하려면 ZIP 안의 <b>Supabase_계약기능_SQL.txt</b> 내용을 한 번 실행해야 합니다.</div>';
@@ -537,13 +589,13 @@ function renderContracts(customer){
         <div class="field"><label>보험회사</label><input data-contract-field="company" value="${esc(contract.company||"")}" placeholder="보험회사"></div>
         <div class="field"><label>상품명</label><input data-contract-field="product" value="${esc(contract.product||"")}" placeholder="상품명"></div>
         <div class="field"><label>계약일</label><input type="date" data-contract-field="date" value="${esc(dateOnly(contract.date))}"></div>
-        <div class="field"><label>계약금액</label><input type="number" min="0" step="1000" data-contract-field="amount" value="${num(contract.amount)||""}" placeholder="원"></div>
+        <div class="field"><label>계약만료일</label><input type="date" data-contract-field="expiry_date" value="${esc(dateOnly(contract.expiry_date))}"></div><div class="field"><label>보험기간</label><input data-contract-field="insurance_period" value="${esc(contract.insurance_period||"")}" placeholder="예: 20년 / 종신"></div><div class="field"><label>납입기간</label><input data-contract-field="payment_period" value="${esc(contract.payment_period||"")}" placeholder="예: 10년납"></div><div class="field"><label>월보험료</label><input type="number" min="0" step="1000" data-contract-field="amount" value="${num(contract.amount)||""}" placeholder="원"></div>
         <div class="field"><label>계약상태</label><select data-contract-field="status"><option ${contract.status==="유지"?"selected":""}>유지</option><option ${contract.status==="유지관리"?"selected":""}>유지관리</option><option ${contract.status==="확인필요"?"selected":""}>확인필요</option><option ${contract.status==="실효위험"?"selected":""}>실효위험</option><option ${contract.status==="해지"?"selected":""}>해지</option></select></div>
       </div>
       <div class="contract-actions"><button type="button" class="btn danger" data-contract-action="delete" data-contract-index="${index}">계약 삭제</button><button type="button" class="btn primary" data-contract-action="save" data-contract-index="${index}">계약 저장</button></div>
     </div>`).join(""):'<div class="contract-empty">등록된 계약이 없습니다. 위의 <b>＋ 계약 추가</b>를 눌러주세요.</div>');
 }
-function newContract(){return {id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),company:"",product:"",date:"",amount:0,status:"유지"}}
+function newContract(){return {id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),company:"",product:"",date:"",expiry_date:"",insurance_period:"",payment_period:"",amount:0,status:"유지"}}
 async function persistContracts(customer,nextContracts){
   const {error}=await db.from("customers").update({contracts:nextContracts}).eq("id",customer.id);
   if(error){
@@ -554,6 +606,7 @@ async function persistContracts(customer,nextContracts){
   }
   contractsColumnAvailable=true;
   customer.contracts=nextContracts;
+  $("detailContractCount").textContent=nextContracts.length;
   customer.status=nextContracts.length?"계약완료":customer.status;
   await db.from("customers").update({status:customer.status}).eq("id",customer.id);
   renderContracts(customer); render(); renderTasks();
@@ -602,44 +655,18 @@ $("customerBody").addEventListener("click",async event=>{
   const id=button.dataset.id;
   const action=button.dataset.action;
 
+  if(action==="open") openConsultation(id);
   if(action==="edit") editCustomer(id);
   if(action==="delete") await deleteCustomer(id);
 });
-$("cardNumber").addEventListener("input",e=>{const digits=e.target.value.replace(/\D/g,"").slice(0,16);e.target.value=digits.replace(/(.{4})/g,"$1 ").trim();});
-$("cardExpiry").addEventListener("input",e=>{const digits=e.target.value.replace(/\D/g,"").slice(0,4);e.target.value=digits.length>2?digits.slice(0,2)+"/"+digits.slice(2):digits;});
-$("paymentAccount").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9-]/g,"");});
-$("autoInsuranceCheck").addEventListener("change",toggleAutoInsuranceBox);
 
 $("customerForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const id=$("customerId").value;
   const payload={
-    name:$("name").value.trim(),
-    phone:$("phone").value.trim(),
-    age_group:$("age").value,
-    status:$("status").value,
-    source:$("source").value||"CRM",
-    available_time:$("availableTime").value.trim(),
-    follow_up_date:$("followUp").value||null,
-    interest:$("interest").value.trim(),
-    profile_info:{birthday:$("birthday").value||null,grade:$("customerGrade").value||"B",referrer_id:$("referrerId").value||null,family_info:$("familyInfo").value.trim()},
-    insurance_info:{
-      types:[...document.querySelectorAll('input[name="insuranceType"]:checked')].map(x=>x.value),
-      auto_company:$("autoCompany").value.trim(),
-      vehicle_number:$("vehicleNumber").value.trim(),
-      auto_expiry_date:$("autoExpiryDate").value||null,
-      auto_renewal_status:$("autoRenewalStatus").value
-    },
-    payment_identity_info:{
-      payment_bank:$("paymentBank").value.trim(),
-      payment_account:$("paymentAccount").value.trim(),
-      payment_day:$("paymentDay").value,
-      card_number:$("cardNumber").value.replace(/\s|-/g,""),
-      card_expiry:$("cardExpiry").value.trim(),
-      identity_verified:$("identityVerified").checked,
-      driver_license:$("driverLicense").value.trim(),
-      resident_issue_date:$("residentIssueDate").value||null
-    },
+    name:$("name").value.trim(), phone:$("phone").value.trim(), age_group:$("age").value, status:$("status").value,
+    source:$("source").value||"DB", available_time:$("availableTime").value.trim(),
+    profile_info:{birthday:$("birthday").value||null,grade:$("customerGrade").value||"B",referrer_id:$("referrerId").value||null,family_info:$("familyInfo").value.trim(),landing_source:$("source").value==="랜딩페이지"?$("landingSource").value.trim():""},
     memo:$("memo").value.trim()
   };
   const res=id
@@ -670,6 +697,11 @@ $("customerForm").addEventListener("submit",async e=>{
 $("cancelBtn").addEventListener("click",()=>{clearForm();showListView();});
 $("newBtn").addEventListener("click",()=>{clearForm();showFormView();});
 $("backToListBtn").addEventListener("click",()=>{clearForm();showListView();});
+document.querySelectorAll(".task-filter").forEach(button=>button.addEventListener("click",()=>{activeTaskFilter=button.dataset.taskFilter;document.querySelectorAll(".task-filter").forEach(b=>b.classList.toggle("active",b===button));renderTasks();}));
+$("taskSort")?.addEventListener("change",()=>{activeTaskSort=$("taskSort").value;renderTasks();});
+$("priorityList")?.addEventListener("click",e=>{const b=e.target.closest("[data-priority-id]");if(b)openConsultation(b.dataset.priorityId);});
+$("attentionList")?.addEventListener("click",e=>{const b=e.target.closest("[data-attention-id]");if(b)openConsultation(b.dataset.attentionId);});
+
 $("taskList").addEventListener("click",event=>{
   const button=event.target.closest("button[data-task-action]"); if(!button)return;
   const task=($("taskList")._tasks||[])[Number(button.dataset.taskIndex)]; if(!task)return;
@@ -766,6 +798,20 @@ document.querySelectorAll(".contract-tab").forEach(button=>button.addEventListen
   currentPage=1; render();
 }));
 
+
+function setCustomerDetailTab(tab){
+  document.querySelectorAll(".customer-detail-tab").forEach(button=>{
+    button.classList.toggle("active",button.dataset.detailTab===tab);
+  });
+  document.querySelectorAll(".customer-detail-panel").forEach(panel=>{
+    panel.classList.toggle("active",panel.dataset.detailPanel===tab);
+  });
+}
+
+document.querySelectorAll(".customer-detail-tab").forEach(button=>{
+  button.addEventListener("click",()=>setCustomerDetailTab(button.dataset.detailTab));
+});
+
 $("consultClose").addEventListener("click",closeConsultation);
 $("consultCancel").addEventListener("click",closeConsultation);
 $("consultSave").addEventListener("click",saveConsultation);
@@ -787,9 +833,7 @@ $("consultModal").addEventListener("click",event=>{
 });
 
 document.addEventListener("keydown",event=>{
-  if(event.key==="Escape"&&$("consultModal").classList.contains("open")){
-    closeConsultation();
-  }
+  if(event.key==="Escape"&&$("consultModal").classList.contains("open")){ closeConsultation(); } else if(event.key==="Escape"&&!$("formView").classList.contains("hidden")){ clearForm(); showListView(); }
 });
 
 $("pagination").addEventListener("click",event=>{
@@ -820,6 +864,14 @@ $("selectAll").addEventListener("change",event=>{
 });
 
 document.querySelector('.stat-filter[data-filter="all"]')?.classList.add("active");
+
+["birthYear","birthMonth","birthDay"].forEach((id,index)=>$(id).addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,""); if((index===0&&e.target.value.length===4)||(index>0&&e.target.value.length===2))syncBirthday(); if(index===0&&e.target.value.length===4)$("birthMonth").focus(); if(index===1&&e.target.value.length===2)$("birthDay").focus();}));
+$("source").addEventListener("change",toggleLandingSource);
+$("formView").addEventListener("click",e=>{if(e.target===$("formView")){clearForm();showListView();}});
+$("sensitiveSave").addEventListener("click",saveSensitiveInfo);
+$("consultCardNumber").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"").slice(0,16);e.target.value=d.replace(/(.{4})/g,"$1 ").trim();});
+$("consultCardExpiry").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"").slice(0,4);e.target.value=d.length>2?d.slice(0,2)+"/"+d.slice(2):d;});
+$("consultPaymentAccount").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9-]/g,"");});
 checkSession();
 
 $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()-1,1);renderCalendar();});
