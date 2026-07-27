@@ -61,7 +61,10 @@ function markPaymentDirty(){setSectionStatus("paymentSaveStatus",sameData(curren
 function markIdentityDirty(){setSectionStatus("identitySaveStatus",sameData(currentIdentityInfo(),initialIdentityInfo)?"saved":"dirty");}
 
 const $ = id => document.getElementById(id);
-const today = () => new Date().toISOString().slice(0,10);
+const today = () => {
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+};
 const esc = s => String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const num = v => Number(v || 0);
 const formatWon = v => Math.round(num(v)).toLocaleString("ko-KR") + "원";
@@ -185,11 +188,13 @@ function renderDashboard(){
   const conversion=newCustomers?Math.round(contractedCustomers/newCustomers*100):0;
   $("monthlySummary").innerHTML=`<div><small>신규 고객</small><strong>${newCustomers}명</strong></div><div><small>신규 계약</small><strong>${monthContracts.length}건</strong></div><div><small>월보험료</small><strong>${formatWon(monthContracts.reduce((s,c)=>s+num(c.amount),0))}</strong></div><div><small>단순 전환율</small><strong>${conversion}%</strong></div>`;
   const attention=[];
+  const todayDate=today();
   customers.forEach(customer=>{
     const promisedDate=dateOnly(customer.follow_up_date);
-    if(!promisedDate||promisedDate>=today())return;
+    // 약속일 다음 날부터, 약속일 이후 상담기록이 없을 때 자동 표시
+    if(!promisedDate||promisedDate>=todayDate)return;
     if(hasConsultationOnOrAfter(customer,promisedDate))return;
-    const overdueDays=daysBetween(promisedDate);
+    const overdueDays=Math.max(1,daysBetween(promisedDate,todayDate));
     attention.push({
       id:customer.id,
       name:customer.name,
@@ -480,7 +485,26 @@ async function handleFamilyAction(event){
   if(button.dataset.familyAction==="delete"){if(confirm("이 가족 연결을 삭제할까요?")){const next=[...getFamilyMembers(customer)];next.splice(index,1);if(await saveFamilyMembers(next))showSaveToast("가족 정보가 저장되었습니다.");}}
   if(button.dataset.familyAction==="open"&&member?.customer_id){openConsultation(member.customer_id);setCustomerDetailTab("overview");}
 }
-function getInsuranceInfo(customer){const raw=customer?.insurance_info;if(raw&&typeof raw==="object")return raw;if(typeof raw==="string"){try{return JSON.parse(raw)||{}}catch(e){}}return {types:[]}}
+function getInsuranceInfo(customer){
+  let info={types:[]};
+  const raw=customer?.insurance_info;
+  if(raw&&typeof raw==="object") info={...info,...raw};
+  else if(typeof raw==="string"){try{info={...info,...(JSON.parse(raw)||{})};}catch(e){}}
+  // 계약관리에서 입력한 자동차보험 정보를 대시보드/오늘 할 일과 자동 연동
+  const autoContract=[...getContracts(customer)].reverse().find(c=>c&&(
+    c.is_auto_insurance||c.auto_expiry_date||c.vehicle_number||String(c.product||"").includes("자동차")
+  ));
+  if(autoContract){
+    info={
+      ...info,
+      types:Array.from(new Set([...(Array.isArray(info.types)?info.types:[]),"자동차보험"])),
+      vehicle_number:autoContract.vehicle_number||info.vehicle_number||"",
+      auto_expiry_date:dateOnly(autoContract.auto_expiry_date||autoContract.expiry_date||info.auto_expiry_date),
+      auto_renewal_status:autoContract.auto_renewal_status||info.auto_renewal_status||"갱신 예정"
+    };
+  }
+  return info;
+}
 function daysUntil(value){const a=parseLocalDate(today()),b=parseLocalDate(value);return a&&b?Math.ceil((b-a)/86400000):null}
 function isAutoRenewalDue(customer){const info=getInsuranceInfo(customer);const d=daysUntil(info.auto_expiry_date);return info.auto_expiry_date&&info.auto_renewal_status!=="갱신 완료"&&d!==null&&d>=0&&d<=30}
 function toggleAutoInsuranceBox(){const checked=$("autoInsuranceCheck").checked;$("autoInsuranceBox").classList.toggle("hidden",!checked)}
@@ -800,10 +824,19 @@ function renderContracts(customer){
         <div class="field"><label>계약만료일</label><input type="text" inputmode="numeric" data-smart-date="true" placeholder="YYYY-MM-DD" data-contract-field="expiry_date" value="${esc(dateOnly(contract.expiry_date))}"></div><div class="field"><label>보험기간</label><input data-contract-field="insurance_period" value="${esc(contract.insurance_period||"")}" placeholder="예: 20년 / 종신"></div><div class="field"><label>납입기간</label><input data-contract-field="payment_period" value="${esc(contract.payment_period||"")}" placeholder="예: 10년납"></div><div class="field"><label>월보험료</label><input type="number" min="0" step="1000" data-contract-field="amount" value="${num(contract.amount)||""}" placeholder="원"></div>
         <div class="field"><label>계약상태</label><select data-contract-field="status"><option ${contract.status==="유지"?"selected":""}>유지</option><option ${contract.status==="유지관리"?"selected":""}>유지관리</option><option ${contract.status==="확인필요"?"selected":""}>확인필요</option><option ${contract.status==="실효위험"?"selected":""}>실효위험</option><option ${contract.status==="해지"?"selected":""}>해지</option></select></div>
       </div>
+      <div class="contract-auto-box">
+        <label class="contract-auto-check"><input type="checkbox" data-contract-field="is_auto_insurance" ${contract.is_auto_insurance||contract.auto_expiry_date||String(contract.product||"").includes("자동차")?"checked":""}> 자동차보험 계약</label>
+        <div class="contract-auto-grid">
+          <div class="field"><label>차량번호</label><input data-contract-field="vehicle_number" value="${esc(contract.vehicle_number||"")}" placeholder="예: 12가3456"></div>
+          <div class="field"><label>자동차보험 만기일</label><input type="text" inputmode="numeric" data-smart-date="true" placeholder="YYYY-MM-DD" data-contract-field="auto_expiry_date" value="${esc(dateOnly(contract.auto_expiry_date||""))}"></div>
+          <div class="field"><label>갱신 상태</label><select data-contract-field="auto_renewal_status"><option ${contract.auto_renewal_status!=="갱신 완료"?"selected":""}>갱신 예정</option><option ${contract.auto_renewal_status==="갱신 완료"?"selected":""}>갱신 완료</option></select></div>
+        </div>
+        <small>만기일을 저장하면 대시보드 자동차 만기 30일 이내와 오늘 할 일에 자동 반영됩니다.</small>
+      </div>
       <div class="contract-actions"><button type="button" class="btn danger" data-contract-action="delete" data-contract-index="${index}">계약 삭제</button><button type="button" class="btn primary" data-contract-action="save" data-contract-index="${index}">계약 저장</button></div>
     </div>`).join(""):'<div class="contract-empty">등록된 계약이 없습니다. 위의 <b>＋ 계약 추가</b>를 눌러주세요.</div>');
 }
-function newContract(){return {id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),company:"",product:"",date:"",expiry_date:"",insurance_period:"",payment_period:"",amount:0,status:"유지"}}
+function newContract(){return {id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),company:"",product:"",date:"",expiry_date:"",insurance_period:"",payment_period:"",amount:0,status:"유지",is_auto_insurance:false,vehicle_number:"",auto_expiry_date:"",auto_renewal_status:"갱신 예정"}}
 async function persistContracts(customer,nextContracts){
   const {error}=await db.from("customers").update({contracts:nextContracts}).eq("id",customer.id);
   if(error){
@@ -816,8 +849,20 @@ async function persistContracts(customer,nextContracts){
   customer.contracts=nextContracts;
   $("detailContractCount").textContent=nextContracts.length;
   customer.status=nextContracts.length?"계약완료":customer.status;
-  await db.from("customers").update({status:customer.status}).eq("id",customer.id);
-  renderContracts(customer); render(); renderTasks();
+  const autoContract=[...nextContracts].reverse().find(c=>c.is_auto_insurance&&c.auto_expiry_date);
+  let insuranceInfo=getInsuranceInfo({...customer,contracts:[]});
+  if(autoContract){
+    insuranceInfo={
+      ...insuranceInfo,
+      types:Array.from(new Set([...(Array.isArray(insuranceInfo.types)?insuranceInfo.types:[]),"자동차보험"])),
+      vehicle_number:autoContract.vehicle_number||"",
+      auto_expiry_date:dateOnly(autoContract.auto_expiry_date),
+      auto_renewal_status:autoContract.auto_renewal_status||"갱신 예정"
+    };
+  }
+  customer.insurance_info=insuranceInfo;
+  await db.from("customers").update({status:customer.status,insurance_info:insuranceInfo}).eq("id",customer.id);
+  renderContracts(customer); render(); renderTasks(); renderDashboard();
   return true;
 }
 async function addContract(){
@@ -830,7 +875,16 @@ async function saveContractFromCard(index){
   const card=$("contractList").querySelector(`[data-contract-index="${index}"]`); if(!card)return;
   const current=[...getContracts(customer)];
   const updated={...current[index]};
-  card.querySelectorAll("[data-contract-field]").forEach(input=>{updated[input.dataset.contractField]=input.dataset.contractField==="amount"?num(input.value):input.value;});
+  card.querySelectorAll("[data-contract-field]").forEach(input=>{
+    const field=input.dataset.contractField;
+    updated[field]=input.type==="checkbox"?input.checked:(field==="amount"?num(input.value):input.value);
+  });
+  if(updated.is_auto_insurance){
+    updated.auto_expiry_date=formatSmartDate(updated.auto_expiry_date)||updated.auto_expiry_date;
+    if(!updated.auto_expiry_date){alert("자동차보험 만기일을 입력해주세요.");return;}
+  }else{
+    updated.vehicle_number=""; updated.auto_expiry_date=""; updated.auto_renewal_status="갱신 예정";
+  }
   if(!updated.date){alert("계약일을 입력해주세요.");return;}
   if(sameData(updated,current[index])){showSaveToast("변경된 내용이 없습니다.","info");return;}
   current[index]=updated;
@@ -1169,7 +1223,7 @@ const missedScheduleTitle = document.getElementById("missedScheduleTitle");
 if (missedScheduleTitle) missedScheduleTitle.textContent = "놓치기 쉬운 일정 (약속일경과)";
 
 
-// 5.4.20: 숫자 날짜 입력을 YYYY-MM-DD로 자동 변환합니다.
+// 5.4.21: 숫자 날짜 입력을 YYYY-MM-DD로 자동 변환합니다.
 // 지원: 20260805 -> 2026-08-05, 260805 -> 2026-08-05
 function normalizeSmartDate(value){
   const raw=String(value||"").trim();
