@@ -429,7 +429,7 @@ function updateSelectAll(pageList){
 }
 
 function populateReferrers(selected=""){const s=$("referrerId"); if(!s)return; s.innerHTML='<option value="">없음</option>'+customers.map(c=>`<option value="${esc(c.id)}">${esc(c.name||"이름없음")} · ${esc(c.phone||"")}</option>`).join(""); s.value=selected||"";}
-function clearForm(){ $("customerForm").reset(); $("customerId").value=""; $("formTitle").textContent="신규 고객 등록"; $("status").value="신규"; $("source").value="DB"; $("customerGrade").value="B"; $("birthday").value=""; $("age").value=""; $("landingSourceField").classList.add("hidden"); populateReferrers(); }
+function clearForm(){ $("customerForm").reset(); $("customerId").value=""; $("formTitle").textContent="신규 고객 등록"; $("status").value="신규"; $("source").value="DB"; $("customerGrade").value="B"; $("birthday").value=""; $("age").value=""; $("landingSourceField").classList.add("hidden"); $("autoInsuranceBox")?.classList.add("hidden"); populateReferrers(); }
 function syncBirthday(){
   const y=$("birthYear").value.replace(/\D/g,"").slice(0,4),m=$("birthMonth").value.replace(/\D/g,"").slice(0,2),d=$("birthDay").value.replace(/\D/g,"").slice(0,2);
   $("birthYear").value=y; $("birthMonth").value=m; $("birthDay").value=d;
@@ -496,6 +496,13 @@ function editCustomer(id){
   $("availableTime").value=c.available_time||"";
     const profile=getProfileInfo(c);
    setBirthdayParts(profile.birthday||""); $("customerGrade").value=profile.grade||"B"; populateReferrers(profile.referrer_id||""); $("familyInfo").value=profile.family_info||""; $("landingSource").value=profile.landing_source||""; toggleLandingSource();
+  const insurance=getInsuranceInfo(c);
+  const hasAuto=Boolean(insurance.auto_expiry_date||insurance.vehicle_number||insurance.auto_renewal_status);
+  $("autoInsuranceCheck").checked=hasAuto;
+  $("vehicleNumber").value=insurance.vehicle_number||"";
+  $("autoExpiryDate").value=insurance.auto_expiry_date||"";
+  $("autoRenewalStatus").value=insurance.auto_renewal_status||"갱신 예정";
+  toggleAutoInsuranceBox();
   $("memo").value=c.memo||c.message||"";
   $("formTitle").textContent="고객 정보 수정";
   showFormView();
@@ -789,8 +796,8 @@ function renderContracts(customer){
       <div class="contract-grid">
         <div class="field"><label>보험회사</label><input data-contract-field="company" value="${esc(contract.company||"")}" placeholder="보험회사"></div>
         <div class="field"><label>상품명</label><input data-contract-field="product" value="${esc(contract.product||"")}" placeholder="상품명"></div>
-        <div class="field"><label>계약일</label><input type="date" data-contract-field="date" value="${esc(dateOnly(contract.date))}"></div>
-        <div class="field"><label>계약만료일</label><input type="date" data-contract-field="expiry_date" value="${esc(dateOnly(contract.expiry_date))}"></div><div class="field"><label>보험기간</label><input data-contract-field="insurance_period" value="${esc(contract.insurance_period||"")}" placeholder="예: 20년 / 종신"></div><div class="field"><label>납입기간</label><input data-contract-field="payment_period" value="${esc(contract.payment_period||"")}" placeholder="예: 10년납"></div><div class="field"><label>월보험료</label><input type="number" min="0" step="1000" data-contract-field="amount" value="${num(contract.amount)||""}" placeholder="원"></div>
+        <div class="field"><label>계약일</label><input type="text" inputmode="numeric" data-smart-date="true" placeholder="YYYY-MM-DD" data-contract-field="date" value="${esc(dateOnly(contract.date))}"></div>
+        <div class="field"><label>계약만료일</label><input type="text" inputmode="numeric" data-smart-date="true" placeholder="YYYY-MM-DD" data-contract-field="expiry_date" value="${esc(dateOnly(contract.expiry_date))}"></div><div class="field"><label>보험기간</label><input data-contract-field="insurance_period" value="${esc(contract.insurance_period||"")}" placeholder="예: 20년 / 종신"></div><div class="field"><label>납입기간</label><input data-contract-field="payment_period" value="${esc(contract.payment_period||"")}" placeholder="예: 10년납"></div><div class="field"><label>월보험료</label><input type="number" min="0" step="1000" data-contract-field="amount" value="${num(contract.amount)||""}" placeholder="원"></div>
         <div class="field"><label>계약상태</label><select data-contract-field="status"><option ${contract.status==="유지"?"selected":""}>유지</option><option ${contract.status==="유지관리"?"selected":""}>유지관리</option><option ${contract.status==="확인필요"?"selected":""}>확인필요</option><option ${contract.status==="실효위험"?"selected":""}>실효위험</option><option ${contract.status==="해지"?"selected":""}>해지</option></select></div>
       </div>
       <div class="contract-actions"><button type="button" class="btn danger" data-contract-action="delete" data-contract-index="${index}">계약 삭제</button><button type="button" class="btn primary" data-contract-action="save" data-contract-index="${index}">계약 저장</button></div>
@@ -880,6 +887,7 @@ $("customerForm").addEventListener("submit",async e=>{
     name:$("name").value.trim(), phone:enteredPhone, age_group:$("age").value, status:$("status").value,
     source:$("source").value||"DB", available_time:$("availableTime").value.trim(),
     profile_info:{birthday:$("birthday").value||null,grade:$("customerGrade").value||"B",referrer_id:$("referrerId").value||null,family_info:$("familyInfo").value.trim(),landing_source:$("source").value==="랜딩페이지"?$("landingSource").value.trim():""},
+    insurance_info:$("autoInsuranceCheck").checked?{types:["자동차보험"],vehicle_number:$("vehicleNumber").value.trim(),auto_expiry_date:$("autoExpiryDate").value||null,auto_renewal_status:$("autoRenewalStatus").value||"갱신 예정"}:{types:[]},
     memo:$("memo").value.trim()
   };
   const formSaveButton=$("customerForm").querySelector('button[type="submit"]');
@@ -1141,6 +1149,7 @@ document.querySelector('.stat-filter[data-filter="all"]')?.classList.add("active
 
 ["birthYear","birthMonth","birthDay"].forEach((id,index)=>$(id).addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,""); if((index===0&&e.target.value.length===4)||(index>0&&e.target.value.length===2))syncBirthday(); if(index===0&&e.target.value.length===4)$("birthMonth").focus(); if(index===1&&e.target.value.length===2)$("birthDay").focus();}));
 $("source").addEventListener("change",toggleLandingSource);
+$("autoInsuranceCheck")?.addEventListener("change",toggleAutoInsuranceBox);
 $("formView").addEventListener("click",e=>{if(e.target===$("formView")){clearForm();showListView();}});
 $("paymentSave").addEventListener("click",savePaymentInfo);
 $("identitySave").addEventListener("click",saveIdentityInfo);
@@ -1155,6 +1164,74 @@ $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.g
 $("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
 $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});
 
-// 5.4.18: 대시보드 약속일 경과 카드 제목을 항상 정확히 표시합니다.
+// 5.4.19: 대시보드 약속일 경과 카드 제목을 항상 정확히 표시합니다.
 const missedScheduleTitle = document.getElementById("missedScheduleTitle");
 if (missedScheduleTitle) missedScheduleTitle.textContent = "놓치기 쉬운 일정 (약속일경과)";
+
+
+// 5.4.20: 숫자 날짜 입력을 YYYY-MM-DD로 자동 변환합니다.
+// 지원: 20260805 -> 2026-08-05, 260805 -> 2026-08-05
+function normalizeSmartDate(value){
+  const raw=String(value||"").trim();
+  if(!raw)return "";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){
+    const [y,m,d]=raw.split("-").map(Number);
+    const dt=new Date(y,m-1,d);
+    return dt.getFullYear()===y&&dt.getMonth()===m-1&&dt.getDate()===d?raw:null;
+  }
+  const digits=raw.replace(/\D/g,"");
+  let y,m,d;
+  if(digits.length===8){
+    y=Number(digits.slice(0,4));m=Number(digits.slice(4,6));d=Number(digits.slice(6,8));
+  }else if(digits.length===6){
+    y=2000+Number(digits.slice(0,2));m=Number(digits.slice(2,4));d=Number(digits.slice(4,6));
+  }else return null;
+  const dt=new Date(y,m-1,d);
+  if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d)return null;
+  return `${String(y).padStart(4,"0")}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+
+function focusNextFormControl(current){
+  const scope=current.closest("form, .contract-card, .form-grid, .detail-panel, .modal-card")||document;
+  const controls=[...scope.querySelectorAll('input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])')]
+    .filter(el=>el.offsetParent!==null);
+  const index=controls.indexOf(current);
+  if(index>=0&&controls[index+1])controls[index+1].focus();
+}
+
+document.addEventListener("input",event=>{
+  const input=event.target.closest('input[data-smart-date="true"]');
+  if(!input)return;
+  const digits=input.value.replace(/\D/g,"").slice(0,8);
+  // 숫자 8자리가 완성되면 즉시 변환합니다.
+  if(digits.length===8){
+    const normalized=normalizeSmartDate(digits);
+    if(normalized){
+      input.value=normalized;
+      input.dataset.smartDateFormatted="true";
+    }
+  }
+});
+
+document.addEventListener("blur",event=>{
+  const input=event.target.closest('input[data-smart-date="true"]');
+  if(!input||!input.value.trim())return;
+  const normalized=normalizeSmartDate(input.value);
+  if(normalized){
+    input.value=normalized;
+    input.setCustomValidity("");
+  }else{
+    input.setCustomValidity("날짜를 20260805 또는 2026-08-05 형식으로 입력해주세요.");
+  }
+},true);
+
+document.addEventListener("keydown",event=>{
+  const input=event.target.closest('input[data-smart-date="true"]');
+  if(!input||event.key!=="Enter")return;
+  const normalized=normalizeSmartDate(input.value);
+  if(!normalized)return;
+  event.preventDefault();
+  input.value=normalized;
+  input.setCustomValidity("");
+  focusNextFormControl(input);
+});

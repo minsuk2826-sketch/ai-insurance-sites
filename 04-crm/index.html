@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 5.4.18 약속일경과 제목 수정</title>
+  <title>AI보험 CRM 5.4.20 날짜 자동입력</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=5.4.17">
+    <link rel="stylesheet" href="style.css?v=5.4.20">
 
 <style id="crm-5-4-15-critical-ui">
 /* 고객 상세창: 뒤로가기 / 중앙 제목 / 탭 글자 잘림 방지 */
@@ -32,7 +32,7 @@
 <body>
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card">
-    <h1>AI보험 CRM 5.0</h1>
+    <h1>AI보험 CRM 5.4</h1>
     <p>관리자 계정으로 로그인하세요.</p>
     <div class="field"><label>이메일</label><input id="loginEmail" type="email" required></div>
     <div class="field"><label>비밀번호</label><input id="loginPassword" type="password" required></div>
@@ -43,7 +43,7 @@
 
 <div id="app" class="hidden">
 <nav class="crm-sidebar" aria-label="CRM 메뉴">
-  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.4.18</small></div></div>
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>5.4.20</small></div></div>
   <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
   <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
   <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
@@ -73,7 +73,7 @@
       <div id="monthlySummary" class="monthly-summary"></div>
     </div>
     <div class="dashboard-card">
-      <div class="dashboard-card-head"><div><small>주의가 필요한 고객</small><h3 id="missedScheduleTitle">놓치기 쉬운 일정 (약속일경과)</h3></div></div>
+      <div class="dashboard-card-head"><div><h3 id="missedScheduleTitle">놓치기 쉬운 일정 (약속일경과)</h3></div></div>
       <div id="attentionList" class="attention-list"></div>
     </div>
   </section>
@@ -147,8 +147,17 @@
         <div class="field"><label>소개해준 고객</label><select id="referrerId"><option value="">없음</option></select></div>
         <div class="field"><label>가족관계</label><input id="familyInfo" placeholder="예: 배우자 김영희, 자녀 김민준"></div>
         <div class="field"><label>상담 가능 시간</label><select id="availableTime"><option value="">선택</option><option>오전 10시~12시</option><option>오후 12시~2시</option><option>오후 2시~4시</option><option>오후 4시~6시</option><option>오후 6시 이후</option><option>시간 상관없음</option></select></div>
+        <div class="section-label">자동차보험</div>
+        <label class="auto-insurance-toggle"><input type="checkbox" id="autoInsuranceCheck"> 자동차보험 정보 등록</label>
+        <div id="autoInsuranceBox" class="auto-insurance-box hidden">
+          <div class="two">
+            <div class="field"><label>차량번호</label><input id="vehicleNumber" placeholder="예: 12가3456"></div>
+            <div class="field"><label>자동차보험 만기일</label><input id="autoExpiryDate" type="text" inputmode="numeric" data-smart-date="true" placeholder="YYYY-MM-DD"></div>
+          </div>
+          <div class="field"><label>갱신 상태</label><select id="autoRenewalStatus"><option>갱신 예정</option><option>갱신 완료</option><option>미정</option></select></div>
+        </div>
         <div class="field"><label>간단 메모</label><textarea id="memo" placeholder="등록 시 꼭 필요한 메모만 입력하세요."></textarea></div>
-        <div class="form-guide">다음 연락일, 관심분야, 보험정보, 결제정보와 신분증 확인은 고객 상담기록 화면에서 입력합니다.</div>
+        <div class="form-guide">다음 연락일, 상담기록, 계약정보, 결제정보와 신분증 확인은 고객 상세 화면에서 관리합니다.</div>
         <div class="form-actions"><button class="btn light" type="button" id="cancelBtn">취소</button><button class="btn primary" type="submit">고객 저장</button></div>
       </form>
     </div>
@@ -187,7 +196,7 @@
       <div class="consult-follow-box">
         <div class="field">
           <label for="consultFollowUpInput">다음 연락일 지정</label>
-          <input id="consultFollowUpInput" type="date">
+          <input id="consultFollowUpInput" type="text" inputmode="numeric" data-smart-date="true" placeholder="YYYY-MM-DD">
         </div>
         <button type="button" class="btn primary" id="consultFollowUpSave">다음 연락일 저장</button>
       </div>
@@ -243,7 +252,7 @@
             <div class="sensitive-grid identity-grid">
               <div class="field check-row"><input id="consultIdentityVerified" type="checkbox"><label for="consultIdentityVerified">신분증 확인 완료</label></div>
               <div class="field"><label>운전면허번호</label><input id="consultDriverLicense" autocomplete="off"></div>
-              <div class="field"><label>주민등록증 발급일자</label><input id="consultResidentIssueDate" type="date"></div>
+              <div class="field"><label>주민등록증 발급일자</label><input id="consultResidentIssueDate" type="text" inputmode="numeric" data-smart-date="true" placeholder="YYYY-MM-DD"></div>
             </div>
           </div>
           <div class="sensitive-guide">카드 CVC와 주민등록번호는 저장하지 마세요. Supabase RLS 접근권한을 제한해야 합니다.</div>
@@ -270,7 +279,7 @@
 </div>
 
 <script src="supabase.js?v=5.4.7"></script>
-<script src="app.js?v=5.4.18"></script>
+<script src="app.js?v=5.4.20"></script>
 <div id="saveToast" class="save-toast" role="status" aria-live="polite"></div>
 </body>
 </html>

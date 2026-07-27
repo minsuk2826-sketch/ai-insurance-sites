@@ -564,3 +564,6 @@ button:disabled{cursor:not-allowed;opacity:.68}
     min-width:215px !important;
   }
 }
+
+/* 5.4.19 자동차보험 등록 영역 */
+.auto-insurance-toggle{display:flex;align-items:center;gap:8px;font-weight:700;padding:10px 12px;border:1px solid #dbe7f7;border-radius:10px;background:#f8fbff;cursor:pointer}.auto-insurance-toggle input{width:16px;height:16px}.auto-insurance-box{padding:12px;border:1px solid #dbe7f7;border-radius:12px;background:#fbfdff}.auto-insurance-box.hidden{display:none!important}#missedScheduleTitle{white-space:nowrap}
