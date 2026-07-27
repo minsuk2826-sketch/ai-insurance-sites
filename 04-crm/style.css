@@ -531,3 +531,36 @@ button:disabled{cursor:not-allowed;opacity:.68}
   #consultModal .customer-detail-tabs{top:68px !important;display:flex !important;overflow-x:auto !important;justify-content:flex-start !important}
   #consultModal .customer-detail-tab{width:auto !important;flex:0 0 auto !important;padding:10px 18px !important}
 }
+
+/* CRM 5.4.16: 상담 상태 선택값 한 줄 전체 표시 */
+#consultModal .consult-composer-toolbar{
+  gap:12px !important;
+}
+#consultModal .consult-status-control{
+  flex:0 0 auto !important;
+  gap:8px !important;
+}
+#consultModal .consult-status-control label{
+  font-size:12px !important;
+  line-height:1 !important;
+}
+#consultModal #consultResultStatus{
+  width:250px !important;
+  min-width:250px !important;
+  height:40px !important;
+  padding-left:12px !important;
+  padding-right:36px !important;
+  font-size:12px !important;
+  letter-spacing:-0.2px !important;
+  white-space:nowrap !important;
+}
+#consultModal .consult-composer-close{
+  margin-left:2px !important;
+  flex:0 0 28px !important;
+}
+@media(max-width:520px){
+  #consultModal #consultResultStatus{
+    width:215px !important;
+    min-width:215px !important;
+  }
+}
