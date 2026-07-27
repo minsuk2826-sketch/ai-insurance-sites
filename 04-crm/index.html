@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI보험 CRM 2.0</title>
+  <title>AI보험 CRM 3.0</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{--blue:#1769ff;--blue2:#0e52d8;--navy:#14213a;--muted:#6c7890;--line:#dfe8f5;--soft:#f5f9ff;--white:#fff;--green:#1aa36f;--orange:#f59e0b;--red:#e44848;--shadow:0 14px 40px rgba(48,88,145,.10)}
@@ -23,14 +23,14 @@
     .title-row{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:20px} h1{font-size:30px;margin:0} .sub{color:var(--muted);margin-top:6px}
     .stats{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-bottom:20px} .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
     .stat small{color:var(--muted);font-weight:800} .stat strong{display:block;font-size:30px;margin-top:6px}
-    .layout{display:grid;grid-template-columns:1fr 360px;gap:18px} .panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+    .layout{display:block}.list-view .panel{width:100%} .panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
     .panel-head{padding:18px;border-bottom:1px solid var(--line)} .panel-head h2{margin:0;font-size:20px}
     .filters{display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:10px;margin-top:14px}
     .table-wrap{overflow:auto} table{width:100%;border-collapse:collapse;min-width:1120px} th,td{padding:13px 14px;border-bottom:1px solid #edf2f8;text-align:left;font-size:14px}
     th{background:#fbfdff;color:#56647d;font-size:13px} tr:hover td{background:#fafcff} .status{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900}
     .신규{background:#eaf2ff;color:#1757b8} .연락완료{background:#eefaf6;color:#137a55} .분석대기{background:#fff7e6;color:#a76600} .분석진행{background:#f0edff;color:#6847c5}
     .제안중{background:#fff0f0;color:#b73838} .계약완료{background:#e9f8ef;color:#167347} .보류{background:#f0f2f5;color:#596273}
-    .empty{padding:44px;text-align:center;color:var(--muted)} .side{padding:18px} .side h2{margin:0 0 14px;font-size:20px} .form-grid{display:grid;gap:10px}
+    .empty{padding:44px;text-align:center;color:var(--muted)} .side{padding:24px;max-width:900px;margin:0 auto}.form-page-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.form-page-head h2{margin:0}.task-panel{margin-bottom:20px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}.task-head{padding:18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}.task-head h2{margin:0}.task-count{min-width:44px;height:44px;border-radius:14px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:22px;font-weight:900}.task-list{display:grid}.task-item{display:grid;grid-template-columns:1fr 1.4fr auto;gap:14px;align-items:center;padding:15px 18px;border-bottom:1px solid #edf2f8}.task-item:last-child{border-bottom:0}.task-main{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.task-badge{padding:5px 8px;border-radius:999px;background:#eef4ff;color:#24477f;font-size:12px;font-weight:900}.task-date{font-size:12px;color:var(--muted)}.task-overdue{color:#c03a3a;font-weight:900}.task-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.task-actions button{border:0;border-radius:9px;padding:8px 10px;font-weight:800}.task-open{background:var(--blue);color:#fff}.task-done{background:#e9f8ef;color:#167347}.task-empty{padding:30px;text-align:center;color:var(--muted)} .side{padding:18px} .side h2{margin:0 0 14px;font-size:20px} .form-grid{display:grid;gap:10px}
     .two{display:grid;grid-template-columns:1fr 1fr;gap:10px} label{font-size:13px;font-weight:800;color:#59677f} .form-actions{display:flex;gap:8px;margin-top:6px} .form-actions .btn{flex:1}
     .actions-cell{display:flex;gap:6px}
     .select-col{width:44px;text-align:center}
@@ -81,14 +81,41 @@
     tr.customer-row:hover td{background:#f2f7ff}
     @media(max-width:700px){.customer-summary{grid-template-columns:1fr 1fr}.consult-modal{padding:0}.consult-card{width:100%;height:100%;max-height:none;border-radius:0}}
 
-    @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}}
+    @media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.task-item{grid-template-columns:1fr}.task-actions{justify-content:flex-start}}
     @media(max-width:620px){.wrap{padding:18px 12px 50px}.top{padding:0 12px}.brand{font-size:18px}.title-row{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
+  
+    /* CRM 3.0 navigation and workspace */
+    .crm-sidebar{position:fixed;left:0;top:0;bottom:0;width:224px;background:#0d1b36;color:#fff;padding:20px 14px;z-index:30;display:flex;flex-direction:column;gap:7px;box-shadow:10px 0 30px rgba(13,27,54,.10)}
+    .side-logo{height:62px;display:flex;align-items:center;gap:11px;padding:0 8px 14px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1);font-weight:900;font-size:18px}
+    .side-logo>span{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#397cff,#67a0ff);font-size:15px}
+    .side-logo small{display:block;font-size:11px;color:#89a5d5;margin-top:2px;letter-spacing:.08em}
+    .nav-item{position:relative;width:100%;border:0;background:transparent;color:#aebddd;border-radius:12px;padding:12px 11px;display:flex;align-items:center;gap:12px;text-align:left;font-weight:800}
+    .nav-item b{width:24px;text-align:center;font-size:18px}.nav-item span{flex:1}.nav-item em{font-style:normal;min-width:23px;padding:3px 6px;border-radius:999px;background:#eb4d5c;color:#fff;font-size:11px;text-align:center}
+    .nav-item:hover,.nav-item.active{background:rgba(78,133,255,.18);color:#fff}.nav-item.active:before{content:"";position:absolute;left:-14px;width:4px;height:26px;border-radius:0 5px 5px 0;background:#5f91ff}
+    #app>header{margin-left:224px}.wrap{margin-left:224px;max-width:none;padding-left:26px;padding-right:26px}.top{max-width:none}
+    .stats{grid-template-columns:repeat(7,minmax(135px,1fr))}.stat{box-shadow:none}.stat strong{font-size:27px}
+    .task-panel,.panel{box-shadow:0 8px 24px rgba(26,61,112,.07)}
+    .page-mode-tasks #statsPanel,.page-mode-tasks #listView{display:none!important}.page-mode-tasks #taskPanel{display:block!important}
+    .page-mode-customers #statsPanel,.page-mode-customers #taskPanel{display:none!important}.page-mode-customers #listView{display:block!important}
+    .page-mode-contracts #statsPanel,.page-mode-contracts #taskPanel{display:none!important}.page-mode-contracts #listView{display:block!important}
+    .page-mode-recruiting #statsPanel,.page-mode-recruiting #taskPanel{display:none!important}.page-mode-recruiting #listView{display:block!important}
+    .page-mode-dashboard #statsPanel,.page-mode-dashboard #taskPanel{display:grid}.page-mode-dashboard #taskPanel{display:block}.page-mode-dashboard #listView{display:none!important}
+    #formView .side{max-width:920px;margin:0 auto;padding:26px}.form-page-head{padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--line)}
+    .workspace-note{display:none;padding:12px 15px;margin-bottom:15px;background:#fff7e8;border:1px solid #ffe0a3;border-radius:12px;color:#885b05;font-weight:700;font-size:13px}
+    .page-mode-contracts .workspace-note.contract-note,.page-mode-recruiting .workspace-note.recruit-note{display:block}
+    @media(max-width:1180px){.stats{grid-template-columns:repeat(4,1fr)}}
+    @media(max-width:820px){
+      .crm-sidebar{top:auto;right:0;width:auto;height:67px;padding:7px 8px;flex-direction:row;justify-content:space-around;border-top:1px solid rgba(255,255,255,.1)}
+      .side-logo{display:none}.nav-item{width:auto;min-width:58px;flex-direction:column;gap:2px;padding:6px 7px;font-size:10px}.nav-item b{font-size:17px}.nav-item em{position:absolute;right:3px;top:1px;padding:2px 5px}.nav-item.active:before{display:none}
+      #app>header{margin-left:0}.wrap{margin-left:0;padding:16px 12px 90px}.stats{grid-template-columns:1fr 1fr}.title-row .primary{width:100%}
+    }
+
   </style>
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
   <form id="loginForm" class="login-card">
-    <h1>AI보험 CRM 2.0</h1>
+    <h1>AI보험 CRM 3.0</h1>
     <p>관리자 계정으로 로그인하세요.</p>
     <div class="field"><label>이메일</label><input id="loginEmail" type="email" required></div>
     <div class="field"><label>비밀번호</label><input id="loginPassword" type="password" required></div>
@@ -98,10 +125,18 @@
 </div>
 
 <div id="app" class="hidden">
+<nav class="crm-sidebar" aria-label="CRM 메뉴">
+  <div class="side-logo"><span>AI</span><div>보험 CRM<small>3.0</small></div></div>
+  <button class="nav-item active" data-crm-view="dashboard"><b>⌂</b><span>대시보드</span></button>
+  <button class="nav-item" data-crm-view="customers"><b>♙</b><span>고객관리</span></button>
+  <button class="nav-item" data-crm-view="tasks"><b>✓</b><span>오늘 할 일</span><em id="navTaskCount">0</em></button>
+  <button class="nav-item" data-crm-view="contracts"><b>₩</b><span>계약관리</span></button>
+  <button class="nav-item" data-crm-view="recruiting"><b>＋</b><span>리크루팅</span></button>
+</nav>
 <header><div class="top"><div class="brand"><b>AI보험</b> CRM 2.0</div><button id="logoutBtn" class="btn light">로그아웃</button></div></header>
 <main class="wrap">
-  <div class="title-row"><div><h1>고객 관리 대시보드</h1><div class="sub">랜딩페이지 신청자가 자동으로 표시됩니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
-  <section class="stats">
+  <div class="title-row"><div><h1 id="pageTitle">업무 대시보드</h1><div class="sub" id="pageSubtitle">오늘 처리할 고객과 계약 현황을 한눈에 확인합니다.</div></div><button class="btn primary" id="newBtn">+ 신규 고객 등록</button></div>
+  <section id="statsPanel" class="stats">
     <div class="stat stat-filter" data-filter="all"><small>전체 고객</small><strong id="sTotal">0</strong></div>
     <div class="stat stat-filter" data-filter="new"><small>신규 문의</small><strong id="sNew">0</strong></div>
     <div class="stat stat-filter" data-filter="today"><small>오늘 연락 예정</small><strong id="sToday">0</strong></div>
@@ -111,7 +146,14 @@
     <div class="stat"><small>이번 달 수수료</small><strong id="sCommission" class="money">0원</strong></div>
   </section>
 
-  <section class="layout">
+  <section id="taskPanel" class="task-panel">
+    <div class="task-head"><div><h2>오늘 할 일</h2><div class="sub">계약 경과일과 마지막 상담일을 자동 계산합니다.</div></div><div id="taskCount" class="task-count">0</div></div>
+    <div id="taskList" class="task-list"></div>
+  </section>
+
+  <div class="workspace-note contract-note">계약일이 입력된 고객만 표시됩니다. 고객 수정 화면에서 계약일·월보험료·수수료를 관리할 수 있습니다.</div>
+  <div class="workspace-note recruit-note">리크루팅 랜딩페이지 또는 육아·경력단절 유입 고객을 모아 보여줍니다.</div>
+  <section id="listView" class="layout list-view">
     <div class="panel">
       <div class="panel-head"><h2>고객 목록</h2>
         <div class="filters">
@@ -135,9 +177,11 @@
         <div id="emptyState" class="empty">등록된 고객이 없습니다.</div>
       </div>
     </div>
+  </section>
 
+  <section id="formView" class="hidden">
     <aside class="panel side">
-      <h2 id="formTitle">신규 고객 등록</h2>
+      <div class="form-page-head"><h2 id="formTitle">신규 고객 등록</h2><button type="button" id="backToListBtn" class="btn light">← 고객 목록으로</button></div>
       <form id="customerForm" class="form-grid">
         <input type="hidden" id="customerId">
         <div class="two">
@@ -221,13 +265,78 @@ const num = v => Number(v || 0);
 const formatWon = v => Math.round(num(v)).toLocaleString("ko-KR") + "원";
 const cleanPhone = v => String(v || "").replace(/[^0-9+]/g,"");
 
+const taskStorageKey = "ai-crm-completed-tasks-v1";
+const readCompletedTasks = () => { try { return JSON.parse(localStorage.getItem(taskStorageKey)||"{}"); } catch(e) { return {}; } };
+const writeCompletedTasks = value => localStorage.setItem(taskStorageKey, JSON.stringify(value));
+const dateOnly = value => value ? String(value).slice(0,10) : "";
+const parseLocalDate = value => { if(!value)return null; const [y,m,d]=dateOnly(value).split("-").map(Number); return y&&m&&d?new Date(y,m-1,d):null; };
+const addDays = (value,days) => { const d=parseLocalDate(value); if(!d)return ""; d.setDate(d.getDate()+days); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const addYears = (value,years) => { const d=parseLocalDate(value); if(!d)return ""; d.setFullYear(d.getFullYear()+years); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const daysBetween = (from,to=today()) => { const a=parseLocalDate(from),b=parseLocalDate(to); return a&&b?Math.floor((b-a)/86400000):0; };
+function getLastTouchDate(customer){
+  const history=getConsultHistory(customer);
+  const latest=history.map(x=>dateOnly(x.updated_at||x.created_at)).filter(Boolean).sort().pop();
+  return latest||dateOnly(customer.created_at);
+}
+function customerTasks(customer){
+  const completed=readCompletedTasks();
+  const items=[];
+  const add=(key,due,title,badge)=>{ const unique=`${customer.id}:${key}`; if(due&&due<=today()&&!completed[unique]) items.push({unique,key,due,title,badge,customer,overdue:Math.max(0,daysBetween(due))}); };
+  if(customer.contract_date){
+    add("contract_30d",addDays(customer.contract_date,30),"계약 30일 경과 확인","30일");
+    add("contract_90d",addDays(customer.contract_date,90),"계약 90일 경과 확인","90일");
+    add("contract_1y",addYears(customer.contract_date,1),"계약 1주년 고객 관리","1년");
+  }
+  const lastTouch=getLastTouchDate(customer);
+  if(lastTouch) add(`no_touch_14d:${lastTouch}`,addDays(lastTouch,14),"마지막 상담 후 2주 경과","미접촉");
+  if(customer.follow_up_date) add(`follow_up:${customer.follow_up_date}`,customer.follow_up_date,customer.follow_up_date===today()?"오늘 연락 예정":"연락 예정일 경과","연락");
+  return items;
+}
+function getAllTasks(){ return customers.flatMap(customerTasks).sort((a,b)=>a.due.localeCompare(b.due)); }
+function completeTask(unique){ const completed=readCompletedTasks(); completed[unique]=new Date().toISOString(); writeCompletedTasks(completed); renderTasks(); }
+function renderTasks(){
+  const tasks=getAllTasks();
+  $("taskCount").textContent=tasks.length; if($("navTaskCount")) $("navTaskCount").textContent=tasks.length;
+  $("taskList").innerHTML=tasks.length?tasks.map((t,i)=>`<div class="task-item"><div><b>${esc(t.customer.name||"이름 없음")}</b><div><a href="tel:${esc(t.customer.phone||"")}">${esc(t.customer.phone||"연락처 없음")}</a></div></div><div class="task-main"><span class="task-badge">${esc(t.badge)}</span><b>${esc(t.title)}</b><span class="task-date">${esc(t.due)} · ${t.overdue?`<span class="task-overdue">${t.overdue}일 지남</span>`:"오늘 도래"}</span></div><div class="task-actions"><button class="task-open" data-task-action="open" data-task-index="${i}">상담 열기</button><button class="task-done" data-task-action="done" data-task-index="${i}">완료</button></div></div>`).join(""):'<div class="task-empty">오늘 처리할 자동 업무가 없습니다.</div>';
+  $("taskList")._tasks=tasks;
+}
+function showListView(){ $("formView").classList.add("hidden"); $("listView").classList.remove("hidden"); $("taskPanel").classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); }
+function showFormView(){ $("listView").classList.add("hidden"); $("taskPanel").classList.add("hidden"); $("formView").classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); setTimeout(()=>$('name').focus(),50); }
+
+
+let crmView="dashboard";
+function applyCrmView(view){
+  crmView=view;
+  document.body.classList.remove("page-mode-dashboard","page-mode-customers","page-mode-tasks","page-mode-contracts","page-mode-recruiting");
+  document.body.classList.add(`page-mode-${view}`);
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.crmView===view));
+  const titles={
+    dashboard:["업무 대시보드","오늘 처리할 고객과 계약 현황을 한눈에 확인합니다."],
+    customers:["고객 관리","전체 고객을 검색하고 상담 상태를 관리합니다."],
+    tasks:["오늘 할 일","계약 경과일·미접촉 고객·연락 예정일을 자동 계산합니다."],
+    contracts:["계약 관리","계약 고객의 월보험료와 예상 수수료를 관리합니다."],
+    recruiting:["리크루팅 관리","설계사 지원자와 리크루팅 유입 고객을 관리합니다."]
+  };
+  $("pageTitle").textContent=titles[view][0]; $("pageSubtitle").textContent=titles[view][1];
+  $("newBtn").textContent=view==="recruiting"?"+ 지원자 등록":"+ 신규 고객 등록";
+  todayOnly=false; activeStatsFilter="all";
+  if(view==="contracts") { $("statusFilter").value=""; }
+  if(view==="recruiting") { $("statusFilter").value=""; }
+  currentPage=1; render();
+}
+function getViewScopedCustomers(list){
+  if(crmView==="contracts") return list.filter(c=>Boolean(c.contract_date)||c.status==="계약완료");
+  if(crmView==="recruiting") return list.filter(c=>/리크루팅|육아|경단|사업설명회|설계사/i.test(`${c.source||""} ${c.interest||""} ${c.memo||""}`));
+  return list;
+}
+document.querySelectorAll(".nav-item").forEach(button=>button.addEventListener("click",()=>{ showListView(); applyCrmView(button.dataset.crmView); }));
 
 async function checkSession(){
   const {data} = await db.auth.getSession();
   if(data.session) showApp(); else showLogin();
 }
 function showLogin(){ $("loginScreen").classList.remove("hidden"); $("app").classList.add("hidden"); }
-async function showApp(){ $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden"); await loadCustomers(); }
+async function showApp(){ $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden"); applyCrmView("dashboard"); await loadCustomers(); }
 
 $("loginForm").addEventListener("submit", async e=>{
   e.preventDefault();
@@ -259,7 +368,7 @@ function getFilteredCustomers(){
   const sourcef=$("sourceFilter").value;
   const sort=$("sortBy").value;
 
-  let list=customers.filter(c=>
+  let list=getViewScopedCustomers(customers).filter(c=>
     (!q||(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q)) &&
     (!sf||c.status===sf) &&
     (!sourcef||(c.source||"")===sourcef) &&
@@ -321,6 +430,7 @@ function render(){
 
   renderPagination(totalPages);
   updateSelectAll(pageList);
+  renderTasks();
 }
 
 function renderPagination(totalPages){
@@ -360,7 +470,7 @@ function editCustomer(id){
   $("commission").value=c.commission||"";
   $("memo").value=c.memo||c.message||"";
   $("formTitle").textContent="고객 정보 수정";
-  document.querySelector(".side").scrollIntoView({behavior:"smooth",block:"start"});
+  showFormView();
 }
 
 function formatDateTime(value){
@@ -482,11 +592,14 @@ async function saveConsultation(){
     return;
   }
 
+  const oldTouch=getLastTouchDate(customer);
+  if(oldTouch){ const completed=readCompletedTasks(); completed[`${customer.id}:no_touch_14d:${oldTouch}`]=new Date().toISOString(); writeCompletedTasks(completed); }
   customer.consultation_history=nextHistory;
   $("consultMemo").value="";
   editingHistoryIndex=null;
   saveBtn.textContent="상담 기록 저장";
   renderConsultHistory(customer);
+  renderTasks();
   alert(originalText==="수정 내용 저장"?"상담 기록이 수정되었습니다.":"상담 기록이 저장되었습니다.");
 }
 
@@ -622,6 +735,7 @@ $("customerForm").addEventListener("submit",async e=>{
     const wasEdit=Boolean(id);
     clearForm();
     await loadCustomers();
+    showListView();
     alert(wasEdit?"수정되었습니다.":"고객이 등록되었습니다.");
   }
 });
@@ -629,7 +743,15 @@ $("customerForm").addEventListener("submit",async e=>{
   currentPage=1;
   render();
 }));
-$("cancelBtn").addEventListener("click",clearForm);$("newBtn").addEventListener("click",()=>{clearForm();$("name").focus()});
+$("cancelBtn").addEventListener("click",()=>{clearForm();showListView();});
+$("newBtn").addEventListener("click",()=>{clearForm();showFormView();});
+$("backToListBtn").addEventListener("click",()=>{clearForm();showListView();});
+$("taskList").addEventListener("click",event=>{
+  const button=event.target.closest("button[data-task-action]"); if(!button)return;
+  const task=($("taskList")._tasks||[])[Number(button.dataset.taskIndex)]; if(!task)return;
+  if(button.dataset.taskAction==="open") openConsultation(task.customer.id);
+  if(button.dataset.taskAction==="done") completeTask(task.unique);
+});
 
 
 function getSelectedCustomers(){
