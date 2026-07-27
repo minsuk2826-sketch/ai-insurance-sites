@@ -509,10 +509,10 @@ function renderConsultHistory(customer){
   const reversed=history.map((item,index)=>({item,index})).reverse();
 
   $("consultHistory").innerHTML=reversed.length
-    ? reversed.map(({item,index})=>`
-      <div class="history-item" data-history-index="${index}">
+    ? reversed.map(({item,index},position)=>`
+      <div class="history-item${position<3?" recent-history-item":""}" data-history-index="${index}">
         <div class="history-item-head">
-          <div class="time">${esc(formatDateTime(item.created_at))}</div>
+          <div class="time">${esc(formatDateTime(item.created_at))}${position<3?' <span class="recent-history-badge">최근</span>':''}</div>
           <div class="history-actions">
             <button type="button" class="history-btn edit" data-history-action="edit" data-history-index="${index}">수정</button>
             <button type="button" class="history-btn delete" data-history-action="delete" data-history-index="${index}">삭제</button>
@@ -547,10 +547,14 @@ function openConsultation(id){
   initialPaymentInfo=currentPaymentInfo(); initialIdentityInfo=currentIdentityInfo();
   setSectionStatus("paymentSaveStatus","saved","저장됨"); setSectionStatus("identitySaveStatus","saved","저장됨");
   $("consultMemo").value="";
+  $("consultResultStatus").value="";
+  $("consultComposer").classList.remove("hidden");
+  $("consultComposerOpen").classList.add("hidden");
   consultInitialMemo="";
   editingHistoryIndex=null;
   $("consultSave").textContent="상담 기록 저장";
   renderConsultHistory(customer);
+  $("consultHistory").scrollTop=0;
   renderContracts(customer);
   renderFamilyTree();
   $("detailContractCount").textContent=getContracts(customer).length;
@@ -573,6 +577,7 @@ function closeConsultation(force=false){
   activeConsultCustomerId=null;
   editingHistoryIndex=null;
   $("consultMemo").value="";
+  $("consultResultStatus").value="";
   $("consultSave").textContent="상담 기록 저장";
   consultInitialMemo="";
   return true;
@@ -583,6 +588,7 @@ async function saveConsultation(){
 
   const content=$("consultMemo").value.trim();
   if(!content){alert("상담 내용을 입력해주세요.");return;}
+  const nextStatus=$("consultResultStatus").value;
 
   const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId));
   if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
@@ -613,7 +619,7 @@ async function saveConsultation(){
 
   const {error}=await db
     .from("customers")
-    .update({consultation_history:nextHistory})
+    .update(nextStatus?{consultation_history:nextHistory,status:nextStatus}:{consultation_history:nextHistory})
     .eq("id",activeConsultCustomerId);
 
   saveBtn.disabled=false;
@@ -627,12 +633,17 @@ async function saveConsultation(){
   const oldTouch=getLastTouchDate(customer);
   if(oldTouch){ const completed=readCompletedTasks(); completed[`${customer.id}:no_touch_14d:${oldTouch}`]=new Date().toISOString(); writeCompletedTasks(completed); }
   customer.consultation_history=nextHistory;
+  if(nextStatus){
+    customer.status=nextStatus;
+    $("consultStatus").textContent=nextStatus;
+  }
   $("consultMemo").value="";
+  $("consultResultStatus").value="";
   consultInitialMemo="";
   editingHistoryIndex=null;
   saveBtn.textContent="상담 기록 저장";
   renderConsultHistory(customer);
-  renderTasks();
+  render();
   showSaveToast(originalText==="수정 내용 저장"?"상담 기록이 수정되었습니다.":"상담 기록이 저장되었습니다.");
 }
 
@@ -1039,8 +1050,18 @@ document.querySelectorAll(".customer-detail-tab").forEach(button=>{
 });
 
 $("consultClose").addEventListener("click",closeConsultation);
-$("consultCancel").addEventListener("click",closeConsultation);
 $("consultSave").addEventListener("click",saveConsultation);
+$("consultComposerClose").addEventListener("click",()=>{
+  const current=$("consultMemo").value.trim();
+  if(current&&current!==consultInitialMemo&&!confirm("작성 중인 상담 내용이 있습니다. 기록창을 닫을까요?"))return;
+  $("consultComposer").classList.add("hidden");
+  $("consultComposerOpen").classList.remove("hidden");
+});
+$("consultComposerOpen").addEventListener("click",()=>{
+  $("consultComposer").classList.remove("hidden");
+  $("consultComposerOpen").classList.add("hidden");
+  $("consultMemo").focus();
+});
 $("consultFollowUpSave").addEventListener("click",saveConsultFollowUp);
 
 $("consultHistory").addEventListener("click",event=>{

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI보험 CRM 5.4.5 대시보드 바로가기</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css?v=5.4.5">
+    <link rel="stylesheet" href="style.css?v=5.4.7?v=5.4.5">
 </head>
 <body>
 <div id="loginScreen" class="login-screen">
@@ -78,7 +78,7 @@
       <div class="panel-head"><h2>고객 목록</h2>
         <div class="filters">
           <input id="search" placeholder="이름·전화번호·보험사·상품·가족명 검색">
-          <select id="statusFilter"><option value="">전체 상태</option><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>보류</option></select>
+          <select id="statusFilter"><option value="">전체 상태</option><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>상담종결</option><option>보류</option></select>
           <select id="sourceFilter"><option value="">전체 유입경로</option></select>
           <select id="sortBy"><option value="createdDesc">최근 등록순</option><option value="recentConsult">최근 상담순</option><option value="followAsc">다음 연락일순</option><option value="nameAsc">이름순</option><option value="autoExpiry">자동차 만기순</option><option value="birthday">생일순</option></select>
         </div>
@@ -119,7 +119,7 @@
           <div class="field"><label>생년월일</label><div class="birthday-parts"><input id="birthYear" inputmode="numeric" maxlength="4" placeholder="YYYY" aria-label="생년"><span>-</span><input id="birthMonth" inputmode="numeric" maxlength="2" placeholder="MM" aria-label="생월"><span>-</span><input id="birthDay" inputmode="numeric" maxlength="2" placeholder="DD" aria-label="생일"></div><input id="birthday" type="hidden"></div>
           <div class="field"><label>나이대</label><input id="age" readonly placeholder="생년월일 입력 시 자동"></div>
         </div>
-        <div class="two"><div class="field"><label>고객등급</label><select id="customerGrade"><option value="B">B</option><option value="VIP">VIP</option><option value="A">A</option><option value="C">C</option></select></div><div class="field"><label>상태</label><select id="status"><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>보류</option></select></div></div>
+        <div class="two"><div class="field"><label>고객등급</label><select id="customerGrade"><option value="B">B</option><option value="VIP">VIP</option><option value="A">A</option><option value="C">C</option></select></div><div class="field"><label>상태</label><select id="status"><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>상담종결</option><option>보류</option></select></div></div>
         <div class="section-label">유입 및 관계</div>
         <div class="source-row"><div class="field"><label>유입경로</label><select id="source"><option>DB</option><option>소개</option><option>기계약자</option><option>가망고객</option><option>랜딩페이지</option></select></div><div id="landingSourceField" class="field hidden"><label>랜딩페이지 경로</label><input id="landingSource" placeholder="예: 보험분석 / 리크루팅 / 배달"></div></div>
         <div class="field"><label>소개해준 고객</label><select id="referrerId"><option value="">없음</option></select></div>
@@ -169,64 +169,60 @@
         <button type="button" class="btn primary" id="consultFollowUpSave">다음 연락일 저장</button>
       </div>
 
-      <div class="overview-consult-divider">
-        <div>
-          <h3>상담 기록</h3>
-          <p>고객 요약을 확인한 뒤 바로 아래에서 상담 내용을 이어서 관리합니다.</p>
-        </div>
-      </div>
+      <div id="consultHistory" class="history-list scroll-history-list"></div>
 
-      <section class="sensitive-section">
-        <div class="section-title-row"><div><h3>결제정보 · 신분증 확인</h3><p>각 항목을 따로 저장할 수 있습니다.</p></div></div>
-
-        <div class="sensitive-subsection">
-          <div class="sensitive-subhead">
-            <div><h4>결제계좌</h4><span class="save-status saved" id="paymentSaveStatus">저장됨</span></div>
-            <button type="button" class="btn primary" id="paymentSave">결제계좌 저장</button>
+      <div class="consult-input sticky-consult-input" id="consultComposer">
+        <button type="button" class="consult-composer-close" id="consultComposerClose" aria-label="상담 기록창 닫기">×</button>
+        <textarea id="consultMemo" aria-label="상담 기록 입력" placeholder="통화 내용, 고객 요청사항, 다음 상담 계획 등을 입력해주세요."></textarea>
+        <div class="consult-actions consult-save-row">
+          <div class="consult-status-control">
+            <label for="consultResultStatus">상담 후 상태</label>
+            <select id="consultResultStatus">
+              <option value="">현재 상태 유지</option>
+              <option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>상담종결</option><option>보류</option>
+            </select>
           </div>
-          <div class="sensitive-grid">
-            <div class="field"><label>결제 은행</label><input id="consultPaymentBank" autocomplete="off" placeholder="예: 국민은행"></div>
-            <div class="field"><label>결제 계좌번호</label><input id="consultPaymentAccount" autocomplete="off" inputmode="numeric"></div>
-            <div class="field"><label>결제일</label><select id="consultPaymentDay"><option value="">선택</option><option value="5">5일</option><option value="10">10일</option><option value="15">15일</option><option value="20">20일</option><option value="25">25일</option></select></div>
-            <div class="field"><label>카드번호</label><input id="consultCardNumber" autocomplete="off" inputmode="numeric" maxlength="19"></div>
-            <div class="field"><label>카드 유효기간</label><input id="consultCardExpiry" autocomplete="off" inputmode="numeric" maxlength="5" placeholder="MM/YY"></div>
-          </div>
-        </div>
-
-        <div class="sensitive-subsection">
-          <div class="sensitive-subhead">
-            <div><h4>신분증 확인</h4><span class="save-status saved" id="identitySaveStatus">저장됨</span></div>
-            <button type="button" class="btn primary" id="identitySave">신분증 저장</button>
-          </div>
-          <div class="sensitive-grid identity-grid">
-            <div class="field check-row"><input id="consultIdentityVerified" type="checkbox"><label for="consultIdentityVerified">신분증 확인 완료</label></div>
-            <div class="field"><label>운전면허번호</label><input id="consultDriverLicense" autocomplete="off"></div>
-            <div class="field"><label>주민등록증 발급일자</label><input id="consultResidentIssueDate" type="date"></div>
-          </div>
-        </div>
-        <div class="sensitive-guide">카드 CVC와 주민등록번호는 저장하지 마세요. Supabase RLS 접근권한을 제한해야 합니다.</div>
-      </section>
-
-      <div id="consultHistory" class="history-list"></div>
-
-      <div class="consult-input sticky-consult-input">
-        <div class="sticky-consult-title">
-          <strong>상담 기록 · 새 상담 기록</strong>
-          <span>스크롤 중에도 하단에 고정됩니다.</span>
-        </div>
-        <label for="consultMemo">새 상담 기록</label>
-        <textarea id="consultMemo" placeholder="통화 내용, 고객 요청사항, 다음 상담 계획 등을 입력해주세요."></textarea>
-        <div class="consult-actions">
-          <button type="button" class="btn light" id="consultCancel">닫기</button>
           <button type="button" class="btn primary" id="consultSave">상담 기록 저장</button>
         </div>
       </div>
+      <button type="button" class="btn primary consult-composer-open hidden" id="consultComposerOpen">＋ 상담 기록 남기기</button>
       </div>
 
       <div class="customer-detail-panel" data-detail-panel="contracts">
       <section class="contract-section">
         <div class="section-title-row"><div><h3>계약 정보</h3><p>한 고객에게 여러 계약을 등록할 수 있습니다.</p></div><button type="button" class="btn primary" id="addContractBtn">＋ 계약 추가</button></div>
         <div id="contractList" class="contract-list"></div>
+
+        <section class="sensitive-section contract-sensitive-section">
+          <div class="section-title-row"><div><h3>결제정보 · 신분증 확인</h3><p>계약정보 등록 후 결제정보와 신분증 확인 내용을 관리합니다.</p></div></div>
+
+          <div class="sensitive-subsection">
+            <div class="sensitive-subhead">
+              <div><h4>결제계좌</h4><span class="save-status saved" id="paymentSaveStatus">저장됨</span></div>
+              <button type="button" class="btn primary" id="paymentSave">결제계좌 저장</button>
+            </div>
+            <div class="sensitive-grid">
+              <div class="field"><label>결제 은행</label><input id="consultPaymentBank" autocomplete="off" placeholder="예: 국민은행"></div>
+              <div class="field"><label>결제 계좌번호</label><input id="consultPaymentAccount" autocomplete="off" inputmode="numeric"></div>
+              <div class="field"><label>결제일</label><select id="consultPaymentDay"><option value="">선택</option><option value="5">5일</option><option value="10">10일</option><option value="15">15일</option><option value="20">20일</option><option value="25">25일</option></select></div>
+              <div class="field"><label>카드번호</label><input id="consultCardNumber" autocomplete="off" inputmode="numeric" maxlength="19"></div>
+              <div class="field"><label>카드 유효기간</label><input id="consultCardExpiry" autocomplete="off" inputmode="numeric" maxlength="5" placeholder="MM/YY"></div>
+            </div>
+          </div>
+
+          <div class="sensitive-subsection">
+            <div class="sensitive-subhead">
+              <div><h4>신분증 확인</h4><span class="save-status saved" id="identitySaveStatus">저장됨</span></div>
+              <button type="button" class="btn primary" id="identitySave">신분증 저장</button>
+            </div>
+            <div class="sensitive-grid identity-grid">
+              <div class="field check-row"><input id="consultIdentityVerified" type="checkbox"><label for="consultIdentityVerified">신분증 확인 완료</label></div>
+              <div class="field"><label>운전면허번호</label><input id="consultDriverLicense" autocomplete="off"></div>
+              <div class="field"><label>주민등록증 발급일자</label><input id="consultResidentIssueDate" type="date"></div>
+            </div>
+          </div>
+          <div class="sensitive-guide">카드 CVC와 주민등록번호는 저장하지 마세요. Supabase RLS 접근권한을 제한해야 합니다.</div>
+        </section>
       </section>
       </div>
 
@@ -248,8 +244,8 @@
   </div>
 </div>
 
-<script src="supabase.js?v=5.4.1"></script>
-<script src="app.js?v=5.4.1"></script>
+<script src="supabase.js?v=5.4.7"></script>
+<script src="app.js?v=5.4.7"></script>
 <div id="saveToast" class="save-toast" role="status" aria-live="polite"></div>
 </body>
 </html>
