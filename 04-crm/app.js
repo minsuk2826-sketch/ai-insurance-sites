@@ -102,14 +102,13 @@ function getLastTouchDate(customer){
   const latest=history.map(x=>dateOnly(x.updated_at||x.created_at)).filter(Boolean).sort().pop();
   return latest||dateOnly(customer.created_at);
 }
-function hasConsultationAfterPromiseDay(customer,targetDate){
+function hasConsultationOnOrAfterPromiseDay(customer,targetDate){
   const due=dateOnly(targetDate);
   if(!due)return false;
-  // 약속일이 지난 뒤 새로 작성된 상담 기록만 완료 처리합니다.
-  // 약속일 당일의 기존 기록 때문에 다음 날 누락되는 문제를 방지합니다.
+  // 약속일 당일 또는 그 이후에 작성·수정된 상담 기록이 있으면 처리 완료로 봅니다.
   return getConsultHistory(customer).some(item=>{
-    const recorded=dateOnly(item.created_at||item.updated_at);
-    return recorded&&recorded>due;
+    const recorded=dateOnly(item.updated_at||item.created_at);
+    return Boolean(recorded&&recorded>=due);
   });
 }
 function customerTasks(customer){
@@ -190,21 +189,23 @@ function renderDashboard(){
   const conversion=newCustomers?Math.round(contractedCustomers/newCustomers*100):0;
   $("monthlySummary").innerHTML=`<div><small>신규 고객</small><strong>${newCustomers}명</strong></div><div><small>신규 계약</small><strong>${monthContracts.length}건</strong></div><div><small>월보험료</small><strong>${formatWon(monthContracts.reduce((s,c)=>s+num(c.amount),0))}</strong></div><div><small>단순 전환율</small><strong>${conversion}%</strong></div>`;
   const attention=[];
-  const todayDate=today();
   customers.forEach(customer=>{
     const promisedDate=dateOnly(customer.follow_up_date);
-    // 약속일 다음 날부터, 약속일이 지난 뒤 새 상담기록이 없을 때 자동 표시
-    if(!promisedDate||promisedDate>=todayDate)return;
-    if(hasConsultationAfterPromiseDay(customer,promisedDate))return;
-    const overdueDays=Math.max(1,daysBetween(promisedDate,todayDate));
+    const remaining=daysUntil(promisedDate);
+    // 다음 연락일이 어제 이전이고, 약속일 당일 이후 상담 기록이 없으면 표시합니다.
+    if(!promisedDate||remaining===null||remaining>=0)return;
+    if(hasConsultationOnOrAfterPromiseDay(customer,promisedDate))return;
+    const overdueDays=Math.abs(remaining);
     attention.push({
       id:customer.id,
-      name:customer.name,
-      text:`약속일 ${overdueDays}일 경과 · 이후 상담 기록 없음`,
+      name:customer.name||"이름 없음",
+      text:`약속일 ${overdueDays}일 경과 · 상담 기록 없음`,
       days:overdueDays
     });
   });
-  attention.sort((a,b)=>b.days-a.days);
+  attention.sort((a,b)=>b.days-a.days||String(a.name).localeCompare(String(b.name),"ko"));
+  const attentionTitle=$("missedScheduleTitle");
+  if(attentionTitle) attentionTitle.textContent=`놓치기 쉬운 일정 (약속일경과) · ${attention.length}건`;
   $("attentionList").innerHTML=attention.slice(0,6).map(x=>`<button data-attention-id="${esc(x.id)}" title="클릭하면 고객 상세를 엽니다"><b>${esc(x.name)}</b><span>${esc(x.text)}</span></button>`).join('')||'<div class="dashboard-empty">약속일이 지난 미기록 고객이 없습니다.</div>';
 }
 function renderStatistics(){
@@ -1244,9 +1245,7 @@ $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.g
 $("calNext")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);renderCalendar();});
 $("calendarGrid")?.addEventListener("click",e=>{const b=e.target.closest("[data-cal-id]");if(b)openConsultation(b.dataset.calId);});
 
-// 5.5.1: 대시보드 약속일 경과 카드 제목을 항상 정확히 표시합니다.
-const missedScheduleTitle = document.getElementById("missedScheduleTitle");
-if (missedScheduleTitle) missedScheduleTitle.textContent = "놓치기 쉬운 일정 (약속일경과)";
+// 5.5.2: 약속일 경과 건수는 renderDashboard에서 실시간 표시합니다.
 
 
 // 5.4.21: 숫자 날짜 입력을 YYYY-MM-DD로 자동 변환합니다.
