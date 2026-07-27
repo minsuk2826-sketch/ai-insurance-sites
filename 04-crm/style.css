@@ -222,3 +222,35 @@
 .save-toast.error{background:#8b1e2d}
 button:disabled{cursor:not-allowed;opacity:.68}
 @media(max-width:640px){.save-toast{left:16px;right:16px;top:16px;text-align:center}}
+
+/* CRM 5.4.2: 결제계좌/신분증 분리 저장 */
+.sensitive-subsection{margin-top:14px;padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}
+.sensitive-subhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sensitive-subhead>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sensitive-subhead h4{margin:0;font-size:16px}
+.save-status{font-size:12px;font-weight:800;padding:5px 8px;border-radius:999px}.save-status.saved{background:#e9f8ef;color:#147a3d}.save-status.dirty{background:#fff1e7;color:#b45100}
+.save-toast.info{background:#344054}
+@media(max-width:800px){.sensitive-subhead{align-items:stretch;flex-direction:column}.sensitive-subhead .btn{width:100%}}
+
+
+/* CRM 5.4.3 상담 기록 입력창 하단 고정 */
+.customer-detail-panel[data-detail-panel="overview"]{padding-bottom:8px}
+.sticky-consult-input{
+  position:sticky;
+  bottom:0;
+  z-index:25;
+  margin:24px -20px -60px;
+  padding:14px 20px 18px;
+  border-top:1px solid #cfdbea;
+  background:rgba(255,255,255,.97);
+  box-shadow:0 -10px 28px rgba(22,48,84,.13);
+  backdrop-filter:blur(10px);
+}
+.sticky-consult-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.sticky-consult-title strong{font-size:15px;color:#17375e}
+.sticky-consult-title span{font-size:12px;color:#708198}
+.sticky-consult-input textarea{min-height:82px;max-height:160px;resize:vertical}
+@media(max-width:700px){
+  .sticky-consult-input{margin:18px -20px -60px;padding-bottom:max(16px,env(safe-area-inset-bottom))}
+  .sticky-consult-title span{display:none}
+  .sticky-consult-input textarea{min-height:72px}
+}

@@ -14,6 +14,8 @@ let calendarDate = new Date();
 let activeTaskFilter = "all";
 let activeTaskSort = "urgent";
 let consultInitialMemo = "";
+let initialPaymentInfo = {};
+let initialIdentityInfo = {};
 const favoriteStorageKey = "ai-crm-favorites-v1";
 
 let saveToastTimer=null;
@@ -36,6 +38,27 @@ function setSaving(button,saving,defaultText){
     button.textContent=defaultText||button.dataset.defaultText||"저장";
   }
 }
+function sameData(a,b){return JSON.stringify(a)===JSON.stringify(b)}
+function savedTimeText(){return `${new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",hour12:false})} 저장됨`;}
+function setSectionStatus(id,state,text){
+  const el=$(id); if(!el)return;
+  el.className=`save-status ${state}`;
+  el.textContent=text||(state==="dirty"?"● 저장 안 됨":"저장됨");
+}
+function currentPaymentInfo(){return {
+  payment_bank:$("consultPaymentBank").value.trim(),
+  payment_account:$("consultPaymentAccount").value.trim(),
+  payment_day:$("consultPaymentDay").value,
+  card_number:$("consultCardNumber").value.replace(/\s|-/g,""),
+  card_expiry:$("consultCardExpiry").value.trim()
+};}
+function currentIdentityInfo(){return {
+  identity_verified:$("consultIdentityVerified").checked,
+  driver_license:$("consultDriverLicense").value.trim(),
+  resident_issue_date:$("consultResidentIssueDate").value||null
+};}
+function markPaymentDirty(){setSectionStatus("paymentSaveStatus",sameData(currentPaymentInfo(),initialPaymentInfo)?"saved":"dirty");}
+function markIdentityDirty(){setSectionStatus("identitySaveStatus",sameData(currentIdentityInfo(),initialIdentityInfo)?"saved":"dirty");}
 
 const $ = id => document.getElementById(id);
 const today = () => new Date().toISOString().slice(0,10);
@@ -521,6 +544,8 @@ function openConsultation(id){
   $("consultFollowUpInput").value=customer.follow_up_date||"";
   const sensitive=getSensitiveInfo(customer);
   $("consultPaymentBank").value=sensitive.payment_bank||""; $("consultPaymentAccount").value=sensitive.payment_account||""; $("consultPaymentDay").value=sensitive.payment_day||""; $("consultCardNumber").value=sensitive.card_number||""; $("consultCardExpiry").value=sensitive.card_expiry||""; $("consultIdentityVerified").checked=Boolean(sensitive.identity_verified); $("consultDriverLicense").value=sensitive.driver_license||""; $("consultResidentIssueDate").value=sensitive.resident_issue_date||"";
+  initialPaymentInfo=currentPaymentInfo(); initialIdentityInfo=currentIdentityInfo();
+  setSectionStatus("paymentSaveStatus","saved","저장됨"); setSectionStatus("identitySaveStatus","saved","저장됨");
   $("consultMemo").value="";
   consultInitialMemo="";
   editingHistoryIndex=null;
@@ -669,6 +694,7 @@ async function saveConsultFollowUp(){
   if(!customer){alert("고객 정보를 찾지 못했습니다.");return;}
 
   const nextDate=$("consultFollowUpInput").value||null;
+  if((customer.follow_up_date||null)===nextDate){showSaveToast("변경된 내용이 없습니다.","info");return;}
   const button=$("consultFollowUpSave");
   const originalText=button.textContent;
   button.disabled=true;
@@ -694,15 +720,34 @@ async function saveConsultFollowUp(){
 }
 
 
-async function saveSensitiveInfo(){
+async function savePaymentInfo(){
   const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
-  const payload={payment_bank:$("consultPaymentBank").value.trim(),payment_account:$("consultPaymentAccount").value.trim(),payment_day:$("consultPaymentDay").value,card_number:$("consultCardNumber").value.replace(/\s|-/g,""),card_expiry:$("consultCardExpiry").value.trim(),identity_verified:$("consultIdentityVerified").checked,driver_license:$("consultDriverLicense").value.trim(),resident_issue_date:$("consultResidentIssueDate").value||null};
-  const btn=$("sensitiveSave"); setSaving(btn,true,"저장");
+  const payment=currentPaymentInfo();
+  if(sameData(payment,initialPaymentInfo)){showSaveToast("변경된 내용이 없습니다.","info");return;}
+  const existing=getSensitiveInfo(customer);
+  const payload={...existing,...payment};
+  const btn=$("paymentSave"); setSaving(btn,true,"결제계좌 저장");
   const {error}=await db.from("customers").update({payment_identity_info:payload}).eq("id",customer.id);
-  setSaving(btn,false,"저장");
-  if(error){alert("결제·신분증 정보 저장 실패: "+error.message);return;}
-  customer.payment_identity_info=payload;
-  showSaveToast("결제정보와 신분증 확인 내용이 저장되었습니다.");
+  setSaving(btn,false,"결제계좌 저장");
+  if(error){alert("결제계좌 저장 실패: "+error.message);return;}
+  customer.payment_identity_info=payload; initialPaymentInfo={...payment};
+  setSectionStatus("paymentSaveStatus","saved",savedTimeText());
+  showSaveToast("결제계좌가 저장되었습니다.");
+}
+
+async function saveIdentityInfo(){
+  const customer=customers.find(c=>String(c.id)===String(activeConsultCustomerId)); if(!customer)return;
+  const identity=currentIdentityInfo();
+  if(sameData(identity,initialIdentityInfo)){showSaveToast("변경된 내용이 없습니다.","info");return;}
+  const existing=getSensitiveInfo(customer);
+  const payload={...existing,...identity};
+  const btn=$("identitySave"); setSaving(btn,true,"신분증 저장");
+  const {error}=await db.from("customers").update({payment_identity_info:payload}).eq("id",customer.id);
+  setSaving(btn,false,"신분증 저장");
+  if(error){alert("신분증 정보 저장 실패: "+error.message);return;}
+  customer.payment_identity_info=payload; initialIdentityInfo={...identity};
+  setSectionStatus("identitySaveStatus","saved",savedTimeText());
+  showSaveToast("신분증 정보가 저장되었습니다.");
 }
 
 function renderContracts(customer){
@@ -750,6 +795,7 @@ async function saveContractFromCard(index){
   const updated={...current[index]};
   card.querySelectorAll("[data-contract-field]").forEach(input=>{updated[input.dataset.contractField]=input.dataset.contractField==="amount"?num(input.value):input.value;});
   if(!updated.date){alert("계약일을 입력해주세요.");return;}
+  if(sameData(updated,current[index])){showSaveToast("변경된 내용이 없습니다.","info");return;}
   current[index]=updated;
   const saveButton=card.querySelector('[data-contract-action="save"]');
   setSaving(saveButton,true,"계약 저장");
@@ -1019,10 +1065,13 @@ document.querySelector('.stat-filter[data-filter="all"]')?.classList.add("active
 ["birthYear","birthMonth","birthDay"].forEach((id,index)=>$(id).addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,""); if((index===0&&e.target.value.length===4)||(index>0&&e.target.value.length===2))syncBirthday(); if(index===0&&e.target.value.length===4)$("birthMonth").focus(); if(index===1&&e.target.value.length===2)$("birthDay").focus();}));
 $("source").addEventListener("change",toggleLandingSource);
 $("formView").addEventListener("click",e=>{if(e.target===$("formView")){clearForm();showListView();}});
-$("sensitiveSave").addEventListener("click",saveSensitiveInfo);
+$("paymentSave").addEventListener("click",savePaymentInfo);
+$("identitySave").addEventListener("click",saveIdentityInfo);
 $("consultCardNumber").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"").slice(0,16);e.target.value=d.replace(/(.{4})/g,"$1 ").trim();});
 $("consultCardExpiry").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"").slice(0,4);e.target.value=d.length>2?d.slice(0,2)+"/"+d.slice(2):d;});
 $("consultPaymentAccount").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9-]/g,"");});
+["consultPaymentBank","consultPaymentAccount","consultPaymentDay","consultCardNumber","consultCardExpiry"].forEach(id=>$(id).addEventListener(id==="consultPaymentDay"?"change":"input",markPaymentDirty));
+["consultIdentityVerified","consultDriverLicense","consultResidentIssueDate"].forEach(id=>$(id).addEventListener(id==="consultDriverLicense"?"input":"change",markIdentityDirty));
 checkSession();
 
 $("calPrev")?.addEventListener("click",()=>{calendarDate=new Date(calendarDate.getFullYear(),calendarDate.getMonth()-1,1);renderCalendar();});
