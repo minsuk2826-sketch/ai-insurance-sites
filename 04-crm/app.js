@@ -837,7 +837,7 @@ async function saveIdentityInfo(){
 
 function renderContracts(customer){
   const contracts=getContracts(customer);
-  const warning=contractsColumnAvailable?"":'<div class="schema-warning">여러 계약 저장을 사용하려면 ZIP 안의 <b>Supabase_계약기능_SQL.txt</b> 내용을 한 번 실행해야 합니다.</div>';
+  const warning=contractsColumnAvailable?"":'<div class="schema-warning">여러 계약 저장을 사용하려면 ZIP 안의 <b>01_최초1회_Supabase_SQL.sql</b> 내용을 한 번 실행해야 합니다.</div>';
   $("contractList").innerHTML=warning+(contracts.length?contracts.map((contract,index)=>`
     <div class="contract-card" data-contract-index="${index}">
       <div class="contract-card-head"><strong>${index+1}번째 계약</strong><span class="task-badge">${esc(contract.status||"유지")}</span></div>
@@ -866,7 +866,7 @@ async function persistContracts(customer,nextContracts){
   if(error){
     if(/contracts|column|schema cache/i.test(error.message||"")) contractsColumnAvailable=false;
     renderContracts(customer);
-    alert("계약 저장 실패: "+error.message+"\n\nZIP 안의 Supabase_계약기능_SQL.txt를 Supabase SQL Editor에서 한 번 실행해주세요.");
+    alert("계약 저장 실패: "+error.message+"\n\nZIP 안의 01_최초1회_Supabase_SQL.sql를 Supabase SQL Editor에서 한 번 실행해주세요.");
     return false;
   }
   contractsColumnAvailable=true;
