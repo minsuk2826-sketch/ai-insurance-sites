@@ -1052,10 +1052,11 @@ function openPriorityCustomers(key){
   if(!matched.length){alert("해당 조건의 고객이 없습니다.");return;}
   if(matched.length===1){openConsultation(matched[0].id);return;}
 
-  // 고객관리 화면으로 먼저 이동한 뒤 필터를 적용해야 setView 내부 초기화에 지워지지 않습니다.
-  setView("customers");
+  // 고객관리 화면으로 이동하면서 대시보드 필터를 유지합니다.
   activeStatsFilter="all";
   dashboardCustomerFilter=key;
+  showListView();
+  applyCrmView("customers",{keepDashboardFilter:true});
   todayOnly=false;
   if($("statusFilter")) $("statusFilter").value="";
   if($("gradeFilter")) $("gradeFilter").value="";
