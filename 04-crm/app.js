@@ -180,9 +180,20 @@ function lastMonths(count=6){const out=[];const base=new Date();for(let i=count-
 function renderDashboard(){
   if(!$("dashboardOverview")) return;
   const tasks=customers.flatMap(customerTasks).sort((a,b)=>(b.overdue-a.overdue)||a.due.localeCompare(b.due));
-  const priority=tasks.slice(0,5);
-  $("priorityCount").textContent=`${tasks.length}건`;
-  $("priorityList").innerHTML=priority.length?priority.map(t=>`<button class="priority-item" data-priority-id="${esc(t.customer.id)}"><span class="priority-icon">${taskCategory(t)==='연락'?'☎':taskCategory(t)==='생일'?'🎂':taskCategory(t)==='자동차'?'🚗':taskCategory(t)==='미접촉'?'!':'✓'}</span><span><b>${esc(t.customer.name)}</b><small>${esc(t.title)}</small></span><em>${t.overdue?`${t.overdue}일 지남`:'오늘'}</em></button>`).join(''):'<div class="dashboard-empty">오늘 긴급한 업무가 없습니다.</div>';
+  const newCount=customers.filter(c=>(c.status||"신규")==="신규").length;
+  const todayConsultCount=customers.filter(c=>getConsultHistory(c).some(x=>dateOnly(x.created_at)===today())).length;
+  const auto30Count=customers.filter(c=>{const d=daysUntil(getInsuranceInfo(c).auto_expiry_date);return d!==null&&d>=0&&d<=30;}).length;
+  const birthday7Count=customers.filter(c=>{const b=getProfileInfo(c).birthday;if(!b)return false;const y=today().slice(0,4);let date=`${y}-${b.slice(5)}`;if(date<today())date=`${Number(y)+1}-${b.slice(5)}`;const d=daysUntil(date);return d!==null&&d>=0&&d<=7;}).length;
+  const overduePromiseCount=customers.filter(c=>{const d=dateOnly(c.follow_up_date);const remain=daysUntil(d);return d&&remain!==null&&remain<0&&!hasConsultationOnOrAfterPromiseDay(c,d);}).length;
+  const priorityGroups=[
+    {key:"overduePromise",icon:"🔴",label:"약속일이 지난 고객",count:overduePromiseCount,level:"critical"},
+    {key:"todayConsult",icon:"☎",label:"오늘 상담 고객",count:todayConsultCount,level:"high"},
+    {key:"auto30",icon:"🚗",label:"자동차보험 만기 30일 이내",count:auto30Count,level:"medium"},
+    {key:"birthday7",icon:"🎂",label:"이번 주 생일 고객",count:birthday7Count,level:"normal"},
+    {key:"new",icon:"✦",label:"신규 문의 고객",count:newCount,level:"info"}
+  ].filter(x=>x.count>0);
+  $("priorityCount").textContent=`${priorityGroups.reduce((s,x)=>s+x.count,0)}건`;
+  $("priorityList").innerHTML=priorityGroups.length?priorityGroups.map((x,i)=>`<button class="priority-item priority-summary ${x.level}" data-priority-filter="${x.key}" title="클릭하면 해당 고객만 표시합니다"><span class="priority-rank">${i+1}</span><span class="priority-icon">${x.icon}</span><span><b>${esc(x.label)}</b><small>해당 고객 목록 바로 보기</small></span><em>${x.count}명</em></button>`).join(''):'<div class="dashboard-empty">오늘 우선 처리할 고객이 없습니다.</div>';
   const month=today().slice(0,7); const monthContracts=customers.flatMap(c=>getContracts(c).map(x=>({...x,customer:c}))).filter(c=>monthKey(c.date)===month);
   const newCustomers=customers.filter(c=>monthKey(c.created_at)===month).length;
   const contractedCustomers=new Set(monthContracts.map(x=>String(x.customer.id))).size;
@@ -380,7 +391,8 @@ function getFilteredCustomers(){
       !dashboardCustomerFilter ||
       (dashboardCustomerFilter==="todayConsult" && getConsultHistory(c).some(x=>dateOnly(x.created_at)===today())) ||
       (dashboardCustomerFilter==="auto30" && (()=>{const d=daysUntil(getInsuranceInfo(c).auto_expiry_date);return d!==null&&d>=0&&d<=30;})()) ||
-      (dashboardCustomerFilter==="birthday7" && (()=>{const b=getProfileInfo(c).birthday;if(!b)return false;const y=today().slice(0,4);let date=`${y}-${b.slice(5)}`;if(date<today())date=`${Number(y)+1}-${b.slice(5)}`;const d=daysUntil(date);return d!==null&&d>=0&&d<=7;})())
+      (dashboardCustomerFilter==="birthday7" && (()=>{const b=getProfileInfo(c).birthday;if(!b)return false;const y=today().slice(0,4);let date=`${y}-${b.slice(5)}`;if(date<today())date=`${Number(y)+1}-${b.slice(5)}`;const d=daysUntil(date);return d!==null&&d>=0&&d<=7;})()) ||
+      (dashboardCustomerFilter==="overduePromise" && (()=>{const d=dateOnly(c.follow_up_date);const remain=daysUntil(d);return d&&remain!==null&&remain<0&&!hasConsultationOnOrAfterPromiseDay(c,d);})())
     ) &&
     (
       activeStatsFilter==="all" ||
@@ -1026,7 +1038,19 @@ $("formCloseBtn")?.addEventListener("click",()=>{clearForm();showListView();});
 $("formHomeBtn")?.addEventListener("click",goCrmHome);
 document.querySelectorAll(".task-filter").forEach(button=>button.addEventListener("click",()=>{activeTaskFilter=button.dataset.taskFilter;document.querySelectorAll(".task-filter").forEach(b=>b.classList.toggle("active",b===button));renderTasks();}));
 $("taskSort")?.addEventListener("change",()=>{activeTaskSort=$("taskSort").value;renderTasks();});
-$("priorityList")?.addEventListener("click",e=>{const b=e.target.closest("[data-priority-id]");if(b)openConsultation(b.dataset.priorityId);});
+$("priorityList")?.addEventListener("click",e=>{
+  const customerBtn=e.target.closest("[data-priority-id]");
+  if(customerBtn){openConsultation(customerBtn.dataset.priorityId);return;}
+  const filterBtn=e.target.closest("[data-priority-filter]");
+  if(!filterBtn)return;
+  const key=filterBtn.dataset.priorityFilter;
+  activeStatsFilter="all"; dashboardCustomerFilter=""; todayOnly=false;
+  if($("statusFilter")) $("statusFilter").value="";
+  if(key==="new"){activeStatsFilter="new";if($("statusFilter")) $("statusFilter").value="신규";}
+  else if(["todayConsult","auto30","birthday7"].includes(key)) dashboardCustomerFilter=key;
+  else if(key==="overduePromise") dashboardCustomerFilter="overduePromise";
+  setView("customers"); currentPage=1; render();
+});
 $("attentionList")?.addEventListener("click",e=>{const b=e.target.closest("[data-attention-id]");if(b)openConsultation(b.dataset.attentionId);});
 
 $("taskList").addEventListener("click",event=>{
