@@ -17,7 +17,7 @@
     .stat small{color:var(--muted);font-weight:800} .stat strong{display:block;font-size:30px;margin-top:6px}
     .layout{display:block}.list-view .panel{width:100%} .panel{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
     .panel-head{padding:18px;border-bottom:1px solid var(--line)} .panel-head h2{margin:0;font-size:20px}
-    .filters{display:grid;grid-template-columns:1.5fr repeat(3,1fr);gap:10px;margin-top:14px}
+    .filters{display:grid;grid-template-columns:minmax(280px,1.8fr) repeat(4,minmax(145px,1fr));gap:10px;margin-top:14px;align-items:center}
     .table-wrap{overflow:auto} table{width:100%;border-collapse:collapse;min-width:1120px} th,td{padding:13px 14px;border-bottom:1px solid #edf2f8;text-align:left;font-size:14px}
     th{background:#fbfdff;color:#56647d;font-size:13px} tr:hover td{background:#fafcff} .status{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900}
     .신규{background:#eaf2ff;color:#1757b8} .연락완료{background:#eefaf6;color:#137a55} .분석대기{background:#fff7e6;color:#a76600} .분석진행{background:#f0edff;color:#6847c5}
