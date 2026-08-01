@@ -389,6 +389,7 @@ function getFilteredCustomers(){
     (!todayOnly||c.follow_up_date===today()) &&
     (
       !dashboardCustomerFilter ||
+      (dashboardCustomerFilter==="new" && (c.status||"신규")==="신규") ||
       (dashboardCustomerFilter==="todayConsult" && getConsultHistory(c).some(x=>dateOnly(x.created_at)===today())) ||
       (dashboardCustomerFilter==="auto30" && (()=>{const d=daysUntil(getInsuranceInfo(c).auto_expiry_date);return d!==null&&d>=0&&d<=30;})()) ||
       (dashboardCustomerFilter==="birthday7" && (()=>{const b=getProfileInfo(c).birthday;if(!b)return false;const y=today().slice(0,4);let date=`${y}-${b.slice(5)}`;if(date<today())date=`${Number(y)+1}-${b.slice(5)}`;const d=daysUntil(date);return d!==null&&d>=0&&d<=7;})()) ||
@@ -1048,13 +1049,20 @@ function getPriorityCustomers(key){
 }
 function openPriorityCustomers(key){
   const matched=getPriorityCustomers(key);
+  if(!matched.length){alert("해당 조건의 고객이 없습니다.");return;}
   if(matched.length===1){openConsultation(matched[0].id);return;}
-  activeStatsFilter="all"; dashboardCustomerFilter=""; todayOnly=false;
+
+  // 고객관리 화면으로 먼저 이동한 뒤 필터를 적용해야 setView 내부 초기화에 지워지지 않습니다.
+  setView("customers");
+  activeStatsFilter="all";
+  dashboardCustomerFilter=key;
+  todayOnly=false;
   if($("statusFilter")) $("statusFilter").value="";
-  if(key==="new"){activeStatsFilter="new";if($("statusFilter")) $("statusFilter").value="신규";}
-  else if(["todayConsult","auto30","birthday7"].includes(key)) dashboardCustomerFilter=key;
-  else if(key==="overduePromise") dashboardCustomerFilter="overduePromise";
-  setView("customers"); currentPage=1; render();
+  if($("gradeFilter")) $("gradeFilter").value="";
+  if($("sourceFilter")) $("sourceFilter").value="";
+  if($("search")) $("search").value="";
+  currentPage=1;
+  render();
 }
 $("priorityList")?.addEventListener("dblclick",e=>{
   const customerBtn=e.target.closest("[data-priority-id]");
