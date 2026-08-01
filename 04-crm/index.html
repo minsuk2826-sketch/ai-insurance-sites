@@ -66,9 +66,9 @@
   <section id="statsPanel" class="stats">
     <div class="stat stat-filter dashboard-jump" data-filter="all" data-jump-view="customers" title="더블클릭하면 전체 고객으로 이동"><small>전체 고객</small><strong id="sTotal">0</strong></div>
     <div class="stat stat-filter dashboard-jump" data-filter="new" data-jump-view="customers" data-jump-status="신규" title="더블클릭하면 신규 문의 고객으로 이동"><small>신규 문의</small><strong id="sNew">0</strong></div>
-    <div class="stat stat-filter dashboard-jump" data-filter="today" data-jump-view="tasks" data-jump-task="연락" title="더블클릭하면 오늘 연락 업무로 이동"><small>오늘 상담 고객</small><strong id="sToday">0</strong></div>
-    <div class="stat dashboard-jump" data-jump-view="tasks" data-jump-task="자동차" title="더블클릭하면 자동차 만기 업무로 이동"><small>자동차 만기 30일 이내</small><strong id="sAuto">0</strong></div>
-    <div class="stat dashboard-jump" data-jump-view="tasks" data-jump-task="생일" title="더블클릭하면 생일 업무로 이동"><small>이번 주 생일</small><strong id="sBirthday">0</strong></div>
+    <div class="stat stat-filter dashboard-jump" data-filter="today" data-jump-view="customers" data-jump-filter="todayConsult" title="더블클릭하면 해당 고객 목록으로 이동"><small>오늘 상담 고객</small><strong id="sToday">0</strong></div>
+    <div class="stat dashboard-jump" data-jump-view="customers" data-jump-filter="auto30" title="더블클릭하면 해당 고객 목록으로 이동"><small>자동차 만기 30일 이내</small><strong id="sAuto">0</strong></div>
+    <div class="stat dashboard-jump" data-jump-view="customers" data-jump-filter="birthday7" title="더블클릭하면 해당 고객 목록으로 이동"><small>이번 주 생일</small><strong id="sBirthday">0</strong></div>
     <div class="stat dashboard-jump" data-jump-view="contracts" title="더블클릭하면 계약 관리로 이동"><small>이번 달 월보험료</small><strong id="sPremium" class="money">0원</strong></div>
   </section>
 
@@ -109,9 +109,10 @@
       <div class="panel-head"><h2>고객 목록</h2>
         <div class="filters">
           <input id="search" placeholder="이름·전화번호·보험사·상품·가족명 검색">
-          <select id="statusFilter"><option value="">전체 상태</option><option>신규</option><option>연락완료</option><option>분석대기</option><option>분석진행</option><option>제안중</option><option>계약완료</option><option>상담종결</option><option>보류</option></select>
+          <select id="gradeFilter"><option value="">전체 등급</option><option value="VIP">VIP</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+          <select id="statusFilter"><option value="">전체 상태</option><option value="신규">신규</option><option value="분석대기">상담대기중</option><option value="분석진행">상담진행중</option><option value="제안중">제안중</option><option value="계약완료">계약완료</option><option value="연락완료">연락완료</option><option value="상담종결">상담종결</option><option value="보류">보류</option></select>
           <select id="sourceFilter"><option value="">전체 유입경로</option></select>
-          <select id="sortBy"><option value="createdDesc">최근 등록순</option><option value="recentConsult">최근 상담순</option><option value="followAsc">다음 연락일순</option><option value="nameAsc">이름순</option><option value="autoExpiry">자동차 만기순</option><option value="birthday">생일순</option></select>
+          <select id="sortBy"><option value="createdDesc">최근 등록순</option><option value="recentConsult">최근 상담순</option><option value="followAsc">다음 연락일순</option><option value="nameAsc">이름 가나다순</option><option value="nameDesc">이름 역순</option><option value="gradeDesc">등급 높은순</option><option value="gradeAsc">등급 낮은순</option><option value="autoExpiry">자동차 만기순</option><option value="birthday">생일순</option></select>
         </div>
         <div class="bulk-tools">
           <button type="button" class="btn light" id="todayBtn">오늘 연락 예정만 보기</button>

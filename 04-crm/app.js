@@ -239,6 +239,7 @@ function showFormView(){ $("formView").classList.remove("hidden"); $("formView")
 
 let crmView="dashboard";
 let crmViewHistory=[];
+let dashboardCustomerFilter="";
 function applyCrmView(view,options={}){
   const previous=crmView;
   if(!options.skipHistory&&previous&&previous!==view){
@@ -270,6 +271,7 @@ function applyCrmView(view,options={}){
   $("newBtn").textContent=view==="recruiting"?"+ 지원자 등록":"+ 신규 고객 등록";
   $("contractTabs").classList.toggle("hidden",view!=="contracts");
   todayOnly=false; activeStatsFilter="all";
+  if(!options.keepDashboardFilter) dashboardCustomerFilter="";
   if(view==="contracts") { $("statusFilter").value=""; }
   if(view==="recruiting") { $("statusFilter").value=""; }
   currentPage=1; render();
@@ -358,6 +360,7 @@ function populateSourceFilter(){
 }
 function getFilteredCustomers(){
   const q=$("search").value.trim().toLowerCase();
+  const gradef=$("gradeFilter").value;
   const sf=$("statusFilter").value;
   const sourcef=$("sourceFilter").value;
   const sort=$("sortBy").value;
@@ -369,9 +372,16 @@ function getFilteredCustomers(){
     const haystack=`${c.name||""} ${c.phone||""} ${cleanPhone(c.phone||"")} ${contractText} ${familyText}`.toLowerCase();
     const normalizedQ=cleanPhone(q);
     return (!q||haystack.includes(q)||(normalizedQ&&haystack.includes(normalizedQ))) &&
+    (!gradef||(getProfileInfo(c).grade||"B")===gradef) &&
     (!sf||c.status===sf) &&
     (!sourcef||(c.source||"")===sourcef) &&
     (!todayOnly||c.follow_up_date===today()) &&
+    (
+      !dashboardCustomerFilter ||
+      (dashboardCustomerFilter==="todayConsult" && getConsultHistory(c).some(x=>dateOnly(x.created_at)===today())) ||
+      (dashboardCustomerFilter==="auto30" && (()=>{const d=daysUntil(getInsuranceInfo(c).auto_expiry_date);return d!==null&&d>=0&&d<=30;})()) ||
+      (dashboardCustomerFilter==="birthday7" && (()=>{const b=getProfileInfo(c).birthday;if(!b)return false;const y=today().slice(0,4);let date=`${y}-${b.slice(5)}`;if(date<today())date=`${Number(y)+1}-${b.slice(5)}`;const d=daysUntil(date);return d!==null&&d>=0&&d<=7;})())
+    ) &&
     (
       activeStatsFilter==="all" ||
       (activeStatsFilter==="new" && (c.status||"신규")==="신규") ||
@@ -385,6 +395,10 @@ function getFilteredCustomers(){
   if(sort==="recentConsult") list.sort((a,b)=>(getLastTouchDate(b)||"").localeCompare(getLastTouchDate(a)||""));
   if(sort==="followAsc") list.sort((a,b)=>(a.follow_up_date||"9999").localeCompare(b.follow_up_date||"9999"));
   if(sort==="nameAsc") list.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));
+  if(sort==="nameDesc") list.sort((a,b)=>(b.name||"").localeCompare(a.name||"","ko"));
+  const gradeRank={VIP:4,A:3,B:2,C:1};
+  if(sort==="gradeDesc") list.sort((a,b)=>(gradeRank[getProfileInfo(b).grade]||0)-(gradeRank[getProfileInfo(a).grade]||0)||(a.name||"").localeCompare(b.name||"","ko"));
+  if(sort==="gradeAsc") list.sort((a,b)=>(gradeRank[getProfileInfo(a).grade]||0)-(gradeRank[getProfileInfo(b).grade]||0)||(a.name||"").localeCompare(b.name||"","ko"));
   if(sort==="autoExpiry") list.sort((a,b)=>(getInsuranceInfo(a).auto_expiry_date||"9999").localeCompare(getInsuranceInfo(b).auto_expiry_date||"9999"));
   if(sort==="birthday") list.sort((a,b)=>((getProfileInfo(a).birthday||"9999").slice(5)).localeCompare((getProfileInfo(b).birthday||"9999").slice(5)));
   list.sort((a,b)=>Number(isFavorite(b.id))-Number(isFavorite(a.id)));
@@ -992,7 +1006,8 @@ $("customerForm").addEventListener("submit",async e=>{
     }
   }
 });
-["search","statusFilter","sourceFilter","sortBy"].forEach(id=>$(id).addEventListener("input",()=>{
+["search","gradeFilter","statusFilter","sourceFilter","sortBy"].forEach(id=>$(id).addEventListener("input",()=>{
+  dashboardCustomerFilter="";
   currentPage=1;
   render();
 }));
@@ -1093,8 +1108,10 @@ document.querySelectorAll(".stat-filter").forEach(card=>{
 function openDashboardJump(card){
   const view=card?.dataset.jumpView;
   if(!view)return;
+  const customerFilter=card.dataset.jumpFilter||"";
+  dashboardCustomerFilter=customerFilter;
   showListView();
-  applyCrmView(view);
+  applyCrmView(view,{keepDashboardFilter:Boolean(customerFilter)});
 
   const status=card.dataset.jumpStatus||"";
   if($("statusFilter")) $("statusFilter").value=status;
