@@ -1,0 +1,2 @@
+Vercel 프로젝트 delivery-insurance-landing-v2 → Settings → Domains → aplus-recruit.vercel.app 추가 (사용 가능할 때). 기존 도메인은 필요하면 유지하세요. 새 도메인이 실제 등록되기 전에는 index.html의 og:image 주소를 기존 주소로 유지해야 카카오톡 썸네일이 작동합니다.
+현재 index.html의 og:image는 희망 주소 aplus-recruit.vercel.app으로 설정되어 있습니다. 새 도메인 등록이 실패하면 기존 주소로 되돌려 주세요.

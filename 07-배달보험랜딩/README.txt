@@ -1,12 +1,1 @@
-업로드 방법
-1. GitHub의 07-배달보험랜딩 폴더로 들어갑니다.
-2. 기존 파일을 모두 삭제합니다.
-3. Add file → Upload files를 누릅니다.
-4. 이 폴더 안의 index.html, landing.png 두 파일을 함께 끌어다 놓습니다.
-5. Commit changes를 누릅니다.
-
-연결 내용
-- 왼쪽 카카오톡 상담하기: https://open.kakao.com/o/sPtglPDi
-- 오른쪽 간편 상담 신청: 팝업 상담폼
-- 상담 신청 데이터: AI보험 CRM customers 테이블
-- 유입경로: 배달보험랜딩
+07-배달보험랜딩 폴더에 압축을 푼 파일을 업로드하세요. index.html과 section1~6.png, config.js, og-image.png를 같은 폴더에 둡니다. 별도 하단 신청서는 삭제되었으며 6번째 이미지 위 입력창이 실제 동작합니다. 실제 신청은 CRM 테스트 후 운영하세요. 개인정보 처리 주체 및 보유 기간은 운영 전에 명시해야 합니다.
